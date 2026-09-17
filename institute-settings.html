@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Institute Settings</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header" style="text-align: center; padding: 20px 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+                <img src="igyr-logo.jpg" alt="IGYR" class="blinking-logo" style="height: 60px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                <h2 id="sidebar-inst-name" style="font-size: 1.15rem; color: #fce38a; margin: 0; line-height: 1.4; font-weight: 700; word-wrap: break-word;">Loading...</h2>
+            </div>
+            <ul>
+                <li><a href="institute-dashboard.html">Dashboard</a></li>
+                <li><a href="institute-upload-result.html">Upload Result</a></li>
+                <li><a href="institute-tabulation.html">All Tabulation</a></li>
+                <li><a href="institute-drafts.html">Manage Drafts</a></li>
+                <li><a href="institute-settings.html" style="font-weight:bold; color:var(--gold);">⚙️ Settings</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Institute Settings</h1>
+            
+            <!-- Institute Settings Card -->
+            <div class="card" style="margin-top: 20px; padding: 20px; background: #fff; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 8px;">
+                <h3 style="color: #062b63; margin-bottom: 15px;">⚙️ Institute Settings</h3>
+                <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label style="font-weight: 600; color: #4a5568;">Institute Logo</label>
+                        <div style="border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: #fafafa; display: inline-block; width: fit-content; min-width: 150px; text-align: center;">
+                            <img id="preview-logo" src="" alt="No Logo Uploaded" style="max-height: 80px; display: none; margin: 0 auto 10px;">
+                            <div id="no-logo-text" style="color: #999; font-size: 13px; margin-bottom: 10px;">No Logo Saved</div>
+                            <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                                <input type="file" id="inst-update-logo" accept="image/*" style="width: 200px; font-size: 12px;">
+                                <button id="btn-remove-logo" class="btn btn-outline" style="color: #e55039; border-color: #e55039; padding: 5px 10px; font-size: 12px; display: none;">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label style="font-weight: 600; color: #4a5568;">Digital Signature</label>
+                        <div style="border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: #fafafa; display: inline-block; width: fit-content; min-width: 150px; text-align: center;">
+                            <img id="preview-sign" src="" alt="No Signature Uploaded" style="max-height: 50px; display: none; margin: 0 auto 10px;">
+                            <div id="no-sign-text" style="color: #999; font-size: 13px; margin-bottom: 10px;">No Signature Saved</div>
+                            <div style="display: flex; gap: 10px; align-items: center; justify-content: center;">
+                                <input type="file" id="inst-update-sign" accept="image/*" style="width: 200px; font-size: 12px;">
+                                <button id="btn-remove-sign" class="btn btn-outline" style="color: #e55039; border-color: #e55039; padding: 5px 10px; font-size: 12px; display: none;">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 25px;">
+                    <button id="btn-save-settings" class="btn btn-primary" style="padding: 10px 30px;">Save Changes</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="js/storage.js?v=1000010"></script>
+    <script src="js/institute.js?v=1000010"></script>
+</body>
+</html>

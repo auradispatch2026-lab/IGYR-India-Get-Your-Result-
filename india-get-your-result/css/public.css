@@ -1,0 +1,29 @@
+
+.navbar { display: flex; justify-content: space-between; padding: 20px 50px; background: #fff; box-shadow: 0 2px 15px rgba(0,0,0,0.05); align-items: center; position: sticky; top: 0; z-index: 100;}
+.logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+.nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--text); font-weight: 500; transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent); }
+.hero { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; padding: 100px 20px; text-align: center; min-height: 90vh; display: flex; align-items: center; justify-content: center; }
+.hero-content { width: 100%; max-width: 800px; }
+.hero h1 { font-size: 3rem; margin-bottom: 15px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.hero p { font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9; }
+.search-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 40px; border-radius: 16px; margin: 0 auto; color: var(--text); box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); }
+.input-group { display: flex; gap: 15px; margin-top: 10px;}
+.result-sheet { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 50px; margin-top: 50px; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+.result-header { text-align: center; border-bottom: 2px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+.result-header h1 { color: var(--primary); font-size: 2rem; margin-bottom: 10px;}
+.result-header h2 { color: #555; font-size: 1.2rem; font-weight: 400;}
+.student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; background: var(--light); padding: 20px; border-radius: 8px;}
+.student-info p { font-size: 1.1rem; }
+.marks-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+.marks-table th, .marks-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
+.marks-table th { background: var(--light); color: var(--primary); }
+.result-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 1.2rem; background: var(--primary); color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 30px;}
+.actions { display: flex; gap: 15px; justify-content: center; }
+@media (max-width: 768px) {
+    .input-group { flex-direction: column; gap: 0; }
+    .navbar { flex-direction: column; gap: 15px; padding: 20px; }
+    .hero h1 { font-size: 2rem; }
+}
+@media print { .no-print, .navbar { display: none; } .result-sheet { box-shadow: none; border: none; padding: 0; } }

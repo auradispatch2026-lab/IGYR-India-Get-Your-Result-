@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Card - IGYR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background: #e2e8f0; 
+            font-family: 'Inter', sans-serif; 
+            padding: 40px 20px; 
+            color: #1a202c;
+        }
+        .a4-sheet {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #ffffff;
+            position: relative;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            padding: 25mm 15mm; /* Inner padding */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Top and Bottom Wave Decor (Pure CSS geometric forms) */
+        .wave-top, .wave-bottom {
+            position: absolute;
+            left: 0; width: 100%; height: 25px;
+            background: #062b63;
+        }
+        .wave-top { top: 0; border-bottom: 4px solid #d4af37; }
+        .wave-bottom { bottom: 0; border-top: 4px solid #d4af37; }
+        
+        /* Print Styles */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .a4-sheet { box-shadow: none; border: none; width: 100%; min-height: auto; padding: 15mm 10mm; }
+            .no-print { display: none !important; }
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr 120px;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 2px solid #062b63;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .inst-logo-container {
+            width: 110px; height: 110px;
+            border: 2px dashed #062b63;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            font-size: 11px; text-align: center; color: #718096;
+            background: #f8fafc;
+        }
+        .inst-logo-container img {
+            width: 100%; height: 100%; object-fit: contain;
+        }
+
+        .header-center {
+            text-align: center;
+        }
+        .inst-name {
+            font-family: 'Poppins', sans-serif;
+            color: #062b63; font-size: 26px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 3px;
+        }
+        .inst-slogan {
+            color: #d4af37; font-size: 13px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
+        }
+        .inst-address, .inst-contact {
+            font-size: 13px; color: #4a5568; line-height: 1.5;
+        }
+        .inst-contact { font-weight: 500; margin-top: 5px; color: #2d3748; }
+
+        .header-right {
+            text-align: right;
+        }
+        .motivational-text {
+            font-family: 'Poppins', sans-serif; color: #062b63; font-size: 14px;
+            font-weight: 700; line-height: 1.6; text-transform: uppercase;
+        }
+        .motivational-text span { display: block; color: #d4af37; }
+
+        .main-title-sec { text-align: center; margin-bottom: 30px; }
+        .result-card-badge {
+            display: inline-block;
+            border: 2px solid #d4af37;
+            background: #062b63; color: white;
+            padding: 8px 30px; border-radius: 4px;
+            font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .exam-title { font-size: 16px; font-weight: 700; color: #2d3748; margin-top: 15px; text-transform: uppercase;}
+        .marks-statement { font-size: 14px; font-weight: 600; color: #718096; letter-spacing: 4px; margin-top: 5px; }
+
+        /* Student Info */
+        .student-info-box {
+            background: #eaf6ff;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            border: 1px solid #cde0f5;
+        }
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px;
+        }
+        .info-row { display: flex; font-size: 14px; }
+        .info-label { width: 140px; font-weight: 700; color: #062b63; }
+        .info-value { flex: 1; color: #2d3748; font-weight: 500; text-transform: uppercase;}
+        .info-colon { margin-right: 15px; color: #062b63; font-weight: 700; }
+
+        /* Marks Table */
+        .marks-table {
+            width: 100%; border-collapse: collapse; margin-bottom: 30px;
+            font-size: 13.5px;
+        }
+        .marks-table th {
+            background: #062b63; color: white;
+            padding: 12px 10px; text-align: center;
+            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px;
+            border: 1px solid #062b63;
+        }
+        .marks-table td {
+            padding: 10px; text-align: center;
+            border: 1px solid #cbd5e1; color: #1e293b; font-weight: 500;
+        }
+        .marks-table td.text-left { text-align: left; }
+        .marks-table tr:nth-child(even) { background: #f8fafc; }
+        .marks-table tr:hover { background: #f1f5f9; }
+        .total-row td {
+            background: #e2e8f0; font-weight: 700; color: #062b63; font-size: 14.5px; border-top: 2px solid #062b63;
+        }
+
+        /* Summary Panel */
+        .summary-panel {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+            margin-bottom: 35px;
+        }
+        .summary-card {
+            background: white; border: 1px solid #cbd5e1; border-radius: 8px;
+            padding: 15px; text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative; overflow: hidden;
+        }
+        .summary-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #062b63;
+        }
+        .summary-title { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .summary-val { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; }
+        
+        .val-pass { color: #16a34a; }
+        .val-fail { color: #dc2626; }
+
+        /* Bottom Section */
+        .bottom-section {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 40px; font-size: 14px; font-weight: 500; color: #334155;
+        }
+        .signature-box {
+            text-align: center;
+        }
+        .signature-line {
+            width: 200px; border-bottom: 1px solid #334155; margin-bottom: 8px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: #fffcf0; border: 1px solid #fce38a; border-radius: 6px;
+            padding: 15px 20px; position: relative;
+        }
+        .disclaimer h4 {
+            color: #d97706; font-size: 13px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+        }
+        .disclaimer p {
+            color: #78350f; font-size: 11.5px; line-height: 1.5; text-align: justify;
+        }
+
+        /* Footer text */
+        .footer-text {
+            text-align: center; font-family: 'Caveat', cursive, sans-serif; font-size: 16px;
+            color: #94a3b8; font-weight: 600; margin-top: 20px;
+        }
+        
+        /* Action buttons for preview screen */
+        .actions { text-align: center; margin-bottom: 25px; }
+        .actions button {
+            background: #062b63; color: white; border: none; padding: 12px 25px;
+            font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;
+            transition: 0.3s;
+        }
+        .actions button:hover { background: #1266d6; }
+    </style>
+</head>
+<body>
+
+    <div class="actions no-print">
+        <button onclick="window.print()">🖨️ Print / Download PDF</button>
+        <button onclick="window.location.href='index.html'" style="background:#475569; margin-left:10px;">← Home</button>
+    </div>
+
+    <div class="a4-sheet" id="result-container">
+        <div class="wave-top"></div>
+
+        <!-- HEADER -->
+        <div class="header-grid">
+            <div class="inst-logo-container" id="card-logo">
+                INSTITUTE LOGO
+            </div>
+            <div class="header-center">
+                <div class="inst-name" id="card-inst-name">INSTITUTE NAME</div>
+                
+                <div class="inst-address" id="card-inst-address">📍 Address, City, State - PIN</div>
+                
+            </div>
+            <div class="header-right">
+                
+            </div>
+        </div>
+
+        <!-- TITLE -->
+        <div class="main-title-sec">
+            <div class="result-card-badge">RESULT CARD</div>
+            <div class="exam-title" id="card-exam-title">ACADEMIC EXAMINATION - 2025</div>
+            <div class="marks-statement">MARKS STATEMENT</div>
+        </div>
+
+        <!-- STUDENT INFO -->
+        <div class="student-info-box">
+            <div class="info-grid">
+                <!-- Col 1 -->
+                <div>
+                    <div class="info-row"><div class="info-label">Student Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-name">-</div></div>
+                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Father's Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-fname">-</div></div>
+                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Mother's Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-mname">-</div></div>
+                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Roll Number</div><div class="info-colon">:</div><div class="info-value" id="card-stu-roll">-</div></div>
+                </div>
+                <!-- Col 2 -->
+                <div>
+                    <div class="info-row"><div class="info-label">Institute</div><div class="info-colon">:</div><div class="info-value" id="card-stu-inst">-</div></div>
+                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Examination</div><div class="info-colon">:</div><div class="info-value" id="card-stu-exam">-</div></div>
+                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Registration No.</div><div class="info-colon">:</div><div class="info-value" id="card-stu-reg">-</div></div>
+                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Declaration Date</div><div class="info-colon">:</div><div class="info-value" id="card-stu-date">-</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MARKS TABLE -->
+        <table class="marks-table">
+            <thead>
+                <tr>
+                    <th width="10%">Sl. No.</th>
+                    <th width="45%" class="text-left">Subject Name</th>
+                    <th width="15%">Max Marks</th>
+                    <th width="15%">Marks Obtained</th>
+                    <th width="15%">Grade</th>
+                </tr>
+            </thead>
+            <tbody id="marks-tbody">
+                <!-- Injected via JS -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="2" class="text-left" style="padding-left:15px;">TOTAL</td>
+                    <td id="tot-max">0</td>
+                    <td id="tot-obt">0</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- SUMMARY PANEL -->
+        <div class="summary-panel">
+            <div class="summary-card">
+                <div class="summary-title">TOTAL MARKS</div>
+                <div class="summary-val"><span id="sum-obt">0</span> <span style="font-size:14px;color:#94a3b8;">/ <span id="sum-max">0</span></span></div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">PERCENTAGE</div>
+                <div class="summary-val" id="sum-perc">0.00%</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">OVERALL GRADE</div>
+                <div class="summary-val" id="sum-grade">-</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">RESULT</div>
+                <div class="summary-val" id="sum-result">-</div>
+            </div>
+        </div>
+
+        <!-- BOTTOM SIGNATURE -->
+        <div class="bottom-section">
+            <div>
+                <div style="margin-bottom:5px;">Date : <span id="sign-date">-</span></div>
+                <div>Place : <span id="sign-place">-</span></div>
+            </div>
+            <div class="signature-box" id="signature-block" style="display: none;">
+                <!-- Injected via JS if signature exists -->
+            </div>
+        </div>
+
+        <!-- DISCLAIMER -->
+        <div class="disclaimer">
+            <h4>⚠️ DISCLAIMER</h4>
+            <p>Neither IGYR nor the school / institute whose result is published is responsible for any inadvertent errors that may have crept in the results published in the website due to technical issues. The results published in the website are for immediate information to the examinees. These can not be treated as original mark sheets which will be issued by the Board or Institution separately.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <img src="igyr-logo.jpg" alt="IGYR" style="height: 40px; object-fit: contain; display: inline-block;">
+            <div class="footer-text" style="margin-top: 5px; font-size: 14px;">Building Better Futures Together</div>
+            <div style="margin-top: 15px; text-align: center;">
+                <img id="student-barcode" />
+            </div>
+        </div>
+        <div class="wave-bottom"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="js/storage.js?v=1000010v=2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resData = sessionStorage.getItem('current_result');
+            if(!resData) {
+                alert('No result data found. Please search again.');
+                window.location.href = 'search-result.html';
+                return;
+            }
+
+            const res = JSON.parse(resData);
+            const institutes = getInstitutes();
+            const inst = institutes.find(i => i.id === res.instId);
+
+            if(!inst) {
+                alert('Institute data missing.');
+                return;
+            }
+
+            // Populate Header
+            if (inst.logo) {
+                document.getElementById('card-logo').innerHTML = `<img src="${inst.logo}" alt="Logo">`;
+                document.getElementById('card-logo').style.border = 'none';
+                document.getElementById('card-logo').style.background = 'transparent';
+            }
+            document.getElementById('card-inst-name').textContent = inst.name;
+            const addressText = (inst.address ? inst.address + ', ' : '') + (inst.district ? inst.district + ', ' : '') + (inst.state || '');
+            document.getElementById('card-inst-address').textContent = '📍 ' + addressText;
+            
+            // Populate Student Details
+            document.getElementById('card-exam-title').textContent = res.exam;
+            document.getElementById('card-stu-name').textContent = res.name;
+            document.getElementById('card-stu-fname').textContent = res.fname || 'N/A';
+            document.getElementById('card-stu-mname').textContent = res.mname || 'N/A';
+            document.getElementById('card-stu-roll').textContent = res.roll;
+            document.getElementById('card-stu-reg').textContent = res.reg;
+            document.getElementById('card-stu-inst').textContent = inst.name;
+            document.getElementById('card-stu-exam').textContent = res.exam;
+            document.getElementById('card-stu-date').textContent = res.date || 'N/A';
+            
+            document.getElementById('sign-date').textContent = res.date || 'N/A';
+            document.getElementById('sign-place').textContent = inst.city || inst.district || 'N/A';
+            
+            const sigBlock = document.getElementById('signature-block');
+            if (inst.signature && inst.signature.length > 10) {
+                sigBlock.innerHTML = `
+                    <img src="${inst.signature}" style="height: 45px; object-fit: contain; margin-bottom: 5px;">
+                    <div style="font-weight:700;">Controller of Examinations</div>
+                `;
+                sigBlock.style.display = 'block';
+            } else {
+                sigBlock.style.display = 'none';
+            }
+
+            // Calculate grade helper
+            function getGrade(obt, full) {
+                const p = (obt / full) * 100;
+                if(p >= 90) return {g: 'O', gp: '10.0'};
+                if(p >= 80) return {g: 'A+', gp: '9.0'};
+                if(p >= 70) return {g: 'A', gp: '8.0'};
+                if(p >= 60) return {g: 'B+', gp: '7.0'};
+                if(p >= 50) return {g: 'B', gp: '6.0'};
+                if(p >= 40) return {g: 'C', gp: '5.0'};
+                if(p >= 33) return {g: 'P', gp: '4.0'};
+                return {g: 'F', gp: '0.0'};
+            }
+
+            // Populate Marks Table
+            const tbody = document.getElementById('marks-tbody');
+            let totMax = 0, totObt = 0;
+            let hasFailed = false;
+
+            res.marks.forEach((m, idx) => {
+                let sName = m.sub || m.subject || "Unknown";
+                let sMax = parseInt(m.max || m.full || 100);
+                let sObt = parseInt(m.obt || m.ob || 0);
+                let sPass = parseInt(m.pass || Math.floor(sMax * 0.33));
+                
+                totMax += sMax;
+                totObt += sObt;
+                
+                if (sObt < sPass) hasFailed = true;
+
+                const gInfo = getGrade(sObt, sMax);
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td class="text-left" style="padding-left:15px; font-weight:600;">${sName}</td>
+                    <td>${sMax}</td>
+                    <td>${sObt}</td>
+                    <td style="font-weight:700; color:${gInfo.g==='F' ? '#dc2626' : '#062b63'};">${gInfo.g}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('tot-max').textContent = totMax;
+            document.getElementById('tot-obt').textContent = totObt;
+            document.getElementById('sum-max').textContent = totMax;
+            document.getElementById('sum-obt').textContent = totObt;
+
+            const perc = ((totObt / totMax) * 100).toFixed(2);
+            document.getElementById('sum-perc').textContent = perc + '%';
+            
+            const overallGrade = getGrade(totObt, totMax).g;
+            document.getElementById('sum-grade').textContent = hasFailed ? 'F' : overallGrade;
+
+            const resEl = document.getElementById('sum-result');
+            if (hasFailed) {
+                resEl.textContent = 'FAIL';
+                resEl.className = 'summary-val val-fail';
+                document.getElementById('sum-grade').className = 'summary-val val-fail';
+            } else {
+                resEl.textContent = 'PASS';
+                resEl.className = 'summary-val val-pass';
+            }
+
+            // Generate Barcode Robustly
+            try {
+                let safeName = (res.name || 'STUDENT').toString();
+                let shortName = safeName.substring(0, 15).toUpperCase().replace(/[^A-Z0-9 ]/g, ''); 
+                let bText = shortName + " " + totObt + "-" + totMax;
+                
+                if (typeof JsBarcode !== 'undefined') {
+                    JsBarcode("#student-barcode", bText, {
+                        format: "CODE128",
+                        width: 1.2,
+                        height: 40,
+                        displayValue: true,
+                        fontSize: 12,
+                        fontOptions: "bold",
+                        font: "Inter",
+                        textAlign: "center",
+                        textPosition: "bottom",
+                        textMargin: 4,
+                        margin: 0,
+                        background: "transparent",
+                        lineColor: "#062b63"
+                    });
+                } else {
+                    // Ultimate fallback if CDN fails or blocked
+                    document.getElementById('student-barcode').src = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(bText)}&scale=2&height=10&includetext`;
+                }
+            } catch(e) {
+                console.error("Barcode generation failed", e);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Institute</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2>Super Admin</h2>
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-institutes.html">Manage Institutes</a></li>
+                <li><a href="admin-login-institute.html">Login Institute</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Login to Institute Panel</h1>
+            <div class="card" style="max-width: 500px; margin-top: 30px;">
+                <h2 style="color: var(--primary);">Access Institute</h2>
+                <p style="color: #666; margin-bottom: 20px; font-size: 0.95rem;">Enter the Institute's ID below to seamlessly log into their dedicated dashboard.</p>
+                <form id="admin-inst-login-form">
+                    <input type="text" id="target-inst-id" placeholder="Enter Institute ID (e.g., IGYR1234)" required>
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 15px; font-size: 1.1rem;">Login</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script src="js/storage.js?v=1000010"></script>
+    <script src="js/admin.js?v=1000010"></script>
+</body>
+</html>

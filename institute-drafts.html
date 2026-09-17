@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Drafts</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header" style="text-align: center; padding: 20px 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+                <img src="igyr-logo.jpg" alt="IGYR" class="blinking-logo" style="height: 60px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                <h2 id="sidebar-inst-name" style="font-size: 1.15rem; color: #fce38a; margin: 0; line-height: 1.4; font-weight: 700; word-wrap: break-word;">Loading...</h2>
+            </div>
+            <ul>
+                <li><a href="institute-dashboard.html">Dashboard</a></li>
+                <li><a href="institute-upload-result.html">Upload Result</a></li>
+                <li><a href="institute-tabulation.html">All Tabulation</a></li>
+                <li><a href="institute-drafts.html">Manage Drafts</a></li>
+                <li><a href="institute-settings.html">⚙️ Settings</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Manage Drafts & Results</h1>
+            <div class="card" style="margin-top: 20px; background:#fff; padding: 25px;">
+                <h3 style="color:var(--primary); margin-bottom:15px;">Your Saved Results</h3>
+                <p style="color:#666; margin-bottom: 20px;">Review your drafted results below. You can publish them to make them live for students.</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Exam Name</th>
+                            <th>Result Date</th>
+                            <th>Total Students</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drafts-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script src="js/storage.js?v=1000010"></script>
+    <script src="js/institute.js?v=1000010"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Result</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header" style="text-align: center; padding: 20px 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+                <img src="igyr-logo.jpg" alt="IGYR" class="blinking-logo" style="height: 60px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                <h2 id="sidebar-inst-name" style="font-size: 1.15rem; color: #fce38a; margin: 0; line-height: 1.4; font-weight: 700; word-wrap: break-word;">Loading...</h2>
+            </div>
+            <ul>
+                <li><a href="institute-dashboard.html">Dashboard</a></li>
+                <li><a href="institute-upload-result.html">Upload Result</a></li>
+                <li><a href="institute-tabulation.html">All Tabulation</a></li>
+                <li><a href="institute-drafts.html">Manage Drafts</a></li>
+                <li><a href="institute-settings.html">⚙️ Settings</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Upload Excel Result</h1>
+            
+            <div class="card" style="margin-bottom: 30px; text-align: left;">
+                <h2>Step 1: Generate Excel Template</h2>
+                <p style="margin-bottom: 10px; color: #555;">Enter the subjects for this exam to generate a custom template with demo data.</p>
+                <input type="text" id="subject-names" placeholder="e.g. Mathematics, Science, English" value="Mathematics, Science, English">
+                <button id="btn-generate-template" class="btn btn-outline" style="margin-top: 10px;">Download Template</button>
+            </div>
+
+            <div class="card" style="text-align: left;">
+                <h2>Step 2: Upload Result</h2>
+                
+                <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px;">
+                    <p style="margin-bottom: 10px; color: #555;"><strong>Institute Address:</strong> <span id="inst-address-display" style="color:var(--text);">Loading...</span></p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <input type="text" id="exam-name" placeholder="Name of Exam (e.g. Mid Term 2026)" required style="flex: 1; min-width: 250px;">
+                        <input type="date" id="result-date" required style="flex: 1; min-width: 150px;">
+                    </div>
+                </div>
+                
+                <input type="file" id="excel-file" accept=".xlsx, .xls" style="margin-top: 20px;">
+                <button id="btn-process" class="btn btn-primary" style="margin-top: 10px;">Process Data</button>
+                
+                <div id="preview-area" style="margin-top: 20px;"></div>
+                <button id="btn-publish" class="btn btn-primary" style="display:none; margin-top:20px; background: #27ae60;">Save as Draft</button>
+            </div>
+        </main>
+    </div>
+    <script src="js/storage.js?v=1000010"></script>
+    <script src="js/excel.js?v=1000010?v=3"></script>
+</body>
+</html>

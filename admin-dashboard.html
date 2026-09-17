@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <style>
+        :root {
+            --admin-bg: #f3f8ff;
+            --admin-card: rgba(255, 255, 255, 0.9);
+            --admin-primary: #1266d6;
+            --admin-dark: #062b63;
+        }
+        body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
+        .dashboard { min-height: 100vh; display: flex; }
+        
+        .sidebar { background: linear-gradient(180deg, var(--admin-dark) 0%, #0a3d8c 100%); box-shadow: 4px 0 20px rgba(0,0,0,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+        .sidebar h2 { font-family: 'Poppins', sans-serif; font-size: 22px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; color: #fce38a; }
+        .sidebar ul li a { font-size: 15px; padding: 12px 20px; margin-bottom: 8px; border-radius: 8px; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .sidebar ul li a:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        
+        .main-content { padding: 40px; }
+        .main-content h1 { font-family: 'Poppins', sans-serif; font-size: 32px; color: var(--admin-dark); margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .main-content h1::before { content: '⚡'; font-size: 28px; }
+        
+        .card { 
+            background: var(--admin-card); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(7, 29, 73, 0.05); 
+            border-radius: 16px; 
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(7, 29, 73, 0.08); }
+        
+        .card h3 { font-family: 'Poppins', sans-serif; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        
+        .geo-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; border-radius: 10px; overflow: hidden; border: 1px solid #e1eeff; }
+        .geo-table th, .geo-table td { border-bottom: 1px solid #e1eeff; padding: 12px 15px; text-align: left; }
+        .geo-table th { background: #f8fbff; color: var(--admin-dark); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        .geo-state { background: #fff; font-weight: bold; cursor: pointer; color: var(--admin-primary); transition: 0.2s; }
+        .geo-state:hover { background: #f0f7ff; }
+        .geo-district { background: #fafcff; color: #4a5d7c; font-size: 13px; }
+        
+        input, select, textarea { 
+            background: #f8fbff; 
+            border: 1px solid #cde0f5; 
+            transition: 0.3s; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--admin-primary); outline: none; box-shadow: 0 0 0 3px rgba(18,102,214,0.1); background: #fff; }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--admin-primary) 0%, #0a3d8c 100%); border: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; box-shadow: 0 4px 15px rgba(18,102,214,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(18,102,214,0.4); }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(6, 43, 99, 0.6); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: #fff; padding: 40px; border-radius: 20px; max-width: 550px; width: 90%;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.5);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2>Super Admin</h2>
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-institutes.html">Manage Institutes</a></li>
+                <li><a href="admin-login-institute.html">Login Institute</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Super Admin Dashboard</h1>
+            
+            <div class="cards" style="margin-bottom: 30px;">
+                <div class="card"><h3>Total Institutes</h3><p id="tot-inst">0</p></div>
+                <div class="card"><h3>Total Results</h3><p id="tot-res">0</p></div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Publish Notice Section -->
+                <div class="card" style="background:#fff;">
+                    <h3 style="color: #062b63; margin-bottom: 15px;">📢 Publish Global Notice</h3>
+                    <form id="global-notice-form" onsubmit="return handleGlobalNotice(event)">
+                        <textarea id="notice-text" rows="4" placeholder="Type an urgent issue or notification for the homepage..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; font-family: inherit; resize: vertical;"></textarea>
+                        <select id="notice-type" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                            <option value="info">General Info (Blue)</option>
+                            <option value="warning">Warning / Issue (Yellow)</option>
+                            <option value="urgent">Urgent / Alert (Red)</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Publish Notice</button>
+                    </form>
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                    <h4 style="color: #4a5568; margin-bottom: 10px;">🕒 Published Notices History</h4>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        <table class="table" style="font-size: 13px;">
+                            <thead><tr><th>Date</th><th>Type</th><th>Notice</th><th>Action</th></tr></thead>
+                            <tbody id="notice-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+                <!-- Automatic Result Notices Section -->
+                <div class="card" style="margin-top: 20px;">
+                    <h3 style="color: #062b63; margin-bottom: 5px;">📄 Automatic Result Notices</h3>
+                    <p style="font-size: 13px; color: #666;">Manage the automatic notices generated when institutes publish results.</p>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        <table class="table" style="font-size: 13px;">
+                            <thead><tr><th>Institute</th><th>Exam Name</th><th>Action</th></tr></thead>
+                            <tbody id="auto-notice-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Geo Breakdown Section -->
+                <div class="card" style="background:#fff;">
+                    <h3 style="color: #062b63; margin-bottom: 5px;">📍 Geographical Breakdown</h3>
+                    <p style="font-size: 13px; color: #666;">State-wise & District-wise hierarchy of registered institutes and published results.</p>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table class="geo-table">
+                            <thead>
+                                <tr>
+                                    <th>Region</th>
+                                    <th>Institutes</th>
+                                    <th>Results Published</th>
+                                </tr>
+                            </thead>
+                            <tbody id="geo-tbody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
+            </div> <!-- Close grid-template-columns -->
+            
+            <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px;">
+                <!-- Manage Quick Links Section -->
+                <div class="card" style="background:#fff;">
+                    <h3 style="color: #062b63; margin-bottom: 15px;">🔗 Manage Quick Links (Footer)</h3>
+                    <form id="quick-links-form" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="text" id="ql-text" placeholder="Link Text (e.g. Student Login)" required style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <input type="text" id="ql-url" placeholder="URL (e.g. login.html or https://...)" required style="flex: 2; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <button type="submit" class="btn btn-primary">Add Link</button>
+                    </form>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        <table class="table" style="font-size: 13px;">
+                            <thead><tr><th>Link Text</th><th>URL / Destination</th><th>Action</th></tr></thead>
+                            <tbody id="quick-links-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+</div>
+
+        </main>
+    </div>
+
+    <!-- Upcoming Results Modal -->
+    <div class="modal-overlay" id="upcoming-modal">
+        <div class="modal-content">
+            <h2 style="color: #e55039; margin-bottom: 15px;">🚨 Upcoming Results Alert!</h2>
+            <p style="color: #4a5568; margin-bottom: 20px;">The following results are scheduled for release today or are awaiting attention:</p>
+            <div id="upcoming-list" style="text-align: left; max-height: 250px; overflow-y: auto; background: #f8fbff; padding: 15px; border-radius: 6px; border: 1px solid #cde0f5; margin-bottom: 20px; font-size: 14px;">
+                <!-- Populated by JS -->
+            </div>
+            <button class="btn btn-primary" onclick="document.getElementById('upcoming-modal').style.display='none'">Acknowledge & Close</button>
+        </div>
+    </div>
+
+    <script src="js/storage.js?v=1000010v=200"></script>
+    <script src="js/admin.js?v=1000010"></script>
+</body>
+</html>
