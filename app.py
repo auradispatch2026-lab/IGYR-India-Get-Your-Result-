@@ -7,7 +7,7 @@ app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 # Connect to MongoDB
-MONGO_URI = "mongodb+srv://auradispatch2026_db_user:611LdmEjTS7WeqKW@cluster0.z9xcllt.mongodb.net/?appName=Cluster0"
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://auradispatch2026_db_user:611LdmEjTS7WeqKW@cluster0.z9xcllt.mongodb.net/?appName=Cluster0")
 client = MongoClient(MONGO_URI)
 db = client['igyr_database']
 

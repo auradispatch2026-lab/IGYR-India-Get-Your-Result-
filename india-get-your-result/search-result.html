@@ -988,7 +988,42 @@
             }
         }
 
+
+        .search-box-container {
+            flex-direction: column;
+            justify-content: center;
+            width: min(800px, 92%);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(7, 29, 73, 0.1);
+            padding: 50px;
+            z-index: 10;
+        }
+        
+        .captcha-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 800px) {
+            #full-search-form > div {
+                grid-template-columns: 1fr !important;
+            }
+            .search-box-container {
+                padding: 25px 15px !important;
+            }
+            .captcha-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .captcha-row button {
+                align-self: center;
+            }
+        }
     </style>
+
 </head>
 
 <body>
@@ -1048,7 +1083,7 @@
      SEARCH SECTION
 ===================================================== -->
 <section class="hero" id="search-section" style="min-height: calc(100vh - 106px); display: flex; align-items: center; padding: 60px 0;">
-    <div class="hero-container" style="flex-direction: column; justify-content: center; width: min(800px, 92%); background: white; border-radius: 20px; box-shadow: 0 20px 50px rgba(7, 29, 73, 0.1); padding: 50px; z-index: 10;">
+    <div class="hero-container search-box-container">
         
         <div style="text-align: center; margin-bottom: 40px;">
             <h2 class="hero-title" style="font-size: 42px;">Search Your <span>Result</span></h2>
@@ -1080,7 +1115,7 @@
             </div>
             
             
-            <div style="display: flex; gap: 15px; align-items: center; margin-top: 5px;">
+            <div class="captcha-row">
                 <canvas id="captcha-canvas" width="140" height="50" style="border-radius: 10px; border: 1px solid #cde0f5; background: #eef7ff;"></canvas>
                 <button type="button" id="refresh-captcha" style="background: none; border: none; font-size: 28px; cursor: pointer; color: var(--blue); transition: 0.3s;" title="Refresh Captcha" onmouseover="this.style.transform='rotate(45deg)'" onmouseout="this.style.transform='rotate(0deg)'">↻</button>
                 <input type="text" id="captcha-input" placeholder="Type Captcha Code" required style="flex:1; padding: 15px; border-radius: 10px; border: 1px solid #cde0f5; background: #f8fbff; font-family: inherit; font-size: 15px; outline: none; color: var(--dark-blue); text-transform: uppercase;">
@@ -1358,7 +1393,7 @@
 
     <!-- App Logic Scripts -->
     <script src="js/data-india.js"></script>
-    <script src="js/storage.js?v=1000010"></script>
-    <script src="js/public.js?v=1000010"></script>
+    <script src="js/storage.js?v=1000012"></script>
+    <script src="js/public.js?v=1000012"></script>
 </body>
 </html>
