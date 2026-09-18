@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://your-app-name.onrender.com/sitemap.xml
+Sitemap: https://igyr-india-get-your-result.onrender.com/sitemap.xml
