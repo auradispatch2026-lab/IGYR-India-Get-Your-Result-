@@ -36,8 +36,13 @@
         
         /* Print Styles */
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             body { background: #fff; padding: 0; }
-            .a4-sheet { box-shadow: none; border: none; width: 100%; min-height: auto; padding: 15mm 10mm; }
+            .a4-sheet { box-shadow: none; border: none; width: 100%; min-height: auto; padding: 15mm 10mm; margin: 0; }
             .no-print { display: none !important; }
         }
 
@@ -325,7 +330,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="js/storage.js?v=1000012v=2"></script>
+    <script src="js/storage.js?v=1000013v=2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const resData = sessionStorage.getItem('current_result');

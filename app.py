@@ -41,6 +41,11 @@ def init_db():
 
 init_db()
 
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "ok", "message": "IGYR Backend is running smoothly."}), 200
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
