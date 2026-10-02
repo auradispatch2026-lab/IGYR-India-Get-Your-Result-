@@ -45,40 +45,73 @@ function getNotices() { return window.IGYR_DB.notices; }
 function getQuickLinks() { return window.IGYR_DB.quicklinks; }
 
 // 3. Data Setters (Update memory immediately, and async POST to Python Backend)
+
+function getAuthHeaders() {
+    const token = sessionStorage.getItem('admin_token') || sessionStorage.getItem('inst_token');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': token ? 'Bearer ' + token : ''
+    };
+}
+
 function saveInstitutes(institutes) { 
     window.IGYR_DB.institutes = institutes;
     return fetch(API_BASE + '/institutes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(institutes)
-    }).catch(e => { console.error("DB Save Error:", e); alert("Error saving to database: " + e.message); });
+    }).then(res => {
+        if (!res.ok) throw new Error("Server rejected save: " + res.statusText);
+        return res.json();
+    }).catch(e => { 
+        console.error("DB Save Error:", e); 
+        alert("Security Error: Please log out and log back in to refresh your security token!"); 
+    });
 }
 
 function saveResults(results) { 
     window.IGYR_DB.results = results;
     return fetch(API_BASE + '/results', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(results)
-    }).catch(e => { console.error("DB Save Error:", e); alert("Error saving to database: " + e.message); });
+    }).then(res => {
+        if (!res.ok) throw new Error("Server rejected save: " + res.statusText);
+        return res.json();
+    }).catch(e => { 
+        console.error("DB Save Error:", e); 
+        alert("Security Error: Please log out and log back in to refresh your security token!"); 
+    });
 }
 
 function saveNotices(notices) { 
     window.IGYR_DB.notices = notices;
     return fetch(API_BASE + '/notices', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(notices)
-    }).catch(e => { console.error("DB Save Error:", e); alert("Error saving to database: " + e.message); });
+    }).then(res => {
+        if (!res.ok) throw new Error("Server rejected save: " + res.statusText);
+        return res.json();
+    }).catch(e => { 
+        console.error("DB Save Error:", e); 
+        alert("Security Error: Please log out and log back in to refresh your security token!"); 
+    });
 }
 
 function saveQuickLinks(links) { 
     window.IGYR_DB.quicklinks = links;
     return fetch(API_BASE + '/quicklinks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(links)
-    }).catch(e => { console.error("DB Save Error:", e); alert("Error saving to database: " + e.message); });
+    }).then(res => {
+        if (!res.ok) throw new Error("Server rejected save: " + res.statusText);
+        return res.json();
+    }).catch(e => { 
+        console.error("DB Save Error:", e); 
+        alert("Security Error: Please log out and log back in to refresh your security token!"); 
+    });
 }
 
 

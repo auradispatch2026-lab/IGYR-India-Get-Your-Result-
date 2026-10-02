@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://igyr-india-get-your-result.onrender.com/sitemap.xml

@@ -54,12 +54,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminLogin) {
         adminLogin.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (document.getElementById('admin-user').value === 'admin' && document.getElementById('admin-pass').value === 'admin123') {
-                sessionStorage.setItem('superadmin', 'true');
-                window.location.href = 'admin-dashboard.html';
-            } else {
-                alert('Invalid credentials');
-            }
+            const u = document.getElementById('admin-user').value;
+            const p = document.getElementById('admin-pass').value;
+            
+            // SECURE SERVER-SIDE AUTHENTICATION
+            fetch(API_BASE + '/auth/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    sessionStorage.setItem('superadmin', 'true');
+                    sessionStorage.setItem('admin_token', data.token);
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    alert('Invalid credentials');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Server connection failed!");
+            });
         });
     }
 

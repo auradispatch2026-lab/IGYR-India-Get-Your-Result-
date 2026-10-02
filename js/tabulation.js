@@ -100,5 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         html += `</tbody></table>`;
         container.innerHTML = html;
+        const printBtn = document.getElementById('btn-print-tab');
+        if (printBtn) printBtn.style.display = 'inline-block';
     });
 });

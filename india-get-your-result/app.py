@@ -4,7 +4,7 @@ from pymongo import MongoClient
 import os
 
 app = Flask(__name__, static_folder='.', static_url_path='')
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": ["https://igyr-india-get-your-result.onrender.com", "http://127.0.0.1:5005", "http://localhost:5005", "http://127.0.0.1:5500"]}})
 
 # Connect to MongoDB
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://auradispatch2026_db_user:611LdmEjTS7WeqKW@cluster0.z9xcllt.mongodb.net/?appName=Cluster0")
@@ -41,15 +41,42 @@ def init_db():
 
 init_db()
 
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "ok", "message": "IGYR Backend is running smoothly."}), 200
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
+
+
+@app.route('/api/auth/admin', methods=['POST'])
+def admin_login():
+    data = request.json
+    # The secure password is ONLY stored here on the server
+    if data and data.get('username') == 'admin' and data.get('password') == 'cutiee':
+        return jsonify({"success": True, "token": "igyr_super_secret_auth_token_8829"}), 200
+    return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+@app.route('/api/auth/institute', methods=['POST'])
+def institute_login():
+    data = request.json
+    inst_id = data.get('id')
+    password = data.get('password')
+    inst = institutes_col.find_one({"id": inst_id, "password": password})
+    if inst:
+        return jsonify({"success": True, "token": "igyr_inst_secret_auth_token_7731"}), 200
+    return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
 # API Routes for Initial Sync
 @app.route('/api/sync', methods=['GET'])
 def sync_data():
     # Return all collections in one go for fast synchronous loading
+        # Fetch institutes but STRIP passwords so hackers can't see them on the public frontend!
     institutes = list(institutes_col.find({}, {'_id': 0}))
+    for inst in institutes:
+        inst.pop('password', None)
     results = list(results_col.find({}, {'_id': 0}))
     notices = list(notices_col.find({}, {'_id': 0}))
     
@@ -63,17 +90,36 @@ def sync_data():
         "quicklinks": quicklinks
     })
 
+
+def verify_token():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return False
+    token = auth_header.split(' ')[1]
+    # Accept both super admin and institute tokens for saving data
+    return token in ["igyr_super_secret_auth_token_8829", "igyr_inst_secret_auth_token_7731"]
+
 # API Routes for saving data
+
 @app.route('/api/institutes', methods=['POST'])
 def save_institutes():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
     data = request.json
-    institutes_col.delete_many({})
     if data:
+        # Preserve existing passwords since the frontend doesn't have them anymore!
+        existing_insts = { i['id']: i.get('password', 'demo123') for i in institutes_col.find({}) }
+        for inst in data:
+            if inst['id'] in existing_insts:
+                inst['password'] = existing_insts[inst['id']]
+            elif 'password' not in inst:
+                inst['password'] = 'demo123' # Default for new institutes
+        institutes_col.delete_many({})
         institutes_col.insert_many(data)
     return jsonify({"status": "success"})
 
 @app.route('/api/results', methods=['POST'])
 def save_results():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
     data = request.json
     results_col.delete_many({})
     if data:
@@ -82,6 +128,7 @@ def save_results():
 
 @app.route('/api/notices', methods=['POST'])
 def save_notices():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
     data = request.json
     notices_col.delete_many({})
     if data:
@@ -90,6 +137,7 @@ def save_notices():
 
 @app.route('/api/quicklinks', methods=['POST'])
 def save_quicklinks():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
     data = request.json
     quicklinks_col.delete_many({})
     quicklinks_col.insert_one({"links": data})
