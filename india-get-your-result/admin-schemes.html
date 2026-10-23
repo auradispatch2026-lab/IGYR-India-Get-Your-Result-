@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Schemes - Super Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <style>
+        :root {
+            --admin-bg: #f3f8ff;
+            --admin-card: rgba(255, 255, 255, 0.9);
+            --admin-primary: #1266d6;
+            --admin-dark: #062b63;
+        }
+        body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
+        .dashboard { min-height: 100vh; display: flex; }
+        
+        .sidebar { background: linear-gradient(180deg, var(--admin-dark) 0%, #0a3d8c 100%); box-shadow: 4px 0 20px rgba(0,0,0,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+        .sidebar h2 { font-family: 'Poppins', sans-serif; font-size: 22px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; color: #fce38a; }
+        .sidebar ul li a { font-size: 15px; padding: 12px 20px; margin-bottom: 8px; border-radius: 8px; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .sidebar ul li a:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .sidebar ul li a.active { background: rgba(255,255,255,0.18); color: #fce38a; font-weight: 700; }
+        
+        .main-content { padding: 40px; flex: 1; }
+        .main-content h1 { font-family: 'Poppins', sans-serif; font-size: 32px; color: var(--admin-dark); margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .main-content h1::before { content: '⚡'; font-size: 28px; }
+        
+        .card { 
+            background: var(--admin-card); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(7, 29, 73, 0.05); 
+            border-radius: 16px; 
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        input, select, textarea { 
+            background: #f8fbff; 
+            border: 1px solid #cde0f5; 
+            transition: 0.3s; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--admin-primary); outline: none; box-shadow: 0 0 0 3px rgba(18,102,214,0.1); background: #fff; }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--admin-primary) 0%, #0a3d8c 100%); border: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px; box-shadow: 0 4px 15px rgba(18,102,214,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(18,102,214,0.4); }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+                <aside class="sidebar">
+            <h2>Super Admin</h2>
+            <ul>
+                <li><a href="admin-dashboard.html" >Dashboard</a></li>
+                <li><a href="admin-institutes.html" >Manage Institutes</a></li>
+                <li><a href="admin-schemes.html" class="active">Manage Schemes</a></li>
+                <li><a href="admin-applications.html" >Submission Forms</a></li>
+                <li><a href="admin-settings.html" >System Settings</a></li>
+                <li><a href="admin-login-institute.html" >Login Institute</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <h1>Manage Tabulation Schemes</h1>
+                <a href="schemes.html" target="_blank" class="btn btn-outline" style="color: #1266d6; border-color: #1266d6; padding: 8px 18px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; background: #fff;">
+                    👁️ View Public Schemes Page ↗
+                </a>
+            </div>
+
+            <!-- Scheme Add / Edit Card -->
+            <div class="card" style="background:#fff; margin-bottom: 25px; border-top: 5px solid var(--admin-primary);">
+                <h3 id="scheme-form-title" style="color: #062b63; margin-top: 0; margin-bottom: 8px; font-size: 18px;">
+                    ➕ Add New Tabulation Scheme
+                </h3>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+                    Set per-student tabulation rates, highlight tags, color schemes, and feature descriptions displayed publicly to institutes.
+                </p>
+
+                <form id="scheme-form">
+                    <input type="hidden" id="scheme-index-input" value="-1">
+                    <input type="hidden" id="scheme-id-input" value="">
+                    
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">Scheme Name *</label>
+                            <input type="text" id="scheme-name-input" placeholder="e.g. Normal Tabulation Scheme" required style="width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">Rate in ₹ (Big Display) *</label>
+                            <input type="number" step="0.5" id="scheme-rate-input" placeholder="e.g. 5" required style="width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box; font-weight: 700; color: #1266d6; font-size: 16px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">Billing Unit</label>
+                            <input type="text" id="scheme-unit-input" placeholder="e.g. per student" value="per student" style="width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">Badge / Tag</label>
+                            <input type="text" id="scheme-badge-input" placeholder="e.g. Most Popular" style="width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">Card Color Theme</label>
+                            <select id="scheme-color-input" style="width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
+                                <option value="blue">🔵 Sapphire Blue</option>
+                                <option value="purple">🟣 Royal Purple</option>
+                                <option value="green">🟢 Emerald Green</option>
+                                <option value="orange">🟠 Sunset Amber</option>
+                                <option value="rose">🔴 Ruby Rose</option>
+                                <option value="teal">🌊 Ocean Teal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">Short Summary / Overview</label>
+                            <input type="text" id="scheme-desc-input" placeholder="e.g. Standard complete tabulation sheet & digital marksheet generation." style="width: 100%; padding: 12px; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 5px;">
+                            Feature Bullet Points (Short details - One feature per line)
+                        </label>
+                        <textarea id="scheme-features-input" rows="3" placeholder="Standard Tabulation Register sheet generation&#10;Printable landscape gazette for official records&#10;Student roll number & name search&#10;Instant export" style="width: 100%; padding: 12px; border-radius: 8px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button type="submit" id="scheme-submit-btn" class="btn btn-primary" style="padding: 12px 28px;">
+                            ➕ Save Scheme
+                        </button>
+                        <button type="button" id="scheme-cancel-btn" onclick="cancelSchemeEdit()" class="btn btn-outline" style="display: none; padding: 12px 20px; border-color: #777; color: #555;">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Existing Published Schemes Table Card -->
+            <div class="card" style="background:#fff;">
+                <h3 style="color: #062b63; margin-top: 0; margin-bottom: 15px; font-size: 18px;">
+                    📋 Published Schemes
+                </h3>
+                <div style="overflow-x: auto;">
+                    <table class="table" style="font-size: 14px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8fbff;">
+                                <th style="padding: 12px;">Scheme Name & Badge</th>
+                                <th style="padding: 12px;">Rate (Per Student)</th>
+                                <th style="padding: 12px;">Description & Features</th>
+                                <th style="padding: 12px;">Color</th>
+                                <th style="padding: 12px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheme-list">
+                            <!-- Populated dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/storage.js?v=1000031"></script>
+    <script src="js/admin.js?v=1000031"></script>
+</body>
+</html>

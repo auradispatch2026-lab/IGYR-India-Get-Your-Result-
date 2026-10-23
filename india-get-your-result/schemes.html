@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tabulation & Pricing Schemes - IGYR</title>
+
+    <meta name="description" content="IGYR - India Get Your Result. Affordable, transparent per-student tabulation schemes for schools, colleges, and educational boards.">
+    <meta name="keywords" content="IGYR schemes, tabulation rate per student, school marksheet tabulation, exam result rates">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            color: #071d49;
+            background: #f7faff;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(7, 29, 73, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #0b4db7;
+            box-shadow: 0 4px 10px rgba(11, 77, 183, 0.2);
+        }
+
+        .brand-text h1 {
+            font-family: "Poppins", sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #071d49;
+            line-height: 1;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #0b4db7;
+            margin-top: 3px;
+        }
+
+        .brand-text span {
+            font-size: 9px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            font-size: 15px;
+            font-weight: 600;
+            color: #334155;
+            position: relative;
+            padding: 6px 0;
+            transition: color 0.25s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #0b4db7;
+        }
+
+        .nav-links a.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2.5px;
+            background: linear-gradient(90deg, #0b4db7, #2563eb);
+            border-radius: 4px;
+        }
+
+        .menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #071d49;
+            cursor: pointer;
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            background: linear-gradient(135deg, #071d49 0%, #0b3d8c 50%, #1266d6 100%);
+            color: #ffffff;
+            padding: 65px 20px 85px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 10%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: #fce38a;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .hero-title {
+            font-family: "Poppins", sans-serif;
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1.25;
+            max-width: 850px;
+            margin: 0 auto 16px;
+        }
+
+        .hero-title span {
+            color: #fce38a;
+            text-decoration: underline;
+            text-decoration-color: rgba(252, 227, 138, 0.4);
+            text-underline-offset: 6px;
+        }
+
+        .hero-subtitle {
+            font-size: 17px;
+            color: #e2e8f0;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* CALCULATOR STRIP */
+        .calc-wrapper {
+            max-width: 960px;
+            margin: -45px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .calc-box {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px 32px;
+            box-shadow: 0 15px 40px rgba(7, 29, 73, 0.12);
+            border: 1px solid rgba(7, 29, 73, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .calc-label {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .calc-icon {
+            width: 48px;
+            height: 48px;
+            background: #eff6ff;
+            color: #1266d6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .calc-text h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            color: #071d49;
+            margin-bottom: 3px;
+        }
+
+        .calc-text p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .calc-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .calc-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .calc-input-wrap input {
+            width: 140px;
+            padding: 10px 14px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #071d49;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            outline: none;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .calc-input-wrap input:focus {
+            border-color: #1266d6;
+            box-shadow: 0 0 0 3px rgba(18, 102, 214, 0.15);
+        }
+
+        .calc-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calc-slider-wrap input[type="range"] {
+            width: 180px;
+            cursor: pointer;
+            accent-color: #1266d6;
+        }
+
+        /* SCHEMES GRID */
+        .schemes-section {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 20px 20px 80px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-header h2 {
+            font-family: "Poppins", sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: #071d49;
+            margin-bottom: 10px;
+        }
+
+        .section-header p {
+            font-size: 16px;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .schemes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        /* SCHEME CARD SYSTEM */
+        .scheme-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 35px 28px;
+            box-shadow: 0 12px 35px rgba(7, 29, 73, 0.07);
+            border: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scheme-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(7, 29, 73, 0.15);
+        }
+
+        /* Color Variations */
+        .scheme-card.color-blue {
+            border-top: 6px solid #1266d6;
+        }
+        .scheme-card.color-blue:hover {
+            border-color: #1266d6;
+        }
+        .scheme-card.color-blue .price-amount,
+        .scheme-card.color-blue .currency-sym {
+            color: #1266d6;
+        }
+        .scheme-card.color-blue .scheme-badge {
+            background: #eff6ff;
+            color: #1266d6;
+            border: 1px solid #bfdbfe;
+        }
+        .scheme-card.color-blue .btn-card {
+            background: linear-gradient(135deg, #1266d6, #0a3d8c);
+        }
+
+        .scheme-card.color-purple {
+            border-top: 6px solid #8e44ad;
+        }
+        .scheme-card.color-purple:hover {
+            border-color: #8e44ad;
+        }
+        .scheme-card.color-purple .price-amount,
+        .scheme-card.color-purple .currency-sym {
+            color: #8e44ad;
+        }
+        .scheme-card.color-purple .scheme-badge {
+            background: #faf5ff;
+            color: #8e44ad;
+            border: 1px solid #e9d5ff;
+        }
+        .scheme-card.color-purple .btn-card {
+            background: linear-gradient(135deg, #8e44ad, #5e247b);
+        }
+
+        .scheme-card.color-green {
+            border-top: 6px solid #27ae60;
+        }
+        .scheme-card.color-green:hover {
+            border-color: #27ae60;
+        }
+        .scheme-card.color-green .price-amount,
+        .scheme-card.color-green .currency-sym {
+            color: #27ae60;
+        }
+        .scheme-card.color-green .scheme-badge {
+            background: #f0fdf4;
+            color: #27ae60;
+            border: 1px solid #bbf7d0;
+        }
+        .scheme-card.color-green .btn-card {
+            background: linear-gradient(135deg, #27ae60, #1b7943);
+        }
+
+        .scheme-card.color-orange {
+            border-top: 6px solid #e67e22;
+        }
+        .scheme-card.color-orange:hover {
+            border-color: #e67e22;
+        }
+        .scheme-card.color-orange .price-amount,
+        .scheme-card.color-orange .currency-sym {
+            color: #e67e22;
+        }
+        .scheme-card.color-orange .scheme-badge {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+        .scheme-card.color-orange .btn-card {
+            background: linear-gradient(135deg, #e67e22, #b45309);
+        }
+
+        .scheme-card.color-rose {
+            border-top: 6px solid #e84393;
+        }
+        .scheme-card.color-rose:hover {
+            border-color: #e84393;
+        }
+        .scheme-card.color-rose .price-amount,
+        .scheme-card.color-rose .currency-sym {
+            color: #e84393;
+        }
+        .scheme-card.color-rose .scheme-badge {
+            background: #fdf2f8;
+            color: #db2777;
+            border: 1px solid #fbcfe8;
+        }
+        .scheme-card.color-rose .btn-card {
+            background: linear-gradient(135deg, #e84393, #be185d);
+        }
+
+        .scheme-card.color-teal {
+            border-top: 6px solid #00cec9;
+        }
+        .scheme-card.color-teal:hover {
+            border-color: #00cec9;
+        }
+        .scheme-card.color-teal .price-amount,
+        .scheme-card.color-teal .currency-sym {
+            color: #0984e3;
+        }
+        .scheme-card.color-teal .scheme-badge {
+            background: #f0fdfa;
+            color: #0d9488;
+            border: 1px solid #99f6e4;
+        }
+        .scheme-card.color-teal .btn-card {
+            background: linear-gradient(135deg, #00cec9, #0984e3);
+        }
+
+        /* CARD CONTENT ELEMENTS */
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .scheme-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .scheme-name {
+            font-family: "Poppins", sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #071d49;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .scheme-desc {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 22px;
+            min-height: 42px;
+        }
+
+        /* BIG RUPEES RATE CONTAINER */
+        .price-box {
+            background: #f8fbff;
+            border-radius: 14px;
+            padding: 20px 18px;
+            margin-bottom: 24px;
+            border: 1px solid #edf2f7;
+            text-align: center;
+        }
+
+        .price-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .currency-sym {
+            font-family: "Poppins", sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .price-amount {
+            font-family: "Poppins", sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .unit-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+            margin-left: 2px;
+        }
+
+        .total-estimate {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .total-estimate span {
+            color: #0b4db7;
+            font-size: 15px;
+        }
+
+        /* FEATURES LIST */
+        .features-list {
+            list-style: none;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .features-list li {
+            font-size: 14px;
+            color: #334155;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.45;
+        }
+
+        .features-list li .check-icon {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: -1px;
+        }
+
+        /* CTA BUTTON */
+        .btn-card {
+            width: 100%;
+            padding: 14px 20px;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #1266d6 0%, #0a3d8c 100%);
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(18, 102, 214, 0.3);
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(18, 102, 214, 0.45);
+            color: #ffffff !important;
+        }
+
+        .btn-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+        }
+
+        /* HIGHLIGHTS SECTION */
+        .benefits-section {
+            background: #ffffff;
+            padding: 70px 20px;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .benefits-container {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .benefit-card {
+            background: #f8fbff;
+            border-radius: 16px;
+            padding: 26px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .benefit-card .icon {
+            font-size: 32px;
+            margin-bottom: 14px;
+        }
+
+        .benefit-card h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            color: #071d49;
+            margin-bottom: 8px;
+        }
+
+        .benefit-card p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* FOOTER */
+        .footer {
+            background: #071d49;
+            color: #ffffff;
+            padding: 60px 20px 25px;
+        }
+
+        .footer-container {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            margin-bottom: 14px;
+        }
+
+        .footer h3 {
+            font-family: "Poppins", sans-serif;
+            font-size: 17px;
+            margin-bottom: 18px;
+            color: #fce38a;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: #ffffff;
+                padding: 20px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .menu-btn {
+                display: block;
+            }
+            .hero-title {
+                font-size: 28px;
+            }
+            .calc-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .calc-controls {
+                justify-content: space-between;
+            }
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    
+        /* APPLICATION MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 29, 73, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 24px;
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            margin: auto;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.92) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #071d49 0%, #0b3d8c 100%);
+            color: #ffffff;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #ffffff;
+            font-size: 18px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 28px;
+            max-height: calc(88vh - 120px);
+            overflow-y: auto;
+        }
+
+        /* TABS */
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .modal-tab-btn {
+            padding: 10px 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-tab-btn.active {
+            background: #eff6ff;
+            color: #1266d6;
+            border-color: #bfdbfe;
+        }
+
+        /* FORM CONTROLS */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 11px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 9px;
+            font-size: 14px;
+            color: #0f172a;
+            background: #f8fafc;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #1266d6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(18, 102, 214, 0.12);
+        }
+
+        /* ANIMATED PROCESSING LINE */
+        .processing-line-container {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .processing-track {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .processing-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #1266d6, #00cec9, #8e44ad);
+            border-radius: 10px;
+            animation: lineProgress 1.6s ease-in-out infinite;
+        }
+
+        @keyframes lineProgress {
+            0% { width: 0%; left: 0%; }
+            50% { width: 70%; left: 30%; }
+            100% { width: 100%; left: 0%; }
+        }
+
+        .processing-status-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0b4db7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* SUCCESS CONFIRMATION BOX */
+        .success-box {
+            display: none;
+            text-align: center;
+            padding: 15px 5px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .success-badge-icon {
+            width: 72px;
+            height: 72px;
+            background: #dcfce7;
+            color: #15803d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 18px;
+            box-shadow: 0 10px 25px rgba(21, 128, 61, 0.15);
+        }
+
+        .success-box h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            color: #062b63;
+            margin-bottom: 14px;
+        }
+
+        .success-msg-main {
+            font-size: 15px;
+            color: #334155;
+            line-height: 1.65;
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .success-msg-verified {
+            font-size: 14px;
+            color: #0b4db7;
+            line-height: 1.5;
+            background: #eff6ff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #bfdbfe;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="igyr-logo.jpg" alt="IGYR Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>IGYR</h1>
+                    <p>INDIA GET YOUR RESULT</p>
+                    <span>Education Empowers Tomorrow</span>
+                </div>
+            </a>
+
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+                ☰
+            </button>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="search-result.html">Results</a>
+                <a href="schemes.html" class="active">Schemes</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-badge">
+            <span>✨</span> Official Tabulation Schemes
+        </div>
+        <h1 class="hero-title">
+            Simple, Transparent <span>Per-Student Rates</span>
+        </h1>
+        <p class="hero-subtitle">
+            Publish examination results, generate official gazette tabulation registers, and provide students with verified digital marksheets. Fully managed and audited.
+        </p>
+    </section>
+
+
+
+    <!-- SCHEMES CARDS CONTAINER -->
+    <section class="schemes-section">
+        <div class="section-header">
+            <h2>Select Your Tabulation Scheme</h2>
+            <p>Every scheme is fully audited with official digital print support and guaranteed data preservation.</p>
+        </div>
+
+        <div class="schemes-grid" id="schemes-container">
+            <!-- Dynamically populated from MongoDB via storage.js -->
+        </div>
+    </section>
+
+    <!-- BENEFITS SECTION -->
+    <section class="benefits-section">
+        <div class="benefits-container">
+            <div class="section-header">
+                <h2>Why Institutes Choose IGYR Tabulation</h2>
+                <p>Designed specifically to eliminate paper register hassles for Indian schools & colleges.</p>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">📄</div>
+                    <h4>Printable Tabulation Sheet</h4>
+                    <p>Instant landscape tabulation sheets with student marks, subjects, and pass/fail counts formatted for official office records.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">⚡</div>
+                    <h4>1-Click Bulk Excel Import</h4>
+                    <p>Upload your existing `.xlsx` Excel spreadsheets. The platform automatically maps columns and creates marksheets within seconds.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">🔒</div>
+                    <h4>Tamper-Proof Verification</h4>
+                    <p>Each marksheet includes a unique Verification ID (VID) and barcode. Anyone can verify authenticity, preventing certificate fraud.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">☁️</div>
+                    <h4>Permanent Cloud Storage</h4>
+                    <p>Your records are securely archived in enterprise MongoDB cloud storage. Access past years' results anytime with zero data loss.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- SCHEME REGISTRATION & APPLICATION MODAL -->
+    <div class="modal-overlay" id="scheme-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>
+                    <span>📋</span> <span id="modal-title-text">Apply for Tabulation Scheme</span>
+                </h3>
+                <button type="button" class="modal-close-btn" onclick="closeSchemeModal()" aria-label="Close">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- TOP HELPER BANNER FOR ALREADY VERIFIED INSTITUTES -->
+                <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px 18px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <strong style="color: #0b4db7; font-size: 14px; display: block;">Already a Verified Institute?</strong>
+                        <span style="font-size: 12.5px; color: #475569;">Log in directly using your Institute ID & Password.</span>
+                    </div>
+                    <a href="#" onclick="openInstituteLoginPortal(event)" class="btn" style="background: #1266d6; color: #ffffff !important; font-weight: 700; font-size: 13px; padding: 8px 18px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(18, 102, 214, 0.25);">
+                        🔑 Institute Login Portal →
+                    </a>
+                </div>
+
+                <!-- APPLICATION FORM CONTAINER -->
+                <div id="application-form-container">
+                    <p style="font-size: 13.5px; color: #475569; margin-bottom: 18px; line-height: 1.5;">
+                        Fill in your institute details below to register for the selected tabulation scheme.
+                    </p>
+
+                    <form id="scheme-app-form" onsubmit="handleSchemeApplicationSubmit(event)">
+                        <div class="form-group">
+                            <label>Chosen Scheme *</label>
+                            <select id="app-scheme-select" required style="font-weight: 700; color: #1266d6; font-size: 15px;">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Institute Name *</label>
+                                <input type="text" id="app-inst-name" placeholder="e.g. St. Xavier Public School" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Institute Type *</label>
+                                <select id="app-inst-type" required>
+                                    <option value="">-- Select Type --</option>
+                                    <option value="School (CBSE / ICSE / State Board)">School (CBSE / ICSE / State Board)</option>
+                                    <option value="Higher Secondary / Junior College">Higher Secondary / Junior College</option>
+                                    <option value="Degree College / Autonomous College">Degree College / Autonomous College</option>
+                                    <option value="University / Autonomous Board">University / Autonomous Board</option>
+                                    <option value="Coaching / Competitive Exam Institute">Coaching / Competitive Exam Institute</option>
+                                    <option value="Vocational / Technical Institute">Vocational / Technical Institute</option>
+                                    <option value="Sports / Music / Arts Academy">Sports / Music / Arts Academy</option>
+                                    <option value="Other Educational Institute">Other Educational Institute</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>State (All India) *</label>
+                                <select id="app-inst-state" required onchange="populateDistrictDropdown(this.value)">
+                                    <option value="">-- Select State --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>District *</label>
+                                <select id="app-inst-district" required>
+                                    <option value="">-- Select State First --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>City / Town *</label>
+                                <input type="text" id="app-inst-city" placeholder="e.g. Bhubaneswar" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Pin Code *</label>
+                                <input type="text" id="app-inst-pincode" placeholder="e.g. 751024" pattern="[0-9]{6}" maxlength="6" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Official Email Address *</label>
+                                <input type="email" id="app-inst-email" placeholder="e.g. principal@school.edu.in" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Contact Phone Number *</label>
+                                <input type="tel" id="app-inst-phone" placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10" required>
+                            </div>
+                        </div>
+
+                        <!-- PROCESSING PROGRESS LINE ANIMATION -->
+                        <div class="processing-line-container" id="app-processing-line" style="display: none; margin: 20px 0;">
+                            <div class="processing-track" style="width: 100%; height: 7px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                                <div class="processing-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #1266d6, #00cec9, #8e44ad); animation: lineProgress 1.4s ease-in-out infinite;"></div>
+                            </div>
+                            <div class="processing-status-text" style="font-size: 13px; font-weight: 600; color: #0b4db7; margin-top: 10px;">
+                                ⚡ Submitting your application & verifying credentials...
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-app" class="btn-card" style="margin-top: 15px; font-size: 16px; background: linear-gradient(135deg, #1266d6 0%, #0a3d8c 100%); color: #ffffff !important;">
+                            🚀 Submit Application & Choose Scheme
+                        </button>
+                    </form>
+                </div>
+
+                <!-- SUCCESS & CONFIRMATION BOX (SHOWN AFTER SUBMISSION) -->
+                <div class="success-box" id="app-success-box" style="display: none; text-align: center; padding: 20px 10px;">
+                    <div style="width: 76px; height: 76px; background: #dcfce7; color: #15803d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 0 auto 18px; box-shadow: 0 10px 25px rgba(21, 128, 61, 0.15);">
+                        ✓
+                    </div>
+                    <h4 style="font-family: 'Poppins', sans-serif; font-size: 22px; color: #062b63; margin-bottom: 16px;">
+                        Application Submitted Successfully!
+                    </h4>
+
+                    <!-- USER REQUESTED VERIFICATION MESSAGE -->
+                    <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 18px; margin-bottom: 18px; text-align: left; font-size: 14.5px; color: #1e293b; line-height: 1.65;">
+                        <strong style="color: #062b63; display: block; margin-bottom: 6px; font-size: 15px;">📢 Verification In Progress:</strong>
+                        Our team will verify your details and contact you via Email as soon as possible. It may take a week or more. Thank you!
+                    </div>
+
+                    <!-- USER REQUESTED ALREADY VERIFIED MESSAGE -->
+                    <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 18px; margin-bottom: 25px; text-align: left; font-size: 14px; color: #0b4db7; line-height: 1.6;">
+                        <strong style="display: block; margin-bottom: 4px; font-size: 14.5px;">ℹ️ For Already Verified Institutes:</strong>
+                        If your institute is already verified, please open the verification link given by our team to access your account for the next steps.
+                    </div>
+
+                    <!-- PROMINENT VISIBLE BUTTONS -->
+                    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                        <a href="#" onclick="openInstituteLoginPortal(event)" class="btn" style="background: linear-gradient(135deg, #1266d6 0%, #0a3d8c 100%); color: #ffffff !important; padding: 14px 28px; font-weight: 700; font-size: 15px; border-radius: 10px; text-decoration: none; box-shadow: 0 6px 18px rgba(18, 102, 214, 0.35);">
+                            🔑 Open Institute Login Portal →
+                        </a>
+                        <button type="button" onclick="closeSchemeModal()" class="btn" style="background: #f1f5f9; color: #475569; padding: 14px 24px; font-weight: 600; font-size: 15px; border-radius: 10px; border: 1px solid #cbd5e1; cursor: pointer;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div>
+                <img src="igyr-logo.jpg" alt="IGYR" class="footer-logo">
+                <h3 style="margin-bottom: 8px;">IGYR - India Get Your Result</h3>
+                <p style="font-size: 13px; color: #cbd5e1; line-height: 1.6; max-width: 320px;">
+                    India's trusted digital portal for school and college examination results publication, digital marksheets, and official tabulation registers.
+                </p>
+            </div>
+
+            <div>
+                <h3>Quick Links</h3>
+                <div class="footer-links" id="quick-links-container">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About IGYR</a>
+                    <a href="search-result.html">Search Results</a>
+                    <a href="schemes.html">Pricing Schemes</a>
+                    <a href="institute-login.html" style="color: #fce38a; font-weight: 700;">🔑 Institute Login Portal</a>
+                </div>
+            </div>
+
+            <div>
+                <h3>For Institutes</h3>
+                <div class="footer-links">
+                    <a href="institute-login.html">Institute Portal</a>
+                    <a href="institute-register.html">Register Institute</a>
+                    <a href="verify-result.html">Verify Marksheet</a>
+                    <a href="admin-login.html">Super Admin</a>
+                </div>
+            </div>
+
+            <div>
+                <h3 id="footer-support-heading">Support & Contact</h3>
+                <div class="footer-links" id="support-contact-container">
+                    <a href="about.html#contact">Help Center</a>
+                    <a href="mailto:support@igyr.org">support@igyr.org</a>
+                    <a href="about.html">Government Recognition</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2026 IGYR - India Get Your Result. All Rights Reserved. Managed & Protected under Cloud Infrastructure.
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPTS -->
+    <script src="js/data-india.js"></script>
+    <script src="js/storage.js?v=1000031"></script>
+    <script>
+        function renderPublicSchemes() {
+            const container = document.getElementById('schemes-container');
+            if (!container) return;
+
+            const schemes = (typeof getSchemes === 'function') ? getSchemes() : [];
+            container.innerHTML = '';
+
+            if (!schemes || schemes.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px;">
+                        <h3 style="color: #071d49; margin-bottom: 10px;">Schemes Updating...</h3>
+                        <p style="color: #64748b;">The administrator is currently setting up updated tabulation rates. Please check back shortly!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            schemes.forEach((sch, idx) => {
+                const colorClass = 'color-' + (sch.color || 'blue');
+
+                let featuresList = [];
+                if (Array.isArray(sch.features)) {
+                    featuresList = sch.features;
+                } else if (typeof sch.features === 'string') {
+                    featuresList = sch.features.split('\n').map(s => s.trim()).filter(Boolean);
+                } else if (sch.desc) {
+                    featuresList = [sch.desc];
+                }
+
+                let featuresHtml = '';
+                featuresList.forEach(f => {
+                    featuresHtml += `<li><span class="check-icon">✓</span> <span>${f}</span></li>`;
+                });
+
+                const cardHtml = `
+                    <div class="scheme-card ${colorClass}">
+                        <div>
+                            <div class="card-top">
+                                ${sch.badge ? `<span class="scheme-badge">${sch.badge}</span>` : '<span></span>'}
+                                <span style="font-size: 12px; font-weight: 600; color: #64748b;">Tabulation</span>
+                            </div>
+
+                            <h3 class="scheme-name">${sch.name}</h3>
+                            <p class="scheme-desc">${sch.desc || 'Complete student marksheet tabulation and digital publication support.'}</p>
+
+                            <!-- BIG RUPEE PRICE -->
+                            <div class="price-box">
+                                <div class="price-container">
+                                    <span class="currency-sym">₹</span>
+                                    <span class="price-amount">${sch.rate}</span>
+                                    <span class="unit-label">/${sch.unit || 'student'}</span>
+                                </div>
+                            </div>
+
+                            <ul class="features-list">
+                                ${featuresHtml}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <button type="button" class="btn-card" onclick="openSchemeApplicationByIndex(${idx})">
+                                Choose This Scheme →
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPublicSchemes();
+            renderFooterQuickLinks();
+            renderFooterSupportContact();
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById("menuBtn");
+            const navLinks = document.getElementById("navLinks");
+            if (menuBtn && navLinks) {
+                menuBtn.addEventListener("click", () => {
+                    navLinks.classList.toggle("open");
+                    menuBtn.innerHTML = navLinks.classList.contains("open") ? "✕" : "☰";
+                });
+            }
+        });
+
+        // Listen for real-time background database updates from Admin Panel
+        window.addEventListener('igyr_data_updated', () => {
+            console.log("Real-time schemes update detected!");
+            renderPublicSchemes();
+            renderFooterQuickLinks();
+            renderFooterSupportContact();
+        });
+    
+        // ==========================================
+        // --- SCHEME MODAL & APPLICATION LOGIC ---
+        // ==========================================
+        window.openInstituteLoginPortal = function(e) {
+            if (e) e.preventDefault();
+            const links = (typeof getQuickLinks === 'function') ? getQuickLinks() : [];
+            const match = links.find(l => 
+                l.text && (
+                    l.text.toLowerCase().includes('institute login') || 
+                    l.text.toLowerCase().includes('institute portal') || 
+                    l.text.toLowerCase().includes('login portal') ||
+                    l.text.toLowerCase().includes('institute')
+                )
+            );
+
+            if (match && match.url && match.url.trim() && match.url !== '#') {
+                window.location.href = match.url.trim();
+                return;
+            }
+
+            alert('Link not found: The Institute Login Portal link has not been uploaded by the admin in Manage Quick Links yet.');
+        };
+
+        window.renderFooterQuickLinks = function() {
+            const qlContainer = document.getElementById('quick-links-container');
+            if (!qlContainer) return;
+            let links = (typeof getQuickLinks === 'function') ? getQuickLinks() : [];
+            if (!links || links.length === 0) {
+                links = [
+                    { text: 'Home', url: 'index.html' },
+                    { text: 'About', url: 'about.html' },
+                    { text: 'Results', url: 'search-result.html' },
+                    { text: 'Institute Login Portal', url: 'institute-login.html' }
+                ];
+            } else {
+                const hasInst = links.some(l => l.text && l.text.toLowerCase().includes('institute'));
+                if (!hasInst) {
+                    links.push({ text: 'Institute Login Portal', url: 'institute-login.html' });
+                }
+            }
+
+            qlContainer.innerHTML = '';
+            links.forEach(l => {
+                const a = document.createElement('a');
+                a.textContent = l.text;
+                a.href = l.url || '#';
+                if (l.text.toLowerCase().includes('institute login')) {
+                    a.style.color = '#fce38a';
+                    a.style.fontWeight = '700';
+                }
+                a.onclick = function(e) {
+                    if (!l.url || l.url.trim() === '' || l.url === '#') {
+                        e.preventDefault();
+                        alert('Link not found: This link has not been configured by the admin.');
+                    }
+                };
+                qlContainer.appendChild(a);
+            });
+        };
+
+        window.renderFooterSupportContact = function() {
+            const scContainer = document.getElementById('support-contact-container');
+            const scHeading = document.getElementById('footer-support-heading');
+            const settings = (typeof getSystemSettings === 'function') ? getSystemSettings() : null;
+            if (!settings) return;
+
+            if (scHeading && settings.contactHeading) {
+                scHeading.textContent = settings.contactHeading;
+            }
+
+            if (scContainer) {
+                scContainer.innerHTML = '';
+                if (settings.supportEmail) {
+                    const aMail = document.createElement('a');
+                    aMail.href = `mailto:${settings.supportEmail}`;
+                    aMail.innerHTML = `✉️ ${settings.supportEmail}`;
+                    scContainer.appendChild(aMail);
+                }
+                if (settings.helplinePhone) {
+                    const aPhone = document.createElement('a');
+                    aPhone.href = `tel:${settings.helplinePhone.replace(/\s+/g, '')}`;
+                    aPhone.innerHTML = `📞 ${settings.helplinePhone}`;
+                    scContainer.appendChild(aPhone);
+                }
+                if (settings.whatsappSupport) {
+                    const aWa = document.createElement('a');
+                    const cleanWa = settings.whatsappSupport.replace(/[^0-9]/g, '');
+                    aWa.href = `https://wa.me/${cleanWa}`;
+                    aWa.target = "_blank";
+                    aWa.rel = "noopener noreferrer";
+                    aWa.innerHTML = `💬 WhatsApp: ${settings.whatsappSupport}`;
+                    scContainer.appendChild(aWa);
+                }
+                if (settings.supportHours) {
+                    const divHours = document.createElement('div');
+                    divHours.style.fontSize = '12px';
+                    divHours.style.color = '#94a3b8';
+                    divHours.style.margin = '4px 0';
+                    divHours.innerHTML = `🕒 ${settings.supportHours}`;
+                    scContainer.appendChild(divHours);
+                }
+                if (settings.helpCenterUrl) {
+                    const aHelp = document.createElement('a');
+                    aHelp.href = settings.helpCenterUrl;
+                    aHelp.innerHTML = `ℹ️ Help Center & Recognition`;
+                    scContainer.appendChild(aHelp);
+                }
+            }
+        };
+
+        window.openSchemeApplicationByIndex = function(idx) {
+            const schemes = (typeof getSchemes === 'function') ? getSchemes() : [];
+            const sch = (schemes && schemes[idx]) ? schemes[idx] : null;
+            if (sch) {
+                window.openSchemeApplication(sch.name, sch.rate);
+            } else {
+                window.openSchemeApplication('Standard Tabulation Scheme', '5');
+            }
+        };
+
+        window.openSchemeApplication = function(schemeName, schemeRate) {
+            const modal = document.getElementById('scheme-modal');
+            if (!modal) {
+                console.error("Modal #scheme-modal element not found!");
+                return;
+            }
+
+            // Populate all schemes in dropdown
+            const schemes = (typeof getSchemes === 'function') ? getSchemes() : [];
+            const selectEl = document.getElementById('app-scheme-select');
+            if (selectEl) {
+                selectEl.innerHTML = '';
+                if (schemes.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = schemeName || 'Standard Tabulation Scheme';
+                    opt.textContent = schemeName || 'Standard Tabulation Scheme';
+                    opt.selected = true;
+                    selectEl.appendChild(opt);
+                } else {
+                    schemes.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.name;
+                        opt.textContent = `${s.name} (₹${s.rate} / ${s.unit || 'student'})`;
+                        if (s.name === schemeName) opt.selected = true;
+                        selectEl.appendChild(opt);
+                    });
+                }
+            }
+
+            // Populate States from INDIA_STATES
+            populateStateDropdown();
+
+            // Reset modal states
+            const formContainer = document.getElementById('application-form-container');
+            if (formContainer) formContainer.style.display = 'block';
+
+            const form = document.getElementById('scheme-app-form');
+            if (form) form.reset();
+            if (form) form.style.display = 'block';
+
+            const procLine = document.getElementById('app-processing-line');
+            if (procLine) procLine.style.display = 'none';
+
+            const submitBtn = document.getElementById('btn-submit-app');
+            if (submitBtn) submitBtn.style.display = 'block';
+
+            const successBox = document.getElementById('app-success-box');
+            if (successBox) successBox.style.display = 'none';
+
+            // Show modal
+            modal.style.display = 'flex';
+        };
+
+        window.closeSchemeModal = function() {
+            const modal = document.getElementById('scheme-modal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        window.switchModalTab = function(tab) {
+            const newBtn = document.getElementById('tab-new-btn');
+            const loginBtn = document.getElementById('tab-login-btn');
+            const newContent = document.getElementById('tab-new-content');
+            const loginContent = document.getElementById('tab-login-content');
+
+            if (tab === 'new') {
+                if (newBtn) newBtn.classList.add('active');
+                if (loginBtn) loginBtn.classList.remove('active');
+                if (newContent) newContent.style.display = 'block';
+                if (loginContent) loginContent.style.display = 'none';
+            } else {
+                if (loginBtn) loginBtn.classList.add('active');
+                if (newBtn) newBtn.classList.remove('active');
+                if (newContent) newContent.style.display = 'none';
+                if (loginContent) loginContent.style.display = 'block';
+            }
+        };
+
+        window.populateStateDropdown = function() {
+            const stateSelect = document.getElementById('app-inst-state');
+            if (!stateSelect || stateSelect.options.length > 1) return;
+
+            if (typeof INDIA_STATES !== 'undefined') {
+                Object.keys(INDIA_STATES).sort().forEach(state => {
+                    const opt = document.createElement('option');
+                    opt.value = state;
+                    opt.textContent = state;
+                    stateSelect.appendChild(opt);
+                });
+            }
+        };
+
+        window.populateDistrictDropdown = function(selectedState) {
+            const distSelect = document.getElementById('app-inst-district');
+            if (!distSelect) return;
+            distSelect.innerHTML = '<option value="">-- Select District --</option>';
+
+            if (typeof INDIA_STATES !== 'undefined' && INDIA_STATES[selectedState]) {
+                INDIA_STATES[selectedState].forEach(dist => {
+                    const opt = document.createElement('option');
+                    opt.value = dist;
+                    opt.textContent = dist;
+                    distSelect.appendChild(opt);
+                });
+            }
+        };
+
+        window.handleSchemeApplicationSubmit = function(e) {
+            e.preventDefault();
+
+            const appData = {
+                name: document.getElementById('app-inst-name').value.trim(),
+                type: document.getElementById('app-inst-type').value,
+                state: document.getElementById('app-inst-state').value,
+                district: document.getElementById('app-inst-district').value,
+                city: document.getElementById('app-inst-city').value.trim(),
+                pincode: document.getElementById('app-inst-pincode').value.trim(),
+                email: document.getElementById('app-inst-email').value.trim(),
+                phone: document.getElementById('app-inst-phone').value.trim(),
+                scheme: document.getElementById('app-scheme-select').value,
+                appliedAt: new Date().toLocaleString('en-IN')
+            };
+
+            // Show animated processing line
+            const procLine = document.getElementById('app-processing-line');
+            const submitBtn = document.getElementById('btn-submit-app');
+            if (procLine) procLine.style.display = 'block';
+            if (submitBtn) submitBtn.style.display = 'none';
+
+            // Submit to Python Backend / MongoDB Atlas
+            if (typeof submitSchemeApplication === 'function') {
+                submitSchemeApplication(appData)
+                    .then(() => {
+                        setTimeout(() => {
+                            const formContainer = document.getElementById('application-form-container');
+                            if (formContainer) formContainer.style.display = 'none';
+                            if (procLine) procLine.style.display = 'none';
+                            const successBox = document.getElementById('app-success-box');
+                            if (successBox) successBox.style.display = 'block';
+                        }, 1200);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("There was an issue submitting your application: " + err.message);
+                        if (procLine) procLine.style.display = 'none';
+                        if (submitBtn) submitBtn.style.display = 'block';
+                    });
+            } else {
+                setTimeout(() => {
+                    const form = document.getElementById('scheme-app-form');
+                    if (form) form.style.display = 'none';
+                    if (procLine) procLine.style.display = 'none';
+                    const successBox = document.getElementById('app-success-box');
+                    if (successBox) successBox.style.display = 'block';
+                }, 1200);
+            }
+        };
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSchemeModal();
+        });
+
+    </script>
+</body>
+</html>

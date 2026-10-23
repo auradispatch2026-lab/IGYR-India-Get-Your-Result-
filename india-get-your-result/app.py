@@ -16,6 +16,9 @@ institutes_col = db['institutes']
 results_col = db['results']
 notices_col = db['notices']
 quicklinks_col = db['quicklinks']
+schemes_col = db['schemes']
+applications_col = db['applications']
+settings_col = db['settings']
 
 # Initialize demo data if collections are empty
 def init_db():
@@ -36,8 +39,89 @@ def init_db():
             {"text": "Home", "url": "index.html"},
             {"text": "About", "url": "about.html"},
             {"text": "Results", "url": "search-result.html"},
+            {"text": "Institute Login Portal", "url": "institute-login.html"},
             {"text": "Admin Login", "url": "admin-login.html"}
         ]})
+
+    if schemes_col.count_documents({}) == 0:
+        schemes_col.insert_many([
+            {
+                "id": "SCH_001",
+                "name": "Normal Tabulation Scheme",
+                "rate": "5",
+                "unit": "per student",
+                "badge": "Standard",
+                "color": "blue",
+                "features": [
+                    "Standard Tabulation Register sheet generation",
+                    "Printable landscape gazette for official records",
+                    "Roll number & student name index",
+                    "Basic verification & export"
+                ],
+                "desc": "Best for schools needing standard annual tabulation registers and fast record generation."
+            },
+            {
+                "id": "SCH_002",
+                "name": "Tabulation-Wise Rate Scheme",
+                "rate": "8",
+                "unit": "per student",
+                "badge": "Popular",
+                "color": "purple",
+                "features": [
+                    "Complete Tabulation-wise gazette generation",
+                    "Digital Marksheet with Scannable Barcode",
+                    "Class-wise & Exam-wise filter tabulation",
+                    "Instant online result search by roll number"
+                ],
+                "desc": "Ideal for colleges and high schools wanting both gazette tabulation and online student marksheet access."
+            },
+            {
+                "id": "SCH_003",
+                "name": "Premium Digital & Verification Scheme",
+                "rate": "12",
+                "unit": "per student",
+                "badge": "Complete",
+                "color": "green",
+                "features": [
+                    "Full Tabulation Register + Digital Marksheets",
+                    "Custom Institute Logo & Authorized Signatures",
+                    "Unique Marksheet Verification ID (VID)",
+                    "Tamper-proof online verification portal",
+                    "Permanent MongoDB Cloud Archive"
+                ],
+                "desc": "Complete digital solution with school branding, verification security, and unlimited PDF marksheets."
+            }
+        ])
+
+    if applications_col.count_documents({}) == 0:
+        applications_col.insert_one({
+            "id": "APP_1001",
+            "name": "St. Xavier Public School",
+            "type": "School",
+            "state": "Odisha",
+            "district": "Khordha",
+            "city": "Bhubaneswar",
+            "pincode": "751024",
+            "email": "principal@stxavier.edu.in",
+            "phone": "9876543210",
+            "scheme": "Normal Tabulation Scheme",
+            "schemeRate": "5",
+            "status": "PENDING",
+            "appliedAt": "2026-10-23 15:30"
+        })
+
+    if settings_col.count_documents({}) == 0:
+        settings_col.insert_one({
+            "id": "system_settings",
+            "supportEmail": "support@igyr.org",
+            "helplinePhone": "+91 1800-889-4497",
+            "supportHours": "Monday - Saturday: 9:00 AM - 6:00 PM IST",
+            "officeAddress": "IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India",
+            "helpCenterUrl": "about.html#contact",
+            "whatsappSupport": "+91 98765 43210",
+            "contactHeading": "Support & Contact",
+            "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline"
+        })
 
 init_db()
 
@@ -82,12 +166,31 @@ def sync_data():
     
     ql_doc = quicklinks_col.find_one({}, {'_id': 0})
     quicklinks = ql_doc['links'] if ql_doc and 'links' in ql_doc else []
+    schemes = list(schemes_col.find({}, {'_id': 0}))
+    applications = list(applications_col.find({}, {'_id': 0}))
     
+    settings_doc = settings_col.find_one({"id": "system_settings"}, {'_id': 0})
+    if not settings_doc:
+        settings_doc = settings_col.find_one({}, {'_id': 0}) or {
+            "id": "system_settings",
+            "supportEmail": "support@igyr.org",
+            "helplinePhone": "+91 1800-889-4497",
+            "supportHours": "Monday - Saturday: 9:00 AM - 6:00 PM IST",
+            "officeAddress": "IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India",
+            "helpCenterUrl": "about.html#contact",
+            "whatsappSupport": "+91 98765 43210",
+            "contactHeading": "Support & Contact",
+            "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline"
+        }
+
     return jsonify({
         "institutes": institutes,
         "results": results,
         "notices": notices,
-        "quicklinks": quicklinks
+        "quicklinks": quicklinks,
+        "schemes": schemes,
+        "applications": applications,
+        "settings": settings_doc
     })
 
 
@@ -142,6 +245,55 @@ def save_quicklinks():
     quicklinks_col.delete_many({})
     quicklinks_col.insert_one({"links": data})
     return jsonify({"status": "success"})
+
+@app.route('/api/schemes', methods=['POST'])
+def save_schemes():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
+    data = request.json
+    schemes_col.delete_many({})
+    if data:
+        schemes_col.insert_many(data)
+    return jsonify({"status": "success"})
+
+
+import time
+from datetime import datetime
+
+@app.route('/api/applications', methods=['POST'])
+def submit_application():
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    app_id = f"APP_{int(time.time())}"
+    data['id'] = app_id
+    if 'status' not in data:
+        data['status'] = 'PENDING'
+    if 'appliedAt' not in data:
+        data['appliedAt'] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        
+    applications_col.insert_one(data)
+    data.pop('_id', None)
+    return jsonify({"status": "success", "message": "Application submitted successfully", "application": data}), 201
+
+@app.route('/api/applications/save-all', methods=['POST'])
+def save_all_applications():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
+    data = request.json
+    applications_col.delete_many({})
+    if data:
+        applications_col.insert_many(data)
+    return jsonify({"status": "success"})
+
+@app.route('/api/settings', methods=['POST'])
+def save_settings():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
+    data = request.json or {}
+    data['id'] = 'system_settings'
+    settings_col.delete_many({})
+    settings_col.insert_one(data)
+    data.pop('_id', None)
+    return jsonify({"status": "success", "settings": data})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5005))
