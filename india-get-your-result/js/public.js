@@ -244,6 +244,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 scContainer.appendChild(aHelp);
             }
 
+            // Meet Our Founder Link
+            const aFounder = document.createElement('a');
+            aFounder.href = "about.html";
+            aFounder.innerHTML = `👤 Meet Our Founder — Arnnav Panda`;
+            aFounder.style.fontWeight = "600";
+            aFounder.style.color = "#fce38a";
+            scContainer.appendChild(aFounder);
+
             const aPriv = document.createElement('a');
             aPriv.href = "privacy.html";
             aPriv.textContent = "Privacy Policy";

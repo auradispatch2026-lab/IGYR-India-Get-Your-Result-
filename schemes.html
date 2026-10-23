@@ -1273,7 +1273,7 @@
 
     <!-- LOGIC SCRIPTS -->
     <script src="js/data-india.js"></script>
-    <script src="js/storage.js?v=1000031"></script>
+    <script src="js/storage.js?v=1000034"></script>
     <script>
         function renderPublicSchemes() {
             const container = document.getElementById('schemes-container');
@@ -1478,6 +1478,13 @@
                     aHelp.innerHTML = `ℹ️ Help Center & Recognition`;
                     scContainer.appendChild(aHelp);
                 }
+
+                const aFounder = document.createElement('a');
+                aFounder.href = "about.html";
+                aFounder.innerHTML = `👤 Meet Our Founder — Arnnav Panda`;
+                aFounder.style.fontWeight = "600";
+                aFounder.style.color = "#fce38a";
+                scContainer.appendChild(aFounder);
             }
         };
 

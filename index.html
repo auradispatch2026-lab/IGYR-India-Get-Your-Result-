@@ -513,6 +513,37 @@
             transform: translateY(-3px);
         }
 
+        .about-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 28px;
+        }
+
+        .founder-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 22px;
+            color: #062b63;
+            background: #f0f7ff;
+            border: 1.5px solid #cde0f5;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: .3s;
+        }
+
+        .founder-btn:hover {
+            background: #e1effe;
+            border-color: #1171e8;
+            color: #1171e8;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(17, 113, 232, 0.15);
+        }
+
         .about-image {
             border-radius: 18px;
             overflow: hidden;
@@ -925,6 +956,10 @@
                 margin-right: auto;
             }
 
+            .about-actions {
+                justify-content: center;
+            }
+
             .dream-text {
                 display: none;
             }
@@ -1189,10 +1224,15 @@
                 transparent and trustworthy for every student across India.
             </p>
 
-            <a href="about.html" class="learn-btn">
-                Learn More
-                <span>→</span>
-            </a>
+            <div class="about-actions">
+                <a href="about.html" class="learn-btn" style="margin-top: 0;">
+                    Learn More
+                    <span>→</span>
+                </a>
+                <a href="about.html" class="founder-btn">
+                    <span>👤</span> Meet Our Founder — Arnnav Panda <span>→</span>
+                </a>
+            </div>
 
         </div>
 
@@ -1310,6 +1350,7 @@
 
             <div class="footer-links" id="support-contact-container">
 
+                <a href="about.html" style="font-weight: 600; color: #fce38a;">👤 Meet Our Founder — Arnnav Panda</a>
                 <a href="#contact">Contact</a>
                 <a href="privacy.html">Privacy Policy</a>
                 <a href="terms.html">Terms & Conditions</a>
@@ -1394,8 +1435,8 @@
 
     <!-- App Logic Scripts -->
     <script src="js/data-india.js"></script>
-    <script src="js/storage.js?v=1000033"></script>
-    <script src="js/public.js?v=1000033"></script>
+    <script src="js/storage.js?v=1000034"></script>
+    <script src="js/public.js?v=1000034"></script>
 
 <script>
 
@@ -1496,7 +1537,7 @@
 
     /* Smooth button feedback */
 
-    document.querySelectorAll(".hero-button, .learn-btn").forEach(button => {
+    document.querySelectorAll(".hero-button, .learn-btn, .founder-btn").forEach(button => {
 
         button.addEventListener("click", () => {
 
