@@ -231,11 +231,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const qlForm = document.getElementById('quick-links-form');
     const qlList = document.getElementById('quick-links-list');
     
-    window.deleteQuickLink = function(idx) {
-        let links = getQuickLinks();
-        links.splice(idx, 1);
-        saveQuickLinks(links);
+    window.editQuickLink = function(idx) {
+        const links = getQuickLinks();
+        const l = links[idx];
+        if (!l) return;
+        
+        const editIdxInput = document.getElementById('ql-edit-index');
+        const textInput = document.getElementById('ql-text');
+        const urlInput = document.getElementById('ql-url');
+        const submitBtn = document.getElementById('ql-submit-btn');
+        const cancelBtn = document.getElementById('ql-cancel-btn');
+        const titleEl = document.getElementById('ql-form-title');
+        
+        if (editIdxInput) editIdxInput.value = idx;
+        if (textInput) textInput.value = l.text || '';
+        if (urlInput) urlInput.value = l.url || '';
+        if (submitBtn) {
+            submitBtn.textContent = "💾 Update Link";
+            submitBtn.style.background = "#28a745";
+            submitBtn.style.borderColor = "#28a745";
+        }
+        if (cancelBtn) cancelBtn.style.display = "inline-block";
+        if (titleEl) titleEl.textContent = "✏️ Edit Quick Link: " + (l.text || '');
+        
+        if (qlForm) qlForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (textInput) textInput.focus();
         renderQuickLinks();
+    };
+
+    window.cancelQuickLinkEdit = function() {
+        const form = document.getElementById('quick-links-form');
+        if (form) form.reset();
+        
+        const editIdxInput = document.getElementById('ql-edit-index');
+        const submitBtn = document.getElementById('ql-submit-btn');
+        const cancelBtn = document.getElementById('ql-cancel-btn');
+        const titleEl = document.getElementById('ql-form-title');
+        
+        if (editIdxInput) editIdxInput.value = "-1";
+        if (submitBtn) {
+            submitBtn.textContent = "Add Link";
+            submitBtn.style.background = "";
+            submitBtn.style.borderColor = "";
+        }
+        if (cancelBtn) cancelBtn.style.display = "none";
+        if (titleEl) titleEl.textContent = "🔗 Manage Quick Links (Footer)";
+        renderQuickLinks();
+    };
+
+    window.deleteQuickLink = function(idx) {
+        const doDelete = function() {
+            let links = getQuickLinks();
+            links.splice(idx, 1);
+            saveQuickLinks(links);
+            cancelQuickLinkEdit();
+        };
+
+        if (typeof window.igyrConfirm === 'function') {
+            window.igyrConfirm("Are you sure you want to delete this Quick Link?", doDelete);
+        } else {
+            if (confirm("Are you sure you want to delete this Quick Link?")) {
+                doDelete();
+            }
+        }
     };
 
     window.renderQuickLinks = function() {
@@ -244,14 +302,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const links = getQuickLinks();
             qlList.innerHTML = '';
             if(links.length === 0) {
-                qlList.innerHTML = '<tr><td colspan="3" style="text-align:center;">No quick links added.</td></tr>';
+                qlList.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 15px; color: #888;">No quick links added yet.</td></tr>';
                 return;
             }
+            const activeEditIdx = parseInt(document.getElementById('ql-edit-index')?.value ?? '-1', 10);
+
             links.forEach((l, idx) => {
-                qlList.innerHTML += `<tr>
-                    <td style="font-weight: 600;">${l.text}</td>
-                    <td style="color: #666;">${l.url}</td>
-                    <td><button class="btn btn-outline" style="color:#e55039; border-color:#e55039; padding: 2px 8px;" onclick="deleteQuickLink(${idx})">Delete</button></td>
+                const isEditing = idx === activeEditIdx;
+                const rowBg = isEditing ? 'background: #eef6ff;' : '';
+                const safeText = String(l.text || '').replace(/"/g, '&quot;');
+                const safeUrl = String(l.url || '').replace(/"/g, '&quot;');
+                
+                qlList.innerHTML += `<tr style="${rowBg}">
+                    <td style="font-weight: 600; vertical-align: middle;">
+                        ${isEditing ? '<span style="color:#0d6efd; font-size:11px; margin-right:4px;">▶ EDITING:</span>' : ''}${safeText}
+                    </td>
+                    <td style="color: #4a5568; word-break: break-all; vertical-align: middle;">${safeUrl}</td>
+                    <td style="text-align: center; vertical-align: middle; white-space: nowrap;">
+                        <button type="button" class="btn btn-outline" style="color: #0d6efd; border-color: #0d6efd; padding: 4px 10px; font-size: 12px; margin-right: 6px; cursor: pointer;" onclick="editQuickLink(${idx})">✏️ Edit</button>
+                        <button type="button" class="btn btn-outline" style="color: #e55039; border-color: #e55039; padding: 4px 10px; font-size: 12px; cursor: pointer;" onclick="deleteQuickLink(${idx})">🗑️ Delete</button>
+                    </td>
                 </tr>`;
             });
         } catch(e) { console.error(e); }
@@ -261,16 +331,64 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuickLinks();
         qlForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const editIdx = parseInt(document.getElementById('ql-edit-index')?.value ?? '-1', 10);
             let links = getQuickLinks();
-            links.push({
-                text: document.getElementById('ql-text').value,
-                url: document.getElementById('ql-url').value
-            });
+            const linkData = {
+                text: document.getElementById('ql-text').value.trim(),
+                url: document.getElementById('ql-url').value.trim()
+            };
+
+            if (editIdx >= 0 && editIdx < links.length) {
+                links[editIdx] = linkData;
+                alert("Quick Link updated successfully! It will now show up on the front page and footer.");
+            } else {
+                links.push(linkData);
+                alert("Quick Link added successfully! It will now show up on the front page and footer.");
+            }
             saveQuickLinks(links);
-            qlForm.reset();
-            renderQuickLinks();
-            alert("Quick Link Added successfully! It will now show up on the front page.");
+            cancelQuickLinkEdit();
         });
+    }
+
+    // --- DASHBOARD SUPPORT & CONTACT SETTINGS ---
+    const dashSupportForm = document.getElementById('dash-support-form');
+    if (dashSupportForm) {
+        const loadDashSupport = () => {
+            const settings = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
+            const emailInp = document.getElementById('dash-set-email');
+            const phoneInp = document.getElementById('dash-set-phone');
+            const hoursInp = document.getElementById('dash-set-hours');
+            const waInp = document.getElementById('dash-set-whatsapp');
+
+            if (emailInp) emailInp.value = settings.supportEmail || 'support@igyr.org';
+            if (phoneInp) phoneInp.value = settings.helplinePhone || '+91 1800-889-4497';
+            if (hoursInp) hoursInp.value = settings.supportHours || 'Monday - Saturday: 9:00 AM - 6:00 PM IST';
+            if (waInp) waInp.value = settings.whatsappSupport || '+91 98765 43210';
+        };
+
+        loadDashSupport();
+
+        window.handleDashSupportSave = function(e) {
+            if (e) e.preventDefault();
+            const currentSettings = typeof getSystemSettings === 'function' ? getSystemSettings() : {};
+            const updated = {
+                ...currentSettings,
+                id: 'system_settings',
+                supportEmail: document.getElementById('dash-set-email').value.trim(),
+                helplinePhone: document.getElementById('dash-set-phone').value.trim(),
+                supportHours: document.getElementById('dash-set-hours').value.trim(),
+                whatsappSupport: document.getElementById('dash-set-whatsapp').value.trim()
+            };
+
+            saveSystemSettings(updated);
+            const statusEl = document.getElementById('dash-support-status');
+            if (statusEl) {
+                statusEl.style.display = 'inline';
+                setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
+            }
+            alert("Support & Contact settings saved successfully! Changes are live on public footers.");
+            return false;
+        };
     }
 
     
@@ -649,4 +767,167 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ==========================================
+    // --- SCHEMES MANAGEMENT LOGIC (ADMIN) ---
+    // ==========================================
+    const schemeForm = document.getElementById('scheme-form');
+    const schemeList = document.getElementById('scheme-list');
+    
+    window.renderSchemesList = function() {
+        if (!schemeList) return;
+        const schemes = getSchemes();
+        schemeList.innerHTML = '';
+        if (!schemes || schemes.length === 0) {
+            schemeList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 25px; color:#888;">No tabulation schemes added yet. Create your first scheme above!</td></tr>';
+            return;
+        }
+        
+        schemes.forEach((sch, idx) => {
+            const tr = document.createElement('tr');
+            const colorMap = {
+                blue: '#1266d6',
+                purple: '#8e44ad',
+                green: '#27ae60',
+                orange: '#e67e22',
+                rose: '#e84393',
+                teal: '#00cec9'
+            };
+            const themeColor = colorMap[sch.color] || '#1266d6';
+            
+            let featuresStr = '';
+            if (Array.isArray(sch.features)) {
+                featuresStr = sch.features.join(' • ');
+            } else if (sch.features) {
+                featuresStr = sch.features;
+            }
+            
+            tr.innerHTML = `
+                <td style="padding: 12px 10px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:${themeColor}; flex-shrink:0;"></span>
+                        <strong style="color: #062b63; font-size: 14px;">${sch.name}</strong>
+                    </div>
+                    ${sch.badge ? `<span style="display:inline-block; margin-top:5px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:12px; background:${themeColor}15; color:${themeColor}; border:1px solid ${themeColor}40;">${sch.badge}</span>` : ''}
+                </td>
+                <td style="padding: 12px 10px;">
+                    <div style="font-size: 24px; font-weight: 800; color: ${themeColor}; font-family: 'Poppins', sans-serif; line-height: 1.1;">
+                        ₹${sch.rate}
+                    </div>
+                    <small style="color: #666; font-weight: 500;">${sch.unit || 'per student'}</small>
+                </td>
+                <td style="max-width: 280px; font-size: 12px; color: #555; padding: 12px 10px;">
+                    <p style="margin:0 0 5px 0; font-weight:600; color:#1a202c;">${sch.desc || ''}</p>
+                    ${featuresStr ? `<div style="color:#718096; font-size:11px; line-height:1.4;">${featuresStr}</div>` : ''}
+                </td>
+                <td style="padding: 12px 10px;">
+                    <span style="text-transform: capitalize; font-weight: 700; color: ${themeColor}; font-size: 12px; background:${themeColor}12; padding:3px 8px; border-radius:4px;">
+                        ${sch.color || 'blue'}
+                    </span>
+                </td>
+                <td style="white-space:nowrap; padding: 12px 10px;">
+                    <button class="btn btn-outline" style="color: #1266d6; border-color: #1266d6; padding: 4px 10px; font-size: 12px; margin-right: 6px;" onclick="editScheme(${idx})">✏️ Edit</button>
+                    <button class="btn btn-outline" style="color: #e55039; border-color: #e55039; padding: 4px 10px; font-size: 12px;" onclick="deleteScheme(${idx})">🗑️ Delete</button>
+                </td>
+            `;
+            schemeList.appendChild(tr);
+        });
+    };
+    
+    window.deleteScheme = function(idx) {
+        igyrConfirm("Are you sure you want to delete this pricing scheme?", function() {
+            let schemes = getSchemes();
+            schemes.splice(idx, 1);
+            saveSchemes(schemes);
+            renderSchemesList();
+        });
+    };
+    
+    window.editScheme = function(idx) {
+        let schemes = getSchemes();
+        let sch = schemes[idx];
+        if (!sch) return;
+        
+        document.getElementById('scheme-id-input').value = sch.id || ('SCH_' + idx);
+        document.getElementById('scheme-index-input').value = idx;
+        document.getElementById('scheme-name-input').value = sch.name || '';
+        document.getElementById('scheme-rate-input').value = sch.rate || '';
+        document.getElementById('scheme-unit-input').value = sch.unit || 'per student';
+        document.getElementById('scheme-badge-input').value = sch.badge || '';
+        document.getElementById('scheme-color-input').value = sch.color || 'blue';
+        document.getElementById('scheme-desc-input').value = sch.desc || '';
+        document.getElementById('scheme-features-input').value = Array.isArray(sch.features) ? sch.features.join('\n') : (sch.features || '');
+        
+        document.getElementById('scheme-submit-btn').textContent = "💾 Update Scheme";
+        document.getElementById('scheme-cancel-btn').style.display = "inline-block";
+        document.getElementById('scheme-form-title').textContent = "✏️ Edit Scheme: " + sch.name;
+        
+        document.getElementById('scheme-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    
+    window.cancelSchemeEdit = function() {
+        if (!document.getElementById('scheme-form')) return;
+        document.getElementById('scheme-form').reset();
+        document.getElementById('scheme-index-input').value = '-1';
+        document.getElementById('scheme-id-input').value = '';
+        document.getElementById('scheme-submit-btn').textContent = "➕ Save Scheme";
+        document.getElementById('scheme-cancel-btn').style.display = "none";
+        document.getElementById('scheme-form-title').textContent = "➕ Add New Tabulation Scheme";
+    };
+    
+    if (schemeForm) {
+        renderSchemesList();
+        schemeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('scheme-index-input').value, 10);
+            let schemes = getSchemes();
+            
+            const featuresRaw = document.getElementById('scheme-features-input').value.trim();
+            const featuresArray = featuresRaw ? featuresRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+            
+            const schemeObj = {
+                id: document.getElementById('scheme-id-input').value || ('SCH_' + Date.now()),
+                name: document.getElementById('scheme-name-input').value.trim(),
+                rate: document.getElementById('scheme-rate-input').value.trim(),
+                unit: document.getElementById('scheme-unit-input').value.trim() || 'per student',
+                badge: document.getElementById('scheme-badge-input').value.trim(),
+                color: document.getElementById('scheme-color-input').value,
+                desc: document.getElementById('scheme-desc-input').value.trim(),
+                features: featuresArray
+            };
+            
+            if (editIdx >= 0 && editIdx < schemes.length) {
+                schemes[editIdx] = schemeObj;
+                alert("Scheme updated successfully! Changes are live on the website.");
+            } else {
+                schemes.push(schemeObj);
+                alert("New tabulation scheme added successfully! It is now live on the website.");
+            }
+            
+            saveSchemes(schemes);
+            cancelSchemeEdit();
+            renderSchemesList();
+        });
+    }
+
+
+    // Update Submission Forms pending badge in sidebar
+    window.updatePendingAppsBadge = function() {
+        const apps = (typeof getApplications === 'function') ? getApplications() : [];
+        const pendingCount = apps.filter(a => a.status === 'PENDING').length;
+        const links = document.querySelectorAll('.sidebar ul li a');
+        links.forEach(a => {
+            if (a.textContent.includes('Submission Forms')) {
+                if (pendingCount > 0) {
+                    a.innerHTML = `Submission Forms <span style="background:#e55039; color:#fff; font-size:11px; padding:2px 7px; border-radius:10px; margin-left:6px; font-weight:700;">${pendingCount}</span>`;
+                } else {
+                    a.innerHTML = `Submission Forms`;
+                }
+            }
+        });
+    };
+
+    updatePendingAppsBadge();
+    window.addEventListener('igyr_data_updated', updatePendingAppsBadge);
+
 });

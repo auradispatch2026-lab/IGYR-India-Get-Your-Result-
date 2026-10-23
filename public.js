@@ -149,17 +149,113 @@ document.addEventListener('DOMContentLoaded', () => {
     window.renderQuickLinks = function() {
         const qlContainer = document.getElementById('quick-links-container');
         if (qlContainer) {
-            let links = [];
-            links = typeof getQuickLinks === "function" ? getQuickLinks() : [];
-            if(links.length > 0) {
-                qlContainer.innerHTML = '';
-                links.forEach(l => {
-                    qlContainer.innerHTML += `<a href="${l.url}">${l.text}</a>`;
-                });
+            let links = typeof getQuickLinks === "function" ? getQuickLinks() : [];
+            if (!links || links.length === 0) {
+                links = [
+                    { text: 'Home', url: 'index.html' },
+                    { text: 'About', url: 'about.html' },
+                    { text: 'Results', url: 'search-result.html' },
+                    { text: 'Institute Login Portal', url: 'institute-login.html' }
+                ];
+            } else {
+                const hasInst = links.some(l => l.text && l.text.toLowerCase().includes('institute'));
+                if (!hasInst) {
+                    links.push({ text: 'Institute Login Portal', url: 'institute-login.html' });
+                }
             }
+
+            qlContainer.innerHTML = '';
+            links.forEach(l => {
+                const a = document.createElement('a');
+                a.textContent = l.text;
+                a.href = l.url || '#';
+                if (l.text.toLowerCase().includes('institute login')) {
+                    a.style.color = '#fce38a';
+                    a.style.fontWeight = '700';
+                }
+                a.onclick = function(e) {
+                    if (!l.url || l.url.trim() === '' || l.url === '#') {
+                        e.preventDefault();
+                        alert('Link not found: This link has not been configured by the admin.');
+                    }
+                };
+                qlContainer.appendChild(a);
+            });
         }
     };
     window.renderQuickLinks();
+
+    // Render Support & Contact
+    window.renderSupportContact = function() {
+        const scContainer = document.getElementById('support-contact-container');
+        const scHeading = document.getElementById('footer-support-heading');
+        const settings = typeof getSystemSettings === "function" ? getSystemSettings() : null;
+        if (!settings) return;
+
+        if (scHeading && settings.contactHeading) {
+            scHeading.textContent = settings.contactHeading;
+        }
+
+        if (scContainer) {
+            scContainer.innerHTML = '';
+            
+            // Email link
+            if (settings.supportEmail) {
+                const aMail = document.createElement('a');
+                aMail.href = `mailto:${settings.supportEmail}`;
+                aMail.innerHTML = `✉️ ${settings.supportEmail}`;
+                scContainer.appendChild(aMail);
+            }
+            
+            // Helpline Phone
+            if (settings.helplinePhone) {
+                const aPhone = document.createElement('a');
+                aPhone.href = `tel:${settings.helplinePhone.replace(/\s+/g, '')}`;
+                aPhone.innerHTML = `📞 ${settings.helplinePhone}`;
+                scContainer.appendChild(aPhone);
+            }
+
+            // WhatsApp Support
+            if (settings.whatsappSupport) {
+                const aWa = document.createElement('a');
+                const cleanWa = settings.whatsappSupport.replace(/[^0-9]/g, '');
+                aWa.href = `https://wa.me/${cleanWa}`;
+                aWa.target = "_blank";
+                aWa.rel = "noopener noreferrer";
+                aWa.innerHTML = `💬 WhatsApp: ${settings.whatsappSupport}`;
+                scContainer.appendChild(aWa);
+            }
+
+            // Support Hours
+            if (settings.supportHours) {
+                const divHours = document.createElement('div');
+                divHours.style.fontSize = '12px';
+                divHours.style.color = '#94a3b8';
+                divHours.style.margin = '4px 0';
+                divHours.innerHTML = `🕒 ${settings.supportHours}`;
+                scContainer.appendChild(divHours);
+            }
+
+            // Help Center URL
+            if (settings.helpCenterUrl) {
+                const aHelp = document.createElement('a');
+                aHelp.href = settings.helpCenterUrl;
+                aHelp.innerHTML = `ℹ️ Help Center & Recognition`;
+                scContainer.appendChild(aHelp);
+            }
+
+            const aPriv = document.createElement('a');
+            aPriv.href = "privacy.html";
+            aPriv.textContent = "Privacy Policy";
+            scContainer.appendChild(aPriv);
+
+            const aTerms = document.createElement('a');
+            aTerms.href = "terms.html";
+            aTerms.textContent = "Terms & Conditions";
+            scContainer.appendChild(aTerms);
+        }
+    };
+    window.renderSupportContact();
 
     window.renderPublicData = function() {
         const noticeTicker = document.getElementById('notice-ticker');
@@ -237,4 +333,5 @@ window.addEventListener('igyr_data_updated', () => {
     console.log("Public View Auto-updating...");
     if(typeof window.renderPublicData === 'function') window.renderPublicData();
     if(typeof window.renderQuickLinks === 'function') window.renderQuickLinks();
+    if(typeof window.renderSupportContact === 'function') window.renderSupportContact();
 });

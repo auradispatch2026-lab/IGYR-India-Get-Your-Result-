@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submission Forms - Super Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <style>
+        :root {
+            --admin-bg: #f3f8ff;
+            --admin-card: rgba(255, 255, 255, 0.9);
+            --admin-primary: #1266d6;
+            --admin-dark: #062b63;
+        }
+        body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
+        .dashboard { min-height: 100vh; display: flex; }
+        
+        .sidebar { background: linear-gradient(180deg, var(--admin-dark) 0%, #0a3d8c 100%); box-shadow: 4px 0 20px rgba(0,0,0,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+        .sidebar h2 { font-family: 'Poppins', sans-serif; font-size: 22px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; color: #fce38a; }
+        .sidebar ul li a { font-size: 15px; padding: 12px 20px; margin-bottom: 8px; border-radius: 8px; transition: 0.3s; font-weight: 500; display: flex; align-items: center; justify-content: space-between; }
+        .sidebar ul li a:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .sidebar ul li a.active { background: rgba(255,255,255,0.18); color: #fce38a; font-weight: 700; }
+        
+        .main-content { padding: 40px; flex: 1; }
+        .main-content h1 { font-family: 'Poppins', sans-serif; font-size: 32px; color: var(--admin-dark); margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .main-content h1::before { content: '⚡'; font-size: 28px; }
+        
+        .card { 
+            background: var(--admin-card); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(7, 29, 73, 0.05); 
+            border-radius: 16px; 
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .stat-pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .stat-approved { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .stat-contacted { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2>Super Admin</h2>
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-institutes.html">Manage Institutes</a></li>
+                <li><a href="admin-schemes.html">Manage Schemes</a></li>
+                <li><a href="admin-applications.html" class="active">Submission Forms <span id="sb-pending-badge" style="background:#e55039; color:#fff; font-size:11px; padding:2px 7px; border-radius:10px; display:none;">0</span></a></li>
+                <li><a href="admin-settings.html">System Settings</a></li>
+                <li><a href="admin-login-institute.html">Login Institute</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1>Submission Forms (Scheme Applications)</h1>
+                    <p style="font-size: 14px; color: #64748b; margin-top: -15px;">
+                        Incoming registration forms submitted by institutes when selecting a tabulation scheme.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="schemes.html" target="_blank" class="btn btn-outline" style="color: #1266d6; border-color: #1266d6; padding: 8px 18px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px; background: #fff;">
+                        👁️ View Public Schemes ↗
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                <div class="card" style="border-top: 4px solid #1266d6;">
+                    <h3 style="font-size: 15px; color: #64748b; margin-bottom: 6px;">Total Submissions</h3>
+                    <p id="tot-apps" style="font-size: 32px; font-weight: 800; color: #062b63; margin: 0;">0</p>
+                </div>
+                <div class="card" style="border-top: 4px solid #f59e0b;">
+                    <h3 style="font-size: 15px; color: #64748b; margin-bottom: 6px;">Pending Review</h3>
+                    <p id="tot-pending" style="font-size: 32px; font-weight: 800; color: #d97706; margin: 0;">0</p>
+                </div>
+                <div class="card" style="border-top: 4px solid #10b981;">
+                    <h3 style="font-size: 15px; color: #64748b; margin-bottom: 6px;">Approved</h3>
+                    <p id="tot-approved" style="font-size: 32px; font-weight: 800; color: #059669; margin: 0;">0</p>
+                </div>
+            </div>
+
+            <!-- Applications Table Card -->
+            <div class="card" style="background:#fff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="color: #062b63; margin: 0; font-size: 18px;">
+                        📋 Submitted Institute Applications
+                    </h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="filterApplications('ALL')" class="btn btn-outline" style="padding: 4px 12px; font-size: 12px; border-radius: 6px;">All</button>
+                        <button onclick="filterApplications('PENDING')" class="btn btn-outline" style="padding: 4px 12px; font-size: 12px; border-radius: 6px; color: #d97706; border-color: #d97706;">Pending</button>
+                        <button onclick="filterApplications('APPROVED')" class="btn btn-outline" style="padding: 4px 12px; font-size: 12px; border-radius: 6px; color: #059669; border-color: #059669;">Approved</button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="table" style="font-size: 13px; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8fbff;">
+                                <th style="padding: 12px;">Date & Time</th>
+                                <th style="padding: 12px;">Institute Details</th>
+                                <th style="padding: 12px;">Chosen Scheme</th>
+                                <th style="padding: 12px;">Location</th>
+                                <th style="padding: 12px;">Contact Info</th>
+                                <th style="padding: 12px;">Status</th>
+                                <th style="padding: 12px;">Admin Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applications-table-body">
+                            <!-- Populated dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/storage.js?v=1000031"></script>
+    <script src="js/admin.js?v=1000031"></script>
+    <script>
+        let currentFilter = 'ALL';
+
+        function filterApplications(status) {
+            currentFilter = status;
+            renderApplicationsTable();
+        }
+
+        function renderApplicationsTable() {
+            const tbody = document.getElementById('applications-table-body');
+            if (!tbody) return;
+
+            const apps = (typeof getApplications === 'function') ? getApplications() : [];
+            tbody.innerHTML = '';
+
+            let pendingCount = 0;
+            let approvedCount = 0;
+
+            apps.forEach(a => {
+                if (a.status === 'PENDING') pendingCount++;
+                if (a.status === 'APPROVED') approvedCount++;
+            });
+
+            // Update stats
+            document.getElementById('tot-apps').textContent = apps.length;
+            document.getElementById('tot-pending').textContent = pendingCount;
+            document.getElementById('tot-approved').textContent = approvedCount;
+
+            const badgeEl = document.getElementById('sb-pending-badge');
+            if (badgeEl) {
+                if (pendingCount > 0) {
+                    badgeEl.textContent = pendingCount;
+                    badgeEl.style.display = 'inline-block';
+                } else {
+                    badgeEl.style.display = 'none';
+                }
+            }
+
+            const filteredApps = apps.filter(a => {
+                if (currentFilter === 'ALL') return true;
+                return a.status === currentFilter;
+            });
+
+            if (filteredApps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #888;">No application forms found for this filter.</td></tr>';
+                return;
+            }
+
+            filteredApps.forEach((a, idx) => {
+                const tr = document.createElement('tr');
+
+                let statusBadge = '<span class="stat-badge stat-pending">Pending Review</span>';
+                if (a.status === 'APPROVED') {
+                    statusBadge = '<span class="stat-badge stat-approved">Approved</span>';
+                } else if (a.status === 'CONTACTED') {
+                    statusBadge = '<span class="stat-badge stat-contacted">Contacted</span>';
+                }
+
+                tr.innerHTML = `
+                    <td style="white-space: nowrap; color: #64748b; font-size: 12px;">
+                        ${a.appliedAt || 'Recent'}
+                    </td>
+                    <td>
+                        <strong style="color: #062b63; font-size: 14px;">${a.name}</strong><br>
+                        <small style="color: #475569;">${a.type || 'Institute'}</small>
+                    </td>
+                    <td>
+                        <span style="font-weight: 700; color: #1266d6;">${a.scheme || 'Not Specified'}</span>
+                    </td>
+                    <td style="font-size: 12.5px; color: #334155;">
+                        ${a.city || ''}, ${a.district || ''}<br>
+                        <small style="color: #64748b;">${a.state || ''} - ${a.pincode || ''}</small>
+                    </td>
+                    <td>
+                        <a href="mailto:${a.email}" style="color: #1266d6; text-decoration: underline;">${a.email}</a><br>
+                        <span style="font-size: 12px; color: #475569;">📞 ${a.phone}</span>
+                    </td>
+                    <td>
+                        ${statusBadge}
+                    </td>
+                    <td style="white-space: nowrap;">
+                        ${a.status !== 'APPROVED' ? `
+                            <button class="btn btn-outline" style="color: #059669; border-color: #059669; padding: 4px 10px; font-size: 12px; margin-right: 5px; font-weight:700;" onclick="approveApplication(${idx})">
+                                ✅ Approve
+                            </button>
+                        ` : `
+                            <span style="color: #059669; font-weight: 700; font-size: 12px; margin-right: 8px;">✓ Approved</span>
+                        `}
+                        ${a.status === 'PENDING' ? `
+                            <button class="btn btn-outline" style="color: #1d4ed8; border-color: #1d4ed8; padding: 4px 10px; font-size: 12px; margin-right: 5px;" onclick="markContacted(${idx})">
+                                📞 Contacted
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-outline" style="color: #e55039; border-color: #e55039; padding: 4px 8px; font-size: 12px;" onclick="deleteApplication(${idx})">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function approveApplication(idx) {
+            let apps = getApplications();
+            let app = apps[idx];
+            if (!app) return;
+
+            // Only mark application as approved - No ID or password generated
+            app.status = 'APPROVED';
+            saveApplications(apps);
+
+            alert(`✅ Application Approved Successfully!
+
+The application form for "${app.name}" has been marked as Approved.`);
+            renderApplicationsTable();
+        }
+
+        function markContacted(idx) {
+            let apps = getApplications();
+            if (apps[idx]) {
+                apps[idx].status = 'CONTACTED';
+                saveApplications(apps);
+                renderApplicationsTable();
+            }
+        }
+
+        function deleteApplication(idx) {
+            igyrConfirm("Are you sure you want to delete this submitted form?", function() {
+                let apps = getApplications();
+                apps.splice(idx, 1);
+                saveApplications(apps);
+                renderApplicationsTable();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderApplicationsTable);
+        window.addEventListener('igyr_data_updated', renderApplicationsTable);
+    </script>
+</body>
+</html>
