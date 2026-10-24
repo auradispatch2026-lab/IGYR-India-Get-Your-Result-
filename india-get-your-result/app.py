@@ -130,21 +130,61 @@ init_db()
 def health_check():
     return jsonify({"status": "ok", "message": "IGYR Backend is running smoothly."}), 200
 
+def get_asset_folder(filename):
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = ['.', app_dir, os.path.join('.', 'india-get-your-result'), os.path.join(app_dir, 'india-get-your-result')]
+    for folder in candidates:
+        abs_folder = os.path.abspath(folder)
+        if os.path.isfile(os.path.join(abs_folder, filename)):
+            return abs_folder
+    return os.path.abspath('.')
+
+
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    folder = get_asset_folder('index.html')
+    return send_from_directory(folder, 'index.html')
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory('.', 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    folder = get_asset_folder('favicon.ico')
+    return send_from_directory(folder, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/favicon.png')
 def favicon_png():
-    return send_from_directory('.', 'favicon.png', mimetype='image/png')
+    folder = get_asset_folder('favicon.png')
+    return send_from_directory(folder, 'favicon.png', mimetype='image/png')
+
+@app.route('/favicon-48x48.png')
+def favicon_48():
+    folder = get_asset_folder('favicon-48x48.png')
+    return send_from_directory(folder, 'favicon-48x48.png', mimetype='image/png')
+
+@app.route('/favicon-96x96.png')
+def favicon_96():
+    folder = get_asset_folder('favicon-96x96.png')
+    return send_from_directory(folder, 'favicon-96x96.png', mimetype='image/png')
+
+@app.route('/favicon-192x192.png')
+def favicon_192():
+    folder = get_asset_folder('favicon-192x192.png')
+    return send_from_directory(folder, 'favicon-192x192.png', mimetype='image/png')
+
+@app.route('/favicon-512x512.png')
+def favicon_512():
+    folder = get_asset_folder('favicon-512x512.png')
+    return send_from_directory(folder, 'favicon-512x512.png', mimetype='image/png')
+
+@app.route('/apple-touch-icon.png')
+def apple_touch_icon():
+    folder = get_asset_folder('apple-touch-icon.png')
+    return send_from_directory(folder, 'apple-touch-icon.png', mimetype='image/png')
 
 @app.route('/site.webmanifest')
 def webmanifest():
-    return send_from_directory('.', 'site.webmanifest', mimetype='application/manifest+json')
+    folder = get_asset_folder('site.webmanifest')
+    return send_from_directory(folder, 'site.webmanifest', mimetype='application/manifest+json')
+
 
 
 
