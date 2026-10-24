@@ -185,6 +185,15 @@ def webmanifest():
     folder = get_asset_folder('site.webmanifest')
     return send_from_directory(folder, 'site.webmanifest', mimetype='application/manifest+json')
 
+@app.route('/sw.js')
+def service_worker():
+    folder = get_asset_folder('sw.js')
+    res = send_from_directory(folder, 'sw.js', mimetype='application/javascript')
+    res.headers['Service-Worker-Allowed'] = '/'
+    res.headers['Cache-Control'] = 'no-cache'
+    return res
+
+
 @app.route('/institute-login.html')
 @app.route('/institute-login')
 def institute_login_removed():

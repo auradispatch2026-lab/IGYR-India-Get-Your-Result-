@@ -11,6 +11,7 @@
 
     <!-- Favicon & Touch Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
@@ -1253,18 +1254,17 @@
                     <a href="about.html">About IGYR</a>
                     <a href="search-result.html">Search Results</a>
                     <a href="schemes.html">Pricing Schemes</a>
-                    <a href="institute-login.html" style="color: #fce38a; font-weight: 700;">🔑 Institute Login Portal</a>
                 </div>
             </div>
 
             <div>
                 <h3>For Institutes</h3>
                 <div class="footer-links">
-                    <a href="institute-login.html">Institute Portal</a>
                     <a href="institute-register.html">Register Institute</a>
                     <a href="verify-result.html">Verify Marksheet</a>
                     <a href="admin-login.html">Super Admin</a>
                 </div>
+
             </div>
 
             <div>
@@ -1284,7 +1284,9 @@
 
     <!-- LOGIC SCRIPTS -->
     <script src="js/data-india.js"></script>
-    <script src="js/storage.js?v=1000034"></script>
+    <script src="js/storage.js?v=1000035"></script>
+    <script src="js/pwa-install.js?v=1000035"></script>
+
     <script>
         function renderPublicSchemes() {
             const container = document.getElementById('schemes-container');
@@ -1414,14 +1416,10 @@
                     { text: 'Home', url: 'index.html' },
                     { text: 'About', url: 'about.html' },
                     { text: 'Results', url: 'search-result.html' },
-                    { text: 'Institute Login Portal', url: 'institute-login.html' }
+                    { text: 'Pricing Schemes', url: 'schemes.html' }
                 ];
-            } else {
-                const hasInst = links.some(l => l.text && l.text.toLowerCase().includes('institute'));
-                if (!hasInst) {
-                    links.push({ text: 'Institute Login Portal', url: 'institute-login.html' });
-                }
             }
+
 
             qlContainer.innerHTML = '';
             links.forEach(l => {
