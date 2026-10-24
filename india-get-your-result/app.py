@@ -193,6 +193,22 @@ def service_worker():
     res.headers['Cache-Control'] = 'no-cache'
     return res
 
+@app.route('/pwa-install.js')
+@app.route('/js/pwa-install.js')
+def pwa_install_script():
+    for rel_path in ['pwa-install.js', os.path.join('js', 'pwa-install.js')]:
+        folder = get_asset_folder(rel_path)
+        file_path = os.path.join(folder, rel_path)
+        if os.path.isfile(file_path):
+            dir_name = os.path.dirname(file_path)
+            base_name = os.path.basename(file_path)
+            res = send_from_directory(dir_name, base_name, mimetype='application/javascript')
+            res.headers['Cache-Control'] = 'no-cache'
+            return res
+    res = send_from_directory('.', 'pwa-install.js', mimetype='application/javascript')
+    res.headers['Cache-Control'] = 'no-cache'
+    return res
+
 
 @app.route('/institute-login.html')
 @app.route('/institute-login')
