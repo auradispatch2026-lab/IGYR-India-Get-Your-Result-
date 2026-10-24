@@ -138,6 +138,10 @@ def index():
 def favicon():
     return send_from_directory('.', 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@app.route('/favicon.png')
+def favicon_png():
+    return send_from_directory('.', 'favicon.png', mimetype='image/png')
+
 @app.route('/site.webmanifest')
 def webmanifest():
     return send_from_directory('.', 'site.webmanifest', mimetype='application/manifest+json')
