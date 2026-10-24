@@ -39,9 +39,9 @@ def init_db():
             {"text": "Home", "url": "index.html"},
             {"text": "About", "url": "about.html"},
             {"text": "Results", "url": "search-result.html"},
-            {"text": "Institute Login Portal", "url": "institute-login.html"},
             {"text": "Admin Login", "url": "admin-login.html"}
         ]})
+
 
     if schemes_col.count_documents({}) == 0:
         schemes_col.insert_many([
@@ -185,6 +185,42 @@ def webmanifest():
     folder = get_asset_folder('site.webmanifest')
     return send_from_directory(folder, 'site.webmanifest', mimetype='application/manifest+json')
 
+@app.route('/institute-login.html')
+@app.route('/institute-login')
+def institute_login_removed():
+    html_404 = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>404 Not Found - IGYR</title>
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #071d49; text-align: center; padding: 80px 20px; margin: 0; }
+        .box { max-width: 520px; margin: 0 auto; background: white; padding: 40px 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+        h1 { font-size: 56px; margin: 0 0 10px; color: #1e3a8a; font-weight: 800; }
+        h2 { font-size: 22px; margin: 0 0 15px; color: #1e293b; font-weight: 700; }
+        p { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 30px; }
+        a { display: inline-block; background: #1266d6; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; transition: background 0.2s; }
+        a:hover { background: #0c4da3; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>404</h1>
+        <h2>Page Not Found</h2>
+        <p>The Institute Login portal is not available and has been permanently removed.</p>
+        <a href="/">← Return to Homepage</a>
+    </div>
+</body>
+</html>"""
+    return (html_404, 404)
+
+
 
 
 
@@ -206,45 +242,66 @@ def institute_login():
         return jsonify({"success": True, "token": "igyr_inst_secret_auth_token_7731"}), 200
     return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
+_sync_cache = None
+_sync_cache_time = 0
+CACHE_TTL = 15  # Serve from in-memory cache for up to 15s (1,000x faster, prevents server hanging)
+
+def invalidate_sync_cache():
+    global _sync_cache
+    _sync_cache = None
+
 # API Routes for Initial Sync
 @app.route('/api/sync', methods=['GET'])
 def sync_data():
-    # Return all collections in one go for fast synchronous loading
-        # Fetch institutes but STRIP passwords so hackers can't see them on the public frontend!
-    institutes = list(institutes_col.find({}, {'_id': 0}))
-    for inst in institutes:
-        inst.pop('password', None)
-    results = list(results_col.find({}, {'_id': 0}))
-    notices = list(notices_col.find({}, {'_id': 0}))
+    global _sync_cache, _sync_cache_time
+    now = time.time()
     
-    ql_doc = quicklinks_col.find_one({}, {'_id': 0})
-    quicklinks = ql_doc['links'] if ql_doc and 'links' in ql_doc else []
-    schemes = list(schemes_col.find({}, {'_id': 0}))
-    applications = list(applications_col.find({}, {'_id': 0}))
-    
-    settings_doc = settings_col.find_one({"id": "system_settings"}, {'_id': 0})
-    if not settings_doc:
-        settings_doc = settings_col.find_one({}, {'_id': 0}) or {
-            "id": "system_settings",
-            "supportEmail": "support@igyr.org",
-            "helplinePhone": "+91 1800-889-4497",
-            "supportHours": "Monday - Saturday: 9:00 AM - 6:00 PM IST",
-            "officeAddress": "IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India",
-            "helpCenterUrl": "about.html#contact",
-            "whatsappSupport": "+91 98765 43210",
-            "contactHeading": "Support & Contact",
-            "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline"
-        }
+    # Return in-memory cache if fresh (instant 1ms response, 0 DB roundtrips)
+    if _sync_cache is not None and (now - _sync_cache_time) < CACHE_TTL:
+        return jsonify(_sync_cache)
 
-    return jsonify({
-        "institutes": institutes,
-        "results": results,
-        "notices": notices,
-        "quicklinks": quicklinks,
-        "schemes": schemes,
-        "applications": applications,
-        "settings": settings_doc
-    })
+    try:
+        institutes = list(institutes_col.find({}, {'_id': 0}))
+        for inst in institutes:
+            inst.pop('password', None)
+        results = list(results_col.find({}, {'_id': 0}))
+        notices = list(notices_col.find({}, {'_id': 0}))
+        
+        ql_doc = quicklinks_col.find_one({}, {'_id': 0})
+        quicklinks = ql_doc['links'] if ql_doc and 'links' in ql_doc else []
+        schemes = list(schemes_col.find({}, {'_id': 0}))
+        applications = list(applications_col.find({}, {'_id': 0}))
+        
+        settings_doc = settings_col.find_one({"id": "system_settings"}, {'_id': 0})
+        if not settings_doc:
+            settings_doc = settings_col.find_one({}, {'_id': 0}) or {
+                "id": "system_settings",
+                "supportEmail": "support@igyr.org",
+                "helplinePhone": "+91 1800-889-4497",
+                "supportHours": "Monday - Saturday: 9:00 AM - 6:00 PM IST",
+                "officeAddress": "IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India",
+                "helpCenterUrl": "about.html#contact",
+                "whatsappSupport": "+91 98765 43210",
+                "contactHeading": "Support & Contact",
+                "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline"
+            }
+
+        _sync_cache = {
+            "institutes": institutes,
+            "results": results,
+            "notices": notices,
+            "quicklinks": quicklinks,
+            "schemes": schemes,
+            "applications": applications,
+            "settings": settings_doc
+        }
+        _sync_cache_time = now
+        return jsonify(_sync_cache)
+    except Exception as e:
+        if _sync_cache is not None:
+            return jsonify(_sync_cache)
+        return jsonify({"error": str(e)}), 500
+
 
 
 def verify_token():
@@ -271,6 +328,7 @@ def save_institutes():
                 inst['password'] = 'demo123' # Default for new institutes
         institutes_col.delete_many({})
         institutes_col.insert_many(data)
+    invalidate_sync_cache()
     return jsonify({"status": "success"})
 
 @app.route('/api/results', methods=['POST'])
@@ -280,6 +338,7 @@ def save_results():
     results_col.delete_many({})
     if data:
         results_col.insert_many(data)
+    invalidate_sync_cache()
     return jsonify({"status": "success"})
 
 @app.route('/api/notices', methods=['POST'])
@@ -289,6 +348,7 @@ def save_notices():
     notices_col.delete_many({})
     if data:
         notices_col.insert_many(data)
+    invalidate_sync_cache()
     return jsonify({"status": "success"})
 
 @app.route('/api/quicklinks', methods=['POST'])
@@ -297,6 +357,7 @@ def save_quicklinks():
     data = request.json
     quicklinks_col.delete_many({})
     quicklinks_col.insert_one({"links": data})
+    invalidate_sync_cache()
     return jsonify({"status": "success"})
 
 @app.route('/api/schemes', methods=['POST'])
@@ -306,6 +367,7 @@ def save_schemes():
     schemes_col.delete_many({})
     if data:
         schemes_col.insert_many(data)
+    invalidate_sync_cache()
     return jsonify({"status": "success"})
 
 
@@ -327,6 +389,7 @@ def submit_application():
         
     applications_col.insert_one(data)
     data.pop('_id', None)
+    invalidate_sync_cache()
     return jsonify({"status": "success", "message": "Application submitted successfully", "application": data}), 201
 
 @app.route('/api/applications/save-all', methods=['POST'])
@@ -336,6 +399,7 @@ def save_all_applications():
     applications_col.delete_many({})
     if data:
         applications_col.insert_many(data)
+    invalidate_sync_cache()
     return jsonify({"status": "success"})
 
 @app.route('/api/settings', methods=['POST'])
@@ -346,7 +410,9 @@ def save_settings():
     settings_col.delete_many({})
     settings_col.insert_one(data)
     data.pop('_id', None)
+    invalidate_sync_cache()
     return jsonify({"status": "success", "settings": data})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5005))

@@ -4,7 +4,7 @@ let API_BASE = 'http://127.0.0.1:5005/api';
 if (window.location.hostname.includes('render.com')) {
     API_BASE = '/api';
 }
-// Global In-Memory DB (Loaded synchronously on page load from MongoDB)
+// Global In-Memory DB (Loaded instantly from local cache, updated seamlessly in background)
 window.IGYR_DB = {
     institutes: [],
     results: [],
@@ -24,17 +24,46 @@ window.IGYR_DB = {
     }
 };
 
-// 1. Synchronous fetch on initialization to ensure data is ready before admin.js/public.js runs
-function initStorage() {
-    try {
-        const xhr = new XMLHttpRequest();
-        // Use synchronous request (async: false) so the page blocks until data is ready.
-        // This preserves the exact architecture of localStorage without breaking the 70+ existing function calls.
-        xhr.open('GET', API_BASE + '/sync', false); 
-        xhr.send(null);
-        
-        if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
+// 1. Instant Cache Hydration: Load cached data immediately in 0ms (no screen freeze/hang)
+try {
+    const cached = localStorage.getItem('igyr_db_cache');
+    if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.institutes)) window.IGYR_DB.institutes = parsed.institutes;
+            if (Array.isArray(parsed.results)) window.IGYR_DB.results = parsed.results;
+            if (Array.isArray(parsed.notices)) window.IGYR_DB.notices = parsed.notices;
+            if (Array.isArray(parsed.quicklinks)) window.IGYR_DB.quicklinks = parsed.quicklinks;
+            if (Array.isArray(parsed.schemes)) window.IGYR_DB.schemes = parsed.schemes;
+            if (Array.isArray(parsed.applications)) window.IGYR_DB.applications = parsed.applications;
+            if (parsed.settings) window.IGYR_DB.settings = parsed.settings;
+        }
+    }
+} catch(e) {
+    console.warn("Storage cache read error:", e);
+}
+
+// 2. Non-blocking Asynchronous Background Sync
+let isSyncing = false;
+function syncWithServer(silent = true) {
+    if (isSyncing) return Promise.resolve();
+    isSyncing = true;
+    
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 10000) : null;
+    
+    return fetch(API_BASE + '/sync', controller ? { signal: controller.signal } : {})
+        .then(res => {
+            if (timeoutId) clearTimeout(timeoutId);
+            if (!res.ok) throw new Error("Sync failed with status " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            isSyncing = false;
+            if (!data || typeof data !== 'object') return;
+            
+            const prevHash = JSON.stringify(window.IGYR_DB);
+            
             window.IGYR_DB.institutes = data.institutes || [];
             window.IGYR_DB.results = data.results || [];
             window.IGYR_DB.notices = data.notices || [];
@@ -42,16 +71,25 @@ function initStorage() {
             window.IGYR_DB.schemes = data.schemes || [];
             window.IGYR_DB.applications = data.applications || [];
             if (data.settings) window.IGYR_DB.settings = data.settings;
-        } else {
-            console.error("Failed to sync from MongoDB:", xhr.status);
-        }
-    } catch(err) {
-        console.error("Error communicating with Python Backend:", err);
-    }
+            
+            try {
+                localStorage.setItem('igyr_db_cache', JSON.stringify(window.IGYR_DB));
+            } catch(e) {}
+            
+            const newHash = JSON.stringify(window.IGYR_DB);
+            if (prevHash !== newHash) {
+                window.dispatchEvent(new Event('igyr_data_updated'));
+            }
+        })
+        .catch(err => {
+            isSyncing = false;
+            if (!silent) console.warn("Background sync warning:", err);
+        });
 }
 
-// Call immediately when script loads
-initStorage();
+// Launch non-blocking sync in background immediately
+syncWithServer(true);
+
 
 // 2. Data Getters (Instantly return from memory)
 function getInstitutes() { return window.IGYR_DB.institutes; }
@@ -83,8 +121,15 @@ function getAuthHeaders() {
     };
 }
 
+function persistLocalCache() {
+    try {
+        localStorage.setItem('igyr_db_cache', JSON.stringify(window.IGYR_DB));
+    } catch(e) {}
+}
+
 function saveInstitutes(institutes) { 
     window.IGYR_DB.institutes = institutes;
+    persistLocalCache();
     return fetch(API_BASE + '/institutes', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -100,6 +145,8 @@ function saveInstitutes(institutes) {
 
 function saveResults(results) { 
     window.IGYR_DB.results = results;
+    persistLocalCache();
+
     return fetch(API_BASE + '/results', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -115,6 +162,7 @@ function saveResults(results) {
 
 function saveNotices(notices) { 
     window.IGYR_DB.notices = notices;
+    persistLocalCache();
     return fetch(API_BASE + '/notices', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -142,6 +190,7 @@ function submitSchemeApplication(appData) {
 
 function saveApplications(applications) {
     window.IGYR_DB.applications = applications;
+    persistLocalCache();
     return fetch(API_BASE + '/applications/save-all', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -157,6 +206,7 @@ function saveApplications(applications) {
 
 function saveSchemes(schemes) { 
     window.IGYR_DB.schemes = schemes;
+    persistLocalCache();
     return fetch(API_BASE + '/schemes', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -172,6 +222,7 @@ function saveSchemes(schemes) {
 
 function saveQuickLinks(links) { 
     window.IGYR_DB.quicklinks = links;
+    persistLocalCache();
     return fetch(API_BASE + '/quicklinks', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -187,6 +238,7 @@ function saveQuickLinks(links) {
 
 function saveSystemSettings(settings) {
     window.IGYR_DB.settings = settings;
+    persistLocalCache();
     return fetch(API_BASE + '/settings', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -201,50 +253,26 @@ function saveSystemSettings(settings) {
 }
 
 
+
 // -----------------------------------------------------------
-// REAL-TIME POLLING ENGINE (Updates without refresh)
+// SMART REAL-TIME POLLING ENGINE (Battery & Server friendly)
 // -----------------------------------------------------------
+// Poll every 15s (only when user is actively viewing the tab to avoid hanging the server)
 setInterval(() => {
-    fetch(API_BASE + '/sync')
-        .then(res => res.json())
-        .then(data => {
-            // Compare stringified versions to detect any changes
-            const currentHash = JSON.stringify({
-                institutes: window.IGYR_DB.institutes,
-                results: window.IGYR_DB.results,
-                notices: window.IGYR_DB.notices,
-                quicklinks: window.IGYR_DB.quicklinks,
-                schemes: window.IGYR_DB.schemes,
-                applications: window.IGYR_DB.applications,
-                settings: window.IGYR_DB.settings
-            });
-            
-            const newHash = JSON.stringify({
-                institutes: data.institutes || [],
-                results: data.results || [],
-                notices: data.notices || [],
-                quicklinks: data.quicklinks || [],
-                schemes: data.schemes || [],
-                applications: data.applications || [],
-                settings: data.settings || window.IGYR_DB.settings
-            });
-            
-            if (currentHash !== newHash) {
-                console.log("Real-time update detected from another device!");
-                window.IGYR_DB.institutes = data.institutes || [];
-                window.IGYR_DB.results = data.results || [];
-                window.IGYR_DB.notices = data.notices || [];
-                window.IGYR_DB.quicklinks = data.quicklinks || [];
-                window.IGYR_DB.schemes = data.schemes || [];
-                window.IGYR_DB.applications = data.applications || [];
-                if (data.settings) window.IGYR_DB.settings = data.settings;
-                
-                // Fire custom event so pages can re-render automatically
-                window.dispatchEvent(new Event('igyr_data_updated'));
-            }
-        })
-        .catch(e => { /* Silently ignore network errors during polling */ });
-}, 2000); // Poll every 2 seconds
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncWithServer(true);
+    }
+}, 15000);
+
+// Sync immediately when the user returns/switches to this tab
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            syncWithServer(true);
+        }
+    });
+}
+
 
 
 // =========================================================================

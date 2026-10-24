@@ -155,14 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     { text: 'Home', url: 'index.html' },
                     { text: 'About', url: 'about.html' },
                     { text: 'Results', url: 'search-result.html' },
-                    { text: 'Institute Login Portal', url: 'institute-login.html' }
+                    { text: 'Schemes', url: 'schemes.html' }
                 ];
-            } else {
-                const hasInst = links.some(l => l.text && l.text.toLowerCase().includes('institute'));
-                if (!hasInst) {
-                    links.push({ text: 'Institute Login Portal', url: 'institute-login.html' });
-                }
             }
+
 
             qlContainer.innerHTML = '';
             links.forEach(l => {
