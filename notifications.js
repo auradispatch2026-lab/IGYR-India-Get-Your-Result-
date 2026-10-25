@@ -115,6 +115,14 @@ async function subscribeToIgyrPush() {
     return false;
   }
 
+  const currentToken = localStorage.getItem('igyr_fcm_token');
+  if (currentToken && Notification.permission === 'granted') {
+    if (confirm("🔔 Result alerts are currently active on this device.\n\nDo you want to turn off notifications on this device?")) {
+      return unsubscribeFromIgyrPush();
+    }
+    return true;
+  }
+
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
@@ -182,6 +190,31 @@ async function subscribeToIgyrPush() {
   }
 }
 
+// Unsubscribe Device from Notifications
+async function unsubscribeFromIgyrPush() {
+  const token = localStorage.getItem('igyr_fcm_token');
+  if (token) {
+    try {
+      const apiBase = getNotificationApiBase();
+      await fetch(apiBase + '/notifications/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: token })
+      });
+    } catch(err) {
+      console.warn('[FCM] Error reporting unsubscribe to backend:', err);
+    }
+    localStorage.removeItem('igyr_fcm_token');
+  }
+  updatePushButtons(false);
+  if (typeof showCustomToast === 'function') {
+    showCustomToast("🔕 Result alerts have been disabled on this device.");
+  } else {
+    alert("🔕 Result alerts have been disabled on this device.");
+  }
+  return true;
+}
+
 function updatePushButtons(isActive) {
   const btns = document.querySelectorAll('.igyr-notify-btn, #btn-enable-notifications, #nav-notify-btn');
   btns.forEach(btn => {
@@ -190,9 +223,12 @@ function updatePushButtons(isActive) {
       btn.style.background = '#059669';
       btn.style.color = '#ffffff';
       btn.style.borderColor = '#059669';
-      btn.title = 'Result alerts are active on this device';
+      btn.title = 'Result alerts are active on this device. Click to turn off.';
     } else {
       btn.innerHTML = '🔔 Get Result Alerts';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
       btn.title = 'Click to enable instant push notifications for results';
     }
   });
@@ -202,10 +238,17 @@ function updatePushButtons(isActive) {
 document.addEventListener('DOMContentLoaded', () => {
   initIgyrFirebase();
   const savedToken = localStorage.getItem('igyr_fcm_token');
-  if (savedToken && Notification.permission === 'granted') {
-    updatePushButtons(true);
+  if (savedToken) {
+    if (Notification.permission === 'granted') {
+      updatePushButtons(true);
+    } else {
+      // User blocked or reset notification permissions -> remove from active list
+      unsubscribeFromIgyrPush();
+    }
   }
 });
 
 window.subscribeToIgyrPush = subscribeToIgyrPush;
+window.unsubscribeFromIgyrPush = unsubscribeFromIgyrPush;
 window.initIgyrFirebase = initIgyrFirebase;
+

@@ -113,20 +113,45 @@ def send_push_notification_to_all(title, body, url="/search-result.html"):
 
             for idx, resp in enumerate(response.responses):
                 if not resp.success:
-                    err_str = str(resp.exception or '')
-                    if any(x in err_str for x in ['NOT_FOUND', 'UNREGISTERED', 'invalid', 'SenderIdMismatch']):
+                    exc = resp.exception
+                    err_name = exc.__class__.__name__ if exc else ''
+                    err_msg = str(exc or '').lower()
+                    err_code = str(getattr(exc, 'code', '')).lower()
+                    # Detect uninstalled app, revoked permissions, not found, or invalid tokens
+                    is_unregistered = (
+                        isinstance(exc, (messaging.UnregisteredError, messaging.SenderIdMismatchError)) or
+                        any(term in err_name.lower() for term in ['unregistered', 'notfound', 'invalidargument']) or
+                        any(term in err_code for term in ['unregistered', 'not_found', 'not-found', 'invalid']) or
+                        any(term in err_msg for term in [
+                            'unregistered', 
+                            'not registered', 
+                            'not found', 
+                            'not_found', 
+                            'invalid', 
+                            'mismatch', 
+                            '404', 
+                            '410', 
+                            'entity was not found',
+                            'registration-token-not-registered',
+                            'invalid argument'
+                        ])
+                    )
+                    if is_unregistered:
                         invalid_tokens.append(chunk[idx])
 
         if invalid_tokens:
             fcm_tokens_col.delete_many({"token": {"$in": invalid_tokens}})
-            print(f"Cleaned up {len(invalid_tokens)} stale FCM tokens.")
+            print(f"Cleaned up {len(invalid_tokens)} uninstalled / stale FCM tokens.")
 
-        print(f"✅ FCM Broadcast: {success_count} succeeded, {failure_count} failed out of {len(tokens)} devices.")
+        remaining_count = fcm_tokens_col.count_documents({})
+        print(f"✅ FCM Broadcast: {success_count} succeeded, {failure_count} failed. Cleaned: {len(invalid_tokens)}. Active remaining: {remaining_count}")
         return {
             "success": True,
             "sent_count": success_count,
             "failure_count": failure_count,
-            "total_devices": len(tokens)
+            "cleaned_count": len(invalid_tokens),
+            "total_devices": remaining_count,
+            "active_subscribers": remaining_count
         }
     except Exception as e:
         print("Error sending push notification:", e)
@@ -720,10 +745,80 @@ def subscribe_notifications():
     )
     return jsonify({"success": True, "message": "Device subscribed successfully."}), 200
 
+@app.route('/api/notifications/unsubscribe', methods=['POST'])
+def unsubscribe_notification():
+    data = request.json or {}
+    token = data.get('token')
+    if not token:
+        return jsonify({"error": "No token provided"}), 400
+    res = fcm_tokens_col.delete_many({"token": token})
+    remaining = fcm_tokens_col.count_documents({})
+    return jsonify({
+        "success": True,
+        "deleted_count": res.deleted_count,
+        "total_subscribers": remaining
+    }), 200
+
 @app.route('/api/admin/notifications/stats', methods=['GET'])
 def get_notification_stats():
     count = fcm_tokens_col.count_documents({})
     return jsonify({"success": True, "total_subscribers": count}), 200
+
+@app.route('/api/admin/notifications/sync-subscribers', methods=['POST'])
+def sync_notification_subscribers():
+    if not verify_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not firebase_admin._apps:
+        return jsonify({"error": "Firebase Admin not initialized"}), 500
+
+    tokens_docs = list(fcm_tokens_col.find({}, {"token": 1, "_id": 0}))
+    tokens = [d['token'] for d in tokens_docs if d.get('token')]
+    if not tokens:
+        return jsonify({"success": True, "total_subscribers": 0, "cleaned_count": 0}), 200
+
+    invalid_tokens = []
+    chunk_size = 500
+    for i in range(0, len(tokens), chunk_size):
+        chunk = tokens[i:i + chunk_size]
+        multicast_msg = messaging.MulticastMessage(
+            data={"sync": "1"},
+            tokens=chunk
+        )
+        try:
+            # dry_run=True validates against Google FCM servers without sending any notification to devices
+            response = messaging.send_each_for_multicast(multicast_msg, dry_run=True)
+            for idx, resp in enumerate(response.responses):
+                if not resp.success:
+                    exc = resp.exception
+                    err_name = exc.__class__.__name__ if exc else ''
+                    err_msg = str(exc or '').lower()
+                    err_code = str(getattr(exc, 'code', '')).lower()
+                    is_unregistered = (
+                        isinstance(exc, (messaging.UnregisteredError, messaging.SenderIdMismatchError)) or
+                        any(term in err_name.lower() for term in ['unregistered', 'notfound', 'invalidargument']) or
+                        any(term in err_code for term in ['unregistered', 'not_found', 'not-found', 'invalid']) or
+                        any(term in err_msg for term in [
+                            'unregistered', 'not registered', 'not found', 'not_found',
+                            'invalid', 'mismatch', '404', '410', 'entity was not found',
+                            'registration-token-not-registered', 'invalid argument'
+                        ])
+                    )
+                    if is_unregistered:
+                        invalid_tokens.append(chunk[idx])
+        except Exception as sync_err:
+            print("Sync multicast error:", sync_err)
+
+    if invalid_tokens:
+        fcm_tokens_col.delete_many({"token": {"$in": invalid_tokens}})
+        print(f"Sync: Cleaned up {len(invalid_tokens)} uninstalled / stale subscriber tokens.")
+
+    remaining = fcm_tokens_col.count_documents({})
+    return jsonify({
+        "success": True,
+        "total_subscribers": remaining,
+        "cleaned_count": len(invalid_tokens)
+    }), 200
 
 @app.route('/api/admin/broadcast-notification', methods=['POST'])
 def admin_broadcast_notification():
