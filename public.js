@@ -252,7 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
             aPriv.href = "privacy.html";
             aPriv.textContent = "Privacy Policy";
             aPriv.onclick = (e) => {
-                if (typeof window.openPolicyModal === 'function') {
+                const sec = document.getElementById('policies');
+                if (sec) {
+                    e.preventDefault();
+                    if (typeof window.switchFrontPolicyTab === 'function') {
+                        window.switchFrontPolicyTab('privacy');
+                    }
+                    sec.scrollIntoView({ behavior: 'smooth' });
+                } else if (typeof window.openPolicyModal === 'function') {
                     e.preventDefault();
                     window.openPolicyModal('privacy');
                 }
@@ -263,12 +270,76 @@ document.addEventListener('DOMContentLoaded', () => {
             aTerms.href = "terms.html";
             aTerms.textContent = "Terms & Conditions";
             aTerms.onclick = (e) => {
-                if (typeof window.openPolicyModal === 'function') {
+                const sec = document.getElementById('policies');
+                if (sec) {
+                    e.preventDefault();
+                    if (typeof window.switchFrontPolicyTab === 'function') {
+                        window.switchFrontPolicyTab('terms');
+                    }
+                    sec.scrollIntoView({ behavior: 'smooth' });
+                } else if (typeof window.openPolicyModal === 'function') {
                     e.preventDefault();
                     window.openPolicyModal('terms');
                 }
             };
             scContainer.appendChild(aTerms);
+        }
+    };
+
+    window.activeFrontPolicyTab = 'privacy';
+
+    window.switchFrontPolicyTab = function(type) {
+        window.activeFrontPolicyTab = type;
+        const btnPriv = document.getElementById('tab-btn-privacy');
+        const btnTerms = document.getElementById('tab-btn-terms');
+        const display = document.getElementById('front-policy-display');
+        const fullLink = document.getElementById('policy-full-link');
+        if (!display) return;
+
+        if (type === 'privacy') {
+            if (btnPriv) {
+                btnPriv.style.background = '#1266d6';
+                btnPriv.style.color = '#ffffff';
+                btnPriv.style.border = 'none';
+            }
+            if (btnTerms) {
+                btnTerms.style.background = '#ffffff';
+                btnTerms.style.color = '#475569';
+                btnTerms.style.border = '1px solid #cbd5e1';
+            }
+            if (fullLink) fullLink.href = 'privacy.html';
+            let text = (typeof getPrivacyPolicy === 'function') ? getPrivacyPolicy() : '';
+            if (!text || text === window.DEFAULT_PRIVACY_POLICY) {
+                if (window.IGYR_DB && window.IGYR_DB.settings && window.IGYR_DB.settings.privacyPolicy) {
+                    text = window.IGYR_DB.settings.privacyPolicy;
+                }
+            }
+            display.textContent = text || window.DEFAULT_PRIVACY_POLICY || 'Privacy Policy text will appear here.';
+        } else {
+            if (btnTerms) {
+                btnTerms.style.background = '#1266d6';
+                btnTerms.style.color = '#ffffff';
+                btnTerms.style.border = 'none';
+            }
+            if (btnPriv) {
+                btnPriv.style.background = '#ffffff';
+                btnPriv.style.color = '#475569';
+                btnPriv.style.border = '1px solid #cbd5e1';
+            }
+            if (fullLink) fullLink.href = 'terms.html';
+            let text = (typeof getTermsConditions === 'function') ? getTermsConditions() : '';
+            if (!text || text === window.DEFAULT_TERMS_CONDITIONS) {
+                if (window.IGYR_DB && window.IGYR_DB.settings && window.IGYR_DB.settings.termsConditions) {
+                    text = window.IGYR_DB.settings.termsConditions;
+                }
+            }
+            display.textContent = text || window.DEFAULT_TERMS_CONDITIONS || 'Terms & Conditions text will appear here.';
+        }
+    };
+
+    window.renderFrontPagePolicies = function() {
+        if (typeof window.switchFrontPolicyTab === 'function') {
+            window.switchFrontPolicyTab(window.activeFrontPolicyTab || 'privacy');
         }
     };
 
@@ -278,9 +349,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const isPrivacy = (type === 'privacy');
         const title = isPrivacy ? '🔒 Official Privacy Policy' : '⚖️ Official Terms & Conditions';
-        const rawContent = (isPrivacy && typeof getPrivacyPolicy === 'function') 
+        let rawContent = (isPrivacy && typeof getPrivacyPolicy === 'function') 
             ? getPrivacyPolicy() 
             : ((typeof getTermsConditions === 'function') ? getTermsConditions() : '');
+
+        if (!rawContent && window.IGYR_DB && window.IGYR_DB.settings) {
+            rawContent = isPrivacy ? window.IGYR_DB.settings.privacyPolicy : window.IGYR_DB.settings.termsConditions;
+        }
 
         const modal = document.createElement('div');
         modal.id = 'igyr-policy-modal';
@@ -300,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <button style="background: transparent; border: none; font-size: 24px; color: #64748b; cursor: pointer; padding: 4px 8px; line-height: 1;" onclick="document.getElementById('igyr-policy-modal').remove()">✕</button>
                 </div>
-                <div style="flex: 1; overflow-y: auto; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; font-size: 14px; line-height: 1.7; color: #334155; white-space: pre-wrap; word-break: break-word;">${rawContent}</div>
+                <div id="modal-policy-body" style="flex: 1; overflow-y: auto; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; font-size: 14px; line-height: 1.7; color: #334155; white-space: pre-wrap; word-break: break-word;">${rawContent || 'Loading policy content...'}</div>
                 <div style="display: flex; justify-content: flex-end; margin-top: 18px; gap: 10px;">
                     <a href="${isPrivacy ? 'privacy.html' : 'terms.html'}" target="_blank" style="padding: 10px 18px; font-size: 13px; color: #1266d6; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center;">Open Full Page ↗</a>
                     <button style="background: #1266d6; color: white; border: none; font-size: 14px; font-weight: 700; padding: 10px 24px; border-radius: 8px; cursor: pointer;" onclick="document.getElementById('igyr-policy-modal').remove()">Close</button>
@@ -308,9 +383,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.body.appendChild(modal);
+
+        if (!rawContent) {
+            fetch('/api/sync')
+                .then(r => r.json())
+                .then(d => {
+                    const el = document.getElementById('modal-policy-body');
+                    if (el && d && d.settings) {
+                        el.textContent = isPrivacy ? d.settings.privacyPolicy : d.settings.termsConditions;
+                    }
+                }).catch(() => {});
+        }
     };
 
     window.renderSupportContact();
+    window.renderFrontPagePolicies();
 
     window.renderPublicData = function() {
         const noticeTicker = document.getElementById('notice-ticker');
@@ -389,4 +476,5 @@ window.addEventListener('igyr_data_updated', () => {
     if(typeof window.renderPublicData === 'function') window.renderPublicData();
     if(typeof window.renderQuickLinks === 'function') window.renderQuickLinks();
     if(typeof window.renderSupportContact === 'function') window.renderSupportContact();
+    if(typeof window.renderFrontPagePolicies === 'function') window.renderFrontPagePolicies();
 });

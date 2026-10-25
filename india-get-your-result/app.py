@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, make_response
 from flask_cors import CORS
 from pymongo import MongoClient
 import os
+import html as html_lib
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app, resources={r"/api/*": {"origins": ["https://igyr-india-get-your-result.onrender.com", "http://127.0.0.1:5005", "http://localhost:5005", "http://127.0.0.1:5500"]}})
@@ -209,7 +210,23 @@ def get_asset_folder(filename):
 @app.route('/')
 def index():
     folder = get_asset_folder('index.html')
-    return send_from_directory(folder, 'index.html')
+    file_path = os.path.join(folder, 'index.html')
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        settings_doc = settings_col.find_one({"id": "system_settings"}, {'_id': 0})
+        policy_text = (settings_doc.get('privacyPolicy') if settings_doc else None)
+        if policy_text:
+            safe_policy = html_lib.escape(policy_text)
+            target = 'id="front-policy-display" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; font-size: 14px; line-height: 1.8; color: #334155; white-space: pre-wrap; word-break: break-word; max-height: 380px; overflow-y: auto; font-family: \'Inter\', -apple-system, sans-serif;">Loading legal policies...</div>'
+            replacement = f'id="front-policy-display" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; font-size: 14px; line-height: 1.8; color: #334155; white-space: pre-wrap; word-break: break-word; max-height: 380px; overflow-y: auto; font-family: \'Inter\', -apple-system, sans-serif;">{safe_policy}</div>'
+            content = content.replace(target, replacement)
+        res = make_response(content)
+        res.headers['Content-Type'] = 'text/html; charset=utf-8'
+        res.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return res
+    except Exception:
+        return send_from_directory(folder, 'index.html')
 
 @app.route('/favicon.ico')
 def favicon():
@@ -279,13 +296,43 @@ def pwa_install_script():
 @app.route('/privacy')
 def privacy_page():
     folder = get_asset_folder('privacy.html')
-    return send_from_directory(folder, 'privacy.html')
+    file_path = os.path.join(folder, 'privacy.html')
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        settings_doc = settings_col.find_one({"id": "system_settings"}, {'_id': 0})
+        policy_text = (settings_doc.get('privacyPolicy') if settings_doc else None)
+        if policy_text:
+            safe_policy = html_lib.escape(policy_text)
+            content = content.replace('id="policy-content" class="policy-text">Loading official Privacy Policy...</div>',
+                                      f'id="policy-content" class="policy-text">{safe_policy}</div>')
+        res = make_response(content)
+        res.headers['Content-Type'] = 'text/html; charset=utf-8'
+        res.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return res
+    except Exception:
+        return send_from_directory(folder, 'privacy.html')
 
 @app.route('/terms.html')
 @app.route('/terms')
 def terms_page():
     folder = get_asset_folder('terms.html')
-    return send_from_directory(folder, 'terms.html')
+    file_path = os.path.join(folder, 'terms.html')
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        settings_doc = settings_col.find_one({"id": "system_settings"}, {'_id': 0})
+        terms_text = (settings_doc.get('termsConditions') if settings_doc else None)
+        if terms_text:
+            safe_terms = html_lib.escape(terms_text)
+            content = content.replace('id="policy-content" class="policy-text">Loading official Terms &amp; Conditions...</div>',
+                                      f'id="policy-content" class="policy-text">{safe_terms}</div>')
+        res = make_response(content)
+        res.headers['Content-Type'] = 'text/html; charset=utf-8'
+        res.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return res
+    except Exception:
+        return send_from_directory(folder, 'terms.html')
 
 
 @app.route('/institute-login.html')

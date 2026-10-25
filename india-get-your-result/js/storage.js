@@ -1,8 +1,8 @@
 
 // Smart API Base URL logic for both local testing and production
-let API_BASE = 'http://127.0.0.1:5005/api';
-if (window.location.hostname.includes('render.com')) {
-    API_BASE = '/api';
+let API_BASE = '/api';
+if (window.location.protocol === 'file:') {
+    API_BASE = 'http://127.0.0.1:5005/api';
 }
 window.DEFAULT_PRIVACY_POLICY = `INDIA GET YOUR RESULT (IGYR) - PRIVACY POLICY
 Last Updated: October 2026
@@ -171,11 +171,17 @@ function getSystemSettings() {
 }
 
 function getPrivacyPolicy() {
+    if (window.IGYR_DB && window.IGYR_DB.settings && window.IGYR_DB.settings.privacyPolicy) {
+        return window.IGYR_DB.settings.privacyPolicy;
+    }
     const s = getSystemSettings();
     return s.privacyPolicy || window.DEFAULT_PRIVACY_POLICY;
 }
 
 function getTermsConditions() {
+    if (window.IGYR_DB && window.IGYR_DB.settings && window.IGYR_DB.settings.termsConditions) {
+        return window.IGYR_DB.settings.termsConditions;
+    }
     const s = getSystemSettings();
     return s.termsConditions || window.DEFAULT_TERMS_CONDITIONS;
 }

@@ -187,23 +187,63 @@
         <p>&copy; 2026 IGYR - India Get Your Result. All Rights Reserved. &bull; <a href="/">Homepage</a> &bull; <a href="terms.html">Terms &amp; Conditions</a></p>
     </footer>
 
-    <script src="js/storage.js?v=1000038"></script>
+    <script src="js/storage.js?v=1000040"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        function loadPolicy() {
             const contentEl = document.getElementById('policy-content');
-            if (contentEl) {
-                const text = (typeof getPrivacyPolicy === 'function') 
-                    ? getPrivacyPolicy() 
-                    : (window.DEFAULT_PRIVACY_POLICY || 'Privacy Policy text will appear here.');
-                contentEl.textContent = text;
+            if (!contentEl) return;
+
+            // 1. Check helper function
+            if (typeof getPrivacyPolicy === 'function') {
+                const txt = getPrivacyPolicy();
+                if (txt && txt.trim().length > 0 && txt !== window.DEFAULT_PRIVACY_POLICY) {
+                    contentEl.textContent = txt;
+                    return;
+                }
             }
-        });
-        window.addEventListener('igyr_data_updated', () => {
-            const contentEl = document.getElementById('policy-content');
-            if (contentEl && typeof getPrivacyPolicy === 'function') {
-                contentEl.textContent = getPrivacyPolicy();
+
+            // 2. Check window.IGYR_DB memory
+            if (window.IGYR_DB && window.IGYR_DB.settings && window.IGYR_DB.settings.privacyPolicy) {
+                contentEl.textContent = window.IGYR_DB.settings.privacyPolicy;
+                return;
             }
-        });
+
+            // 3. Check localStorage cache
+            try {
+                const cached = JSON.parse(localStorage.getItem('igyr_db_cache') || '{}');
+                if (cached && cached.settings && cached.settings.privacyPolicy) {
+                    contentEl.textContent = cached.settings.privacyPolicy;
+                    return;
+                }
+            } catch(e) {}
+
+            // 4. Direct live API fetch (Guaranteed to show latest admin-saved data)
+            const apiBase = (window.location.protocol === 'file:') ? 'http://127.0.0.1:5005/api' : '/api';
+            fetch(apiBase + '/sync')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.settings && data.settings.privacyPolicy) {
+                        contentEl.textContent = data.settings.privacyPolicy;
+                        if (window.IGYR_DB) {
+                            if (!window.IGYR_DB.settings) window.IGYR_DB.settings = {};
+                            window.IGYR_DB.settings.privacyPolicy = data.settings.privacyPolicy;
+                        }
+                    } else if (typeof getPrivacyPolicy === 'function') {
+                        contentEl.textContent = getPrivacyPolicy();
+                    }
+                })
+                .catch(() => {
+                    if (typeof getPrivacyPolicy === 'function') {
+                        contentEl.textContent = getPrivacyPolicy();
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPolicy);
+        window.addEventListener('igyr_data_updated', loadPolicy);
+        if (document.readyState === 'interactive' || document.readyState === 'complete') {
+            loadPolicy();
+        }
     </script>
 </body>
 </html>
