@@ -20,6 +20,89 @@ quicklinks_col = db['quicklinks']
 schemes_col = db['schemes']
 applications_col = db['applications']
 settings_col = db['settings']
+fcm_tokens_col = db['fcm_tokens']
+
+# Initialize Firebase Admin SDK for FCM Web Push
+import json
+import firebase_admin
+from firebase_admin import credentials, messaging
+
+try:
+    if not firebase_admin._apps:
+        fb_creds_env = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+        app_dir = os.path.dirname(os.path.abspath(__file__))
+        sa_candidates = [
+            os.path.join(app_dir, "firebase-service-account.json"),
+            os.path.join(app_dir, "..", "firebase-service-account.json"),
+            os.path.join(app_dir, "india-get-your-result", "firebase-service-account.json"),
+            "firebase-service-account.json"
+        ]
+        sa_file = next((f for f in sa_candidates if os.path.isfile(f)), None)
+
+        if fb_creds_env:
+            cred = credentials.Certificate(json.loads(fb_creds_env))
+            firebase_admin.initialize_app(cred)
+            print("✅ Firebase Admin SDK initialized from environment variable.")
+        elif sa_file:
+            cred = credentials.Certificate(sa_file)
+            firebase_admin.initialize_app(cred)
+            print(f"✅ Firebase Admin SDK initialized from file: {sa_file}")
+        else:
+            print("⚠️ Firebase Admin credentials not found. Provide FIREBASE_SERVICE_ACCOUNT_JSON or firebase-service-account.json.")
+except Exception as fb_init_err:
+    print("⚠️ Firebase Admin SDK initialization error:", fb_init_err)
+
+def send_push_notification_to_all(title, body, url="/search-result.html"):
+    try:
+        if not firebase_admin._apps:
+            print("⚠️ Firebase Admin not initialized, skipping push.")
+            return {"success": False, "error": "Firebase Admin not initialized"}
+
+        tokens_docs = list(fcm_tokens_col.find({}, {"token": 1, "_id": 0}))
+        tokens = [d['token'] for d in tokens_docs if d.get('token')]
+        if not tokens:
+            return {"success": True, "sent_count": 0, "message": "No registered devices yet."}
+
+        success_count = 0
+        failure_count = 0
+        invalid_tokens = []
+
+        chunk_size = 500
+        for i in range(0, len(tokens), chunk_size):
+            chunk = tokens[i:i + chunk_size]
+            multicast_msg = messaging.MulticastMessage(
+                notification=messaging.Notification(
+                    title=title,
+                    body=body,
+                    image="https://igyr-india-get-your-result.onrender.com/favicon-192x192.png"
+                ),
+                data={"url": url},
+                tokens=chunk
+            )
+            response = messaging.send_each_for_multicast(multicast_msg)
+            success_count += response.success_count
+            failure_count += response.failure_count
+
+            for idx, resp in enumerate(response.responses):
+                if not resp.success:
+                    err_str = str(resp.exception or '')
+                    if any(x in err_str for x in ['NOT_FOUND', 'UNREGISTERED', 'invalid', 'SenderIdMismatch']):
+                        invalid_tokens.append(chunk[idx])
+
+        if invalid_tokens:
+            fcm_tokens_col.delete_many({"token": {"$in": invalid_tokens}})
+            print(f"Cleaned up {len(invalid_tokens)} stale FCM tokens.")
+
+        print(f"✅ FCM Broadcast: {success_count} succeeded, {failure_count} failed out of {len(tokens)} devices.")
+        return {
+            "success": True,
+            "sent_count": success_count,
+            "failure_count": failure_count,
+            "total_devices": len(tokens)
+        }
+    except Exception as e:
+        print("Error sending push notification:", e)
+        return {"success": False, "error": str(e)}
 
 # Initialize demo data if collections are empty
 def init_db():
@@ -276,6 +359,14 @@ def service_worker():
     res.headers['Cache-Control'] = 'no-cache'
     return res
 
+@app.route('/firebase-messaging-sw.js')
+def firebase_messaging_sw():
+    folder = get_asset_folder('firebase-messaging-sw.js')
+    res = send_from_directory(folder, 'firebase-messaging-sw.js', mimetype='application/javascript')
+    res.headers['Service-Worker-Allowed'] = '/'
+    res.headers['Cache-Control'] = 'no-cache'
+    return res
+
 @app.route('/pwa-install.js')
 @app.route('/js/pwa-install.js')
 def pwa_install_script():
@@ -488,6 +579,21 @@ def save_results():
     results_col.delete_many({})
     if data:
         results_col.insert_many(data)
+        # Automatic FCM Push Alert to all subscribed phones / browsers
+        try:
+            sample = data[0] if len(data) > 0 else {}
+            exam_name = sample.get('exam', 'Examination')
+            inst_id = sample.get('instId', '')
+            inst_doc = institutes_col.find_one({"id": inst_id}) if inst_id else None
+            inst_name = inst_doc.get('name') if inst_doc else "Educational Institution"
+
+            send_push_notification_to_all(
+                title=f"🎯 {exam_name} Result Declared!",
+                body=f"{inst_name} has published online marksheets and digital scorecards. Check your result now!",
+                url="/search-result.html"
+            )
+        except Exception as push_err:
+            print("Auto push notification failed:", push_err)
     invalidate_sync_cache()
     return jsonify({"status": "success"})
 
@@ -562,6 +668,47 @@ def save_settings():
     data.pop('_id', None)
     invalidate_sync_cache()
     return jsonify({"status": "success", "settings": data})
+
+# =====================================================
+# FCM NOTIFICATION API ENDPOINTS
+# =====================================================
+
+@app.route('/api/notifications/subscribe', methods=['POST'])
+def subscribe_notifications():
+    data = request.json or {}
+    token = data.get('token')
+    if not token or not isinstance(token, str) or len(token) < 10:
+        return jsonify({"error": "Valid FCM token is required"}), 400
+
+    fcm_tokens_col.update_one(
+        {"token": token},
+        {"$set": {
+            "token": token,
+            "device": data.get('device', 'Unknown Browser'),
+            "platform": data.get('platform', 'Unknown'),
+            "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }},
+        upsert=True
+    )
+    return jsonify({"success": True, "message": "Device subscribed successfully."}), 200
+
+@app.route('/api/admin/notifications/stats', methods=['GET'])
+def get_notification_stats():
+    count = fcm_tokens_col.count_documents({})
+    return jsonify({"success": True, "total_subscribers": count}), 200
+
+@app.route('/api/admin/broadcast-notification', methods=['POST'])
+def admin_broadcast_notification():
+    if not verify_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    title = data.get('title') or "IGYR Official Notice"
+    body = data.get('body') or "A new examination notice has been published on the portal."
+    url = data.get('url') or "/search-result.html"
+
+    res = send_push_notification_to_all(title=title, body=body, url=url)
+    return jsonify(res), (200 if res.get('success') else 500)
 
 
 if __name__ == '__main__':

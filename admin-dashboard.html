@@ -221,6 +221,46 @@
                     </form>
                 </div>
 
+                <!-- FCM Web Push Notification Broadcast Card -->
+                <div class="card" style="background:#fff; border-top: 4px solid #10b981; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="color: #062b63; margin: 0 0 4px 0; font-size: 18px;">
+                                📲 Broadcast FCM Push Notification (Firebase)
+                            </h3>
+                            <p style="font-size: 13px; color: #64748b; margin: 0;">
+                                Instantly send web push alerts to all subscribed student &amp; institute devices (mobile &amp; desktop).
+                            </p>
+                        </div>
+                        <div style="background: #e0f2fe; padding: 6px 14px; border-radius: 8px; font-size: 13px; color: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <span>Active Subscribers:</span>
+                            <span id="fcm-sub-count" style="font-size: 16px; color: #0369a1;">Loading...</span>
+                            <button type="button" onclick="loadFcmStats()" style="background: transparent; border: none; cursor: pointer; font-size: 14px;" title="Refresh subscriber count">🔄</button>
+                        </div>
+                    </div>
+
+                    <form id="fcm-broadcast-form" onsubmit="return handleFcmBroadcast(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px;">
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 5px;">Notification Title *</label>
+                            <input type="text" id="fcm-notif-title" placeholder="e.g. 🎯 Annual 2026 Results Declared!" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 5px;">Click Destination URL *</label>
+                            <input type="text" id="fcm-notif-url" value="/search-result.html" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px;">
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 5px;">Message Body *</label>
+                            <textarea id="fcm-notif-body" rows="2" placeholder="e.g. Odisha Public School has published Class 10th marksheets and tabulation registers. Check your marks now!" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; font-family: inherit;"></textarea>
+                        </div>
+                        <div style="grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; margin-top: 5px;">
+                            <button type="submit" id="fcm-send-btn" class="btn btn-primary" style="padding: 10px 24px; font-weight: 700; background: #10b981; border-color: #059669;">
+                                🚀 Send Push Notification to All Devices
+                            </button>
+                            <span id="fcm-status-msg" style="font-size: 13px; font-weight: 600; display: none;"></span>
+                        </div>
+                    </form>
+                </div>
+
             </div>
 
         </main>
@@ -238,7 +278,80 @@
         </div>
     </div>
 
-    <script src="js/storage.js?v=1000035"></script>
-    <script src="js/admin.js?v=1000035"></script>
+    <script src="js/storage.js?v=1000041"></script>
+    <script src="js/admin.js?v=1000041"></script>
+    <script>
+        function loadFcmStats() {
+            const countEl = document.getElementById('fcm-sub-count');
+            if (!countEl) return;
+            fetch('/api/admin/notifications/stats')
+                .then(r => r.json())
+                .then(d => {
+                    countEl.textContent = (d && typeof d.total_subscribers !== 'undefined') ? d.total_subscribers : '0';
+                })
+                .catch(() => {
+                    countEl.textContent = '0';
+                });
+        }
+
+        async function handleFcmBroadcast(e) {
+            e.preventDefault();
+            const title = document.getElementById('fcm-notif-title').value.trim();
+            const body = document.getElementById('fcm-notif-body').value.trim();
+            const url = document.getElementById('fcm-notif-url').value.trim() || '/search-result.html';
+            const btn = document.getElementById('fcm-send-btn');
+            const statusMsg = document.getElementById('fcm-status-msg');
+
+            const token = sessionStorage.getItem('admin_token');
+            if (!token) {
+                alert('Session expired. Please log in again.');
+                return false;
+            }
+
+            if (!confirm(`Are you sure you want to broadcast this push notification to all registered phones and computers?\n\nTitle: ${title}\nBody: ${body}`)) {
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Broadcasting to phones...';
+            statusMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/admin/broadcast-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ title, body, url })
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Send Push Notification to All Devices';
+
+                if (res.ok && data.success) {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#059669';
+                    statusMsg.textContent = `✅ Successfully sent to ${data.sent_count} device(s)!`;
+                    alert(`✅ Push Notification Sent!\n\nDelivered: ${data.sent_count} device(s)\nFailed: ${data.failure_count || 0}`);
+                    loadFcmStats();
+                } else {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#dc2626';
+                    statusMsg.textContent = `❌ Error: ${data.error || 'Failed to send'}`;
+                    alert('Broadcast error: ' + (data.error || 'Failed to send.'));
+                }
+            } catch(err) {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Send Push Notification to All Devices';
+                statusMsg.style.display = 'inline';
+                statusMsg.style.color = '#dc2626';
+                statusMsg.textContent = '❌ Network error: ' + err.message;
+            }
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFcmStats);
+    </script>
 </body>
 </html>

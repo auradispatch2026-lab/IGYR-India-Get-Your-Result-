@@ -3,3 +3,5 @@ pymongo
 dnspython
 flask-cors
 gunicorn
+firebase-admin
+
