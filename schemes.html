@@ -189,15 +189,15 @@
                 margin: 0;
             }
             .nav-install-btn {
-                width: 100%;
-                justify-content: center;
-                margin: 10px 0;
+                width: 100% !important;
+                justify-content: center !important;
+                margin: 14px 0 8px 0 !important;
+                padding: 12px 20px !important;
+                font-size: 15px !important;
             }
         }
 
         @media (display-mode: standalone) {
-            .nav-install-btn,
-            .nav-install-btn-mobile,
             #igyr-pwa-banner,
             .igyr-pwa-floating {
                 display: none !important;
@@ -1347,7 +1347,7 @@
     <!-- LOGIC SCRIPTS -->
     <script src="js/data-india.js"></script>
     <script src="js/storage.js?v=1000035"></script>
-    <script src="/pwa-install.js?v=1000037"></script>
+    <script src="/pwa-install.js?v=1000038"></script>
 
     <script>
         function renderPublicSchemes() {
@@ -1434,6 +1434,13 @@
                 menuBtn.addEventListener("click", () => {
                     navLinks.classList.toggle("open");
                     menuBtn.innerHTML = navLinks.classList.contains("open") ? "✕" : "☰";
+                });
+
+                document.querySelectorAll(".nav-links a, .nav-links button").forEach(item => {
+                    item.addEventListener("click", () => {
+                        navLinks.classList.remove("open");
+                        menuBtn.innerHTML = "☰";
+                    });
                 });
             }
         });

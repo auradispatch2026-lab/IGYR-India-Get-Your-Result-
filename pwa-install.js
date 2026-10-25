@@ -1,31 +1,48 @@
 /**
  * IGYR - India Get Your Result
  * PWA Install Manager & Service Worker Registration
+ * 
+ * Rules:
+ * 1. Mobile 3-line menu (and nav) "Install App" button is ALWAYS shown and working anytime.
+ * 2. Floating install banner verifies 1st if user has already downloaded/installed the app:
+ *    - If already downloaded/installed: DO NOT show floating banner.
+ *    - If NOT downloaded/installed: SHOW floating banner.
  */
 
 (function() {
     let deferredInstallPrompt = null;
 
-    // Check if running as an installed standalone PWA app or if user already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                         window.navigator.standalone === true;
-    const isMarkedInstalled = localStorage.getItem('igyr_app_installed') === 'true';
-
-    // Helper to completely purge all install UI elements
-    function removeAllInstallUi() {
-        const elements = document.querySelectorAll('.nav-install-btn, .nav-install-btn-mobile, #igyr-pwa-banner, .igyr-pwa-floating');
-        elements.forEach(el => {
-            el.style.display = 'none';
-            el.remove();
-        });
+    // Helper: close mobile hamburger menu if open
+    function closeMobileMenuIfOpen() {
+        const navLinks = document.getElementById('navLinks');
+        const menuBtn = document.getElementById('menuBtn');
+        if (navLinks && navLinks.classList.contains('open')) {
+            navLinks.classList.remove('open');
+            if (menuBtn) menuBtn.innerHTML = '☰';
+        }
     }
 
-    if (isStandalone || isMarkedInstalled) {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', removeAllInstallUi);
-        } else {
-            removeAllInstallUi();
+    // Helper: check if user has already downloaded/installed the app
+    function isUserAlreadyDownloaded() {
+        // 1. Currently running inside standalone installed app
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true;
+        if (isStandalone) return true;
+
+        // 2. Previously marked as installed on this device
+        if (localStorage.getItem('igyr_app_installed') === 'true') {
+            return true;
         }
+
+        return false;
+    }
+
+    // Helper: remove floating banner from DOM
+    function removeFloatingBanner() {
+        const banner = document.getElementById('igyr-pwa-banner');
+        if (banner) banner.remove();
+        const floating = document.querySelectorAll('.igyr-pwa-floating');
+        floating.forEach(el => el.remove());
     }
 
     // 1. Register Service Worker for PWA compliance & offline caching
@@ -47,19 +64,13 @@
         }
     }
 
-    // If running inside the standalone app, do not inject install buttons or prompts
-    if (isStandalone) {
-        console.log("IGYR: Running in standalone installed app mode. Install options disabled.");
-        return;
-    }
-
-    // Check if the browser reports related app is already installed
+    // Check device native API for installed app (Chrome on Android)
     if ('getInstalledRelatedApps' in navigator) {
         navigator.getInstalledRelatedApps().then(relatedApps => {
             if (relatedApps && relatedApps.length > 0) {
-                console.log('IGYR: App already installed on device.');
+                console.log('IGYR: Device confirms app already installed.');
                 localStorage.setItem('igyr_app_installed', 'true');
-                removeAllInstallUi();
+                removeFloatingBanner();
             }
         }).catch(() => {});
     }
@@ -70,31 +81,30 @@
         const style = document.createElement('style');
         style.id = 'igyr-pwa-styles';
         style.textContent = `
-            /* Hide all install elements when running inside standalone PWA */
+            /* Hide floating banner when running in standalone mode */
             @media (display-mode: standalone) {
-                .nav-install-btn,
-                .nav-install-btn-mobile,
                 #igyr-pwa-banner,
                 .igyr-pwa-floating {
                     display: none !important;
                 }
             }
 
-            /* PWA Nav Install Button */
+            /* PWA Nav Install Button (Always visible in navbar and 3-line menu) */
             .nav-install-btn {
                 display: inline-flex !important;
                 align-items: center !important;
+                justify-content: center !important;
                 gap: 8px !important;
                 background: linear-gradient(135deg, #f5b82e, #e29f0e) !important;
                 color: #071d49 !important;
                 font-family: inherit !important;
                 font-weight: 700 !important;
                 font-size: 14px !important;
-                padding: 8px 18px !important;
+                padding: 9px 20px !important;
                 border-radius: 50px !important;
                 border: none !important;
                 cursor: pointer !important;
-                box-shadow: 0 4px 12px rgba(245, 184, 46, 0.35) !important;
+                box-shadow: 0 4px 14px rgba(245, 184, 46, 0.4) !important;
                 transition: transform 0.2s, box-shadow 0.2s, background 0.2s !important;
                 text-decoration: none !important;
                 white-space: nowrap !important;
@@ -103,7 +113,7 @@
             }
             .nav-install-btn:hover {
                 transform: translateY(-2px) scale(1.02) !important;
-                box-shadow: 0 6px 18px rgba(245, 184, 46, 0.5) !important;
+                box-shadow: 0 6px 18px rgba(245, 184, 46, 0.55) !important;
                 background: linear-gradient(135deg, #f7c34b, #e09908) !important;
             }
             .nav-install-btn svg {
@@ -187,7 +197,7 @@
                 color: #ffffff;
             }
 
-            @media (max-width: 768px) {
+            @media (max-width: 800px) {
                 .igyr-pwa-floating {
                     left: 14px;
                     right: 14px;
@@ -195,9 +205,11 @@
                     padding: 10px 14px;
                 }
                 .nav-install-btn {
-                    margin: 10px 0;
-                    width: 100%;
-                    justify-content: center;
+                    margin: 14px 0 8px 0 !important;
+                    width: 100% !important;
+                    justify-content: center !important;
+                    padding: 12px 20px !important;
+                    font-size: 15px !important;
                 }
             }
 
@@ -295,14 +307,15 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredInstallPrompt = e;
-        console.log("IGYR: beforeinstallprompt captured! Custom install button is ready.");
-        if (!localStorage.getItem('igyr_app_installed')) {
-            showInstallUi();
-        }
+        console.log("IGYR: beforeinstallprompt captured! Ready for installation.");
+        updateInstallBannerVisibility();
     });
 
-    // 4. Trigger Installation Prompt
+    // 4. Trigger Installation Flow
     window.triggerPwaInstall = async function() {
+        closeMobileMenuIfOpen();
+
+        // If native prompt is ready, trigger it directly
         if (deferredInstallPrompt) {
             try {
                 deferredInstallPrompt.prompt();
@@ -310,12 +323,20 @@
                 console.log("User install prompt choice:", outcome);
                 if (outcome === 'accepted') {
                     localStorage.setItem('igyr_app_installed', 'true');
-                    hideInstallUi();
+                    removeFloatingBanner();
                 }
             } catch (err) {
                 console.error("Install prompt error:", err);
             }
             deferredInstallPrompt = null;
+            return;
+        }
+
+        // If already inside installed standalone app
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true;
+        if (isStandalone) {
+            showAlreadyInstalledModal();
             return;
         }
 
@@ -329,6 +350,23 @@
         // Fallback for Android / Desktop Chrome when prompt cooldown or manual install
         showGeneralInstallModal();
     };
+
+    function showAlreadyInstalledModal() {
+        const existing = document.querySelector('.igyr-pwa-modal-overlay');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.className = 'igyr-pwa-modal-overlay';
+        modal.innerHTML = `
+            <div class="igyr-pwa-modal">
+                <img src="/favicon.png" alt="IGYR" class="igyr-pwa-logo" style="width:54px; height:54px; margin:0 auto;">
+                <h3>IGYR App is Installed!</h3>
+                <p>You are already using the installed IGYR App on your device with direct access to exam results.</p>
+                <button class="igyr-pwa-modal-btn" onclick="this.closest('.igyr-pwa-modal-overlay').remove()">OK</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
 
     function showIosInstallModal() {
         const existing = document.querySelector('.igyr-pwa-modal-overlay');
@@ -371,55 +409,71 @@
             <div class="igyr-pwa-modal">
                 <img src="/favicon.png" alt="IGYR" class="igyr-pwa-logo" style="width:54px; height:54px; margin:0 auto;">
                 <h3>Install IGYR App</h3>
-                <p>Fast, direct access to examination results and verified credentials.</p>
+                <p>Instant, direct access to examination results and official verification.</p>
                 <div class="igyr-pwa-steps">
                     <div class="igyr-pwa-step-item">
                         <div class="igyr-pwa-step-num">1</div>
-                        <div>Tap your browser's <strong>menu (⋮ or ⋯)</strong> at the top or bottom right.</div>
+                        <div>Tap your browser's <strong>menu (⋮ or ⋯)</strong> at the top right.</div>
                     </div>
                     <div class="igyr-pwa-step-item">
                         <div class="igyr-pwa-step-num">2</div>
                         <div>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</div>
                     </div>
                 </div>
-                <button class="igyr-pwa-modal-btn" onclick="this.closest('.igyr-pwa-modal-overlay').remove()">Close</button>
+                <button class="igyr-pwa-modal-btn" onclick="this.closest('.igyr-pwa-modal-overlay').remove()">Got It</button>
             </div>
         `;
         document.body.appendChild(modal);
     }
 
-    function showInstallUi() {
-        if (isStandalone || localStorage.getItem('igyr_app_installed') === 'true') {
-            removeAllInstallUi();
-            return;
-        }
-
+    // 5. Setup Navbar & 3-Line Menu Buttons (ALWAYS shown & working)
+    function setupNavButtons() {
         injectPwaStyles();
 
-        // 1. Ensure Navbar Button exists and has active click handler
+        // 1. Ensure 3-line menu button in navLinks exists
         const navLinks = document.getElementById('navLinks');
         let navBtn = document.getElementById('nav-install-btn');
+
         if (!navBtn && navLinks) {
             navBtn = document.createElement('button');
             navBtn.id = 'nav-install-btn';
             navBtn.className = 'nav-install-btn';
+            navBtn.setAttribute('aria-label', 'Install App');
             navBtn.innerHTML = `
-                <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:6px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
                 Install App
             `;
             navLinks.appendChild(navBtn);
         }
 
-        // Attach click handlers to all buttons
+        // 2. Attach click handlers to all install buttons (menu button + mobile header button)
         document.querySelectorAll('.nav-install-btn, .nav-install-btn-mobile').forEach(btn => {
             btn.onclick = (e) => {
                 if (e) e.preventDefault();
+                closeMobileMenuIfOpen();
                 window.triggerPwaInstall();
             };
         });
+    }
 
-        // 2. Floating Bottom Install Banner
-        if (!document.getElementById('igyr-pwa-banner') && !sessionStorage.getItem('igyr_pwa_dismissed')) {
+    // 6. Floating Banner Logic: Verify 1st if user already downloaded/installed
+    function updateInstallBannerVisibility() {
+        // If user ALREADY downloaded/installed: DO NOT SHOW BANNER
+        if (isUserAlreadyDownloaded()) {
+            console.log("IGYR: App already downloaded/installed. Floating banner will NOT be shown.");
+            removeFloatingBanner();
+            return;
+        }
+
+        // If user dismissed banner in this session: DO NOT SHOW BANNER
+        if (sessionStorage.getItem('igyr_pwa_dismissed') === 'true') {
+            return;
+        }
+
+        // If NOT downloaded: SHOW BANNER
+        if (!document.getElementById('igyr-pwa-banner')) {
+            injectPwaStyles();
+
             const banner = document.createElement('div');
             banner.id = 'igyr-pwa-banner';
             banner.className = 'igyr-pwa-floating';
@@ -445,28 +499,29 @@
             const closeBtn = document.getElementById('igyr-pwa-close-btn');
             if (closeBtn) {
                 closeBtn.addEventListener('click', () => {
-                    banner.remove();
+                    removeFloatingBanner();
                     sessionStorage.setItem('igyr_pwa_dismissed', 'true');
                 });
             }
         }
     }
 
-    function hideInstallUi() {
-        removeAllInstallUi();
-    }
-
-    // App installed event listener
+    // 7. Event: App successfully installed
     window.addEventListener('appinstalled', () => {
         console.log('IGYR App was successfully installed!');
         localStorage.setItem('igyr_app_installed', 'true');
-        hideInstallUi();
+        removeFloatingBanner();
     });
 
-    // Initialize immediately without waiting if DOM is already ready
+    // 8. Initialization: Always enable menu button, verify banner visibility
+    function initPwa() {
+        setupNavButtons();
+        updateInstallBannerVisibility();
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', showInstallUi);
+        document.addEventListener('DOMContentLoaded', initPwa);
     } else {
-        showInstallUi();
+        initPwa();
     }
 })();
