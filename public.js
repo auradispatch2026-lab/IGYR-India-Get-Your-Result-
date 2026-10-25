@@ -155,14 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     { text: 'Home', url: 'index.html' },
                     { text: 'About', url: 'about.html' },
                     { text: 'Results', url: 'search-result.html' },
-                    { text: 'Institute Login Portal', url: 'institute-login.html' }
+                    { text: 'Schemes', url: 'schemes.html' }
                 ];
-            } else {
-                const hasInst = links.some(l => l.text && l.text.toLowerCase().includes('institute'));
-                if (!hasInst) {
-                    links.push({ text: 'Institute Login Portal', url: 'institute-login.html' });
-                }
             }
+
 
             qlContainer.innerHTML = '';
             links.forEach(l => {
@@ -255,14 +251,65 @@ document.addEventListener('DOMContentLoaded', () => {
             const aPriv = document.createElement('a');
             aPriv.href = "privacy.html";
             aPriv.textContent = "Privacy Policy";
+            aPriv.onclick = (e) => {
+                if (typeof window.openPolicyModal === 'function') {
+                    e.preventDefault();
+                    window.openPolicyModal('privacy');
+                }
+            };
             scContainer.appendChild(aPriv);
 
             const aTerms = document.createElement('a');
             aTerms.href = "terms.html";
             aTerms.textContent = "Terms & Conditions";
+            aTerms.onclick = (e) => {
+                if (typeof window.openPolicyModal === 'function') {
+                    e.preventDefault();
+                    window.openPolicyModal('terms');
+                }
+            };
             scContainer.appendChild(aTerms);
         }
     };
+
+    window.openPolicyModal = function(type) {
+        const existing = document.getElementById('igyr-policy-modal');
+        if (existing) existing.remove();
+
+        const isPrivacy = (type === 'privacy');
+        const title = isPrivacy ? '🔒 Official Privacy Policy' : '⚖️ Official Terms & Conditions';
+        const rawContent = (isPrivacy && typeof getPrivacyPolicy === 'function') 
+            ? getPrivacyPolicy() 
+            : ((typeof getTermsConditions === 'function') ? getTermsConditions() : '');
+
+        const modal = document.createElement('div');
+        modal.id = 'igyr-policy-modal';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(7, 29, 73, 0.7); backdrop-filter: blur(5px);
+            z-index: 100000; display: flex; align-items: center; justify-content: center;
+            padding: 20px; animation: igyrPwaFadeIn 0.2s ease-out;
+        `;
+
+        modal.innerHTML = `
+            <div style="background: #ffffff; color: #071d49; width: 100%; max-width: 720px; border-radius: 20px; padding: 28px 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; max-height: 85vh; display: flex; flex-direction: column; font-family: 'Inter', -apple-system, sans-serif;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #071d49;">${title}</h3>
+                        <span style="font-size: 12px; color: #64748b; font-weight: 600;">India Get Your Result (IGYR) Official Policy</span>
+                    </div>
+                    <button style="background: transparent; border: none; font-size: 24px; color: #64748b; cursor: pointer; padding: 4px 8px; line-height: 1;" onclick="document.getElementById('igyr-policy-modal').remove()">✕</button>
+                </div>
+                <div style="flex: 1; overflow-y: auto; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; font-size: 14px; line-height: 1.7; color: #334155; white-space: pre-wrap; word-break: break-word;">${rawContent}</div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 18px; gap: 10px;">
+                    <a href="${isPrivacy ? 'privacy.html' : 'terms.html'}" target="_blank" style="padding: 10px 18px; font-size: 13px; color: #1266d6; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center;">Open Full Page ↗</a>
+                    <button style="background: #1266d6; color: white; border: none; font-size: 14px; font-weight: 700; padding: 10px 24px; border-radius: 8px; cursor: pointer;" onclick="document.getElementById('igyr-policy-modal').remove()">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    };
+
     window.renderSupportContact();
 
     window.renderPublicData = function() {

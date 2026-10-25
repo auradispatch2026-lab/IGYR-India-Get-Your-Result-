@@ -1070,15 +1070,9 @@
                 </div>
             </a>
 
-            <div style="display:flex; align-items:center; gap:10px;">
-                <button class="nav-install-btn nav-install-btn-mobile" onclick="window.triggerPwaInstall ? window.triggerPwaInstall() : null" aria-label="Install App">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:middle;margin-right:3px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-                    Install App
-                </button>
-                <button class="menu-btn" id="menuBtn" aria-label="Open menu">
-                    ☰
-                </button>
-            </div>
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+                ☰
+            </button>
 
             <nav class="nav-links" id="navLinks">
                 <a href="index.html">Home</a>
@@ -1333,8 +1327,8 @@
                 <h3 id="footer-support-heading">Support & Contact</h3>
                 <div class="footer-links" id="support-contact-container">
                     <a href="about.html#contact">Help Center</a>
-                    <a href="mailto:support@igyr.org">support@igyr.org</a>
-                    <a href="about.html">Government Recognition</a>
+                    <a href="privacy.html" onclick="if(window.openPolicyModal){event.preventDefault();window.openPolicyModal('privacy');}">Privacy Policy</a>
+                    <a href="terms.html" onclick="if(window.openPolicyModal){event.preventDefault();window.openPolicyModal('terms');}">Terms &amp; Conditions</a>
                 </div>
             </div>
         </div>
@@ -1346,7 +1340,8 @@
 
     <!-- LOGIC SCRIPTS -->
     <script src="js/data-india.js"></script>
-    <script src="js/storage.js?v=1000035"></script>
+    <script src="js/storage.js?v=1000038"></script>
+    <script src="js/public.js?v=1000038"></script>
     <script src="/pwa-install.js?v=1000038"></script>
 
     <script>
@@ -1563,6 +1558,28 @@
                 aFounder.style.fontWeight = "600";
                 aFounder.style.color = "#fce38a";
                 scContainer.appendChild(aFounder);
+
+                const aPriv = document.createElement('a');
+                aPriv.href = "privacy.html";
+                aPriv.textContent = "Privacy Policy";
+                aPriv.onclick = (e) => {
+                    if (typeof window.openPolicyModal === 'function') {
+                        e.preventDefault();
+                        window.openPolicyModal('privacy');
+                    }
+                };
+                scContainer.appendChild(aPriv);
+
+                const aTerms = document.createElement('a');
+                aTerms.href = "terms.html";
+                aTerms.textContent = "Terms & Conditions";
+                aTerms.onclick = (e) => {
+                    if (typeof window.openPolicyModal === 'function') {
+                        e.preventDefault();
+                        window.openPolicyModal('terms');
+                    }
+                };
+                scContainer.appendChild(aTerms);
             }
         };
 

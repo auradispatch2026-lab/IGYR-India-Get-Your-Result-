@@ -229,9 +229,31 @@
                         <textarea id="set-subtext" rows="2" placeholder="e.g. Official 24/7 Educational Grievance & Technical Assistance Helpline"></textarea>
                     </div>
 
+                    <!-- Legal Policies Section: Privacy Policy & Terms and Conditions -->
+                    <div style="border-top: 2px dashed #cbd5e1; margin-top: 30px; padding-top: 25px;">
+                        <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 18px;">
+                            <h3 style="color: #062b63; margin: 0 0 4px 0; font-size: 18px;">
+                                📜 Manage Legal Policies (Text Format)
+                            </h3>
+                            <p style="font-size: 13px; color: #64748b; margin: 0;">
+                                Type your official Privacy Policy and Terms &amp; Conditions. Once saved, this data is published live to the front page and public footer links.
+                            </p>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 22px;">
+                            <label style="font-weight: 700; color: #062b63;">🔒 Privacy Policy (Text Format) *</label>
+                            <textarea id="set-privacy" rows="9" style="font-family: inherit; font-size: 13px; line-height: 1.6;" placeholder="Type Privacy Policy here..." required></textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="font-weight: 700; color: #062b63;">⚖️ Terms &amp; Conditions (Text Format) *</label>
+                            <textarea id="set-terms" rows="9" style="font-family: inherit; font-size: 13px; line-height: 1.6;" placeholder="Type Terms &amp; Conditions here..." required></textarea>
+                        </div>
+                    </div>
+
                     <div style="display: flex; gap: 15px; align-items: center; margin-top: 25px; flex-wrap: wrap;">
                         <button type="submit" class="btn btn-primary" style="padding: 12px 30px;">
-                            💾 Save Support & Contact Settings
+                            💾 Save System Settings &amp; Legal Policies
                         </button>
                         <button type="button" onclick="resetToDefaults()" class="btn btn-outline" style="border: 1px solid #94a3b8; color: #475569; padding: 12px 20px; border-radius: 8px; background: transparent; cursor: pointer;">
                             🔄 Reset Defaults
@@ -298,6 +320,8 @@
             const helpurlInput = document.getElementById('set-helpurl');
             const addressInput = document.getElementById('set-address');
             const subtextInput = document.getElementById('set-subtext');
+            const privacyInput = document.getElementById('set-privacy');
+            const termsInput = document.getElementById('set-terms');
 
             function loadSettingsIntoForm(s) {
                 headingInput.value = s.contactHeading || 'Support & Contact';
@@ -308,6 +332,8 @@
                 helpurlInput.value = s.helpCenterUrl || 'about.html#contact';
                 addressInput.value = s.officeAddress || 'IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India';
                 subtextInput.value = s.contactSubtext || 'Official 24/7 Educational Grievance & Technical Assistance Helpline';
+                if (privacyInput) privacyInput.value = s.privacyPolicy || (typeof window.DEFAULT_PRIVACY_POLICY !== 'undefined' ? window.DEFAULT_PRIVACY_POLICY : '');
+                if (termsInput) termsInput.value = s.termsConditions || (typeof window.DEFAULT_TERMS_CONDITIONS !== 'undefined' ? window.DEFAULT_TERMS_CONDITIONS : '');
 
                 updatePreview();
                 updateStats();
@@ -351,7 +377,9 @@
                     supportHours: hoursInput.value.trim(),
                     helpCenterUrl: helpurlInput.value.trim(),
                     officeAddress: addressInput.value.trim(),
-                    contactSubtext: subtextInput.value.trim()
+                    contactSubtext: subtextInput.value.trim(),
+                    privacyPolicy: privacyInput ? privacyInput.value.trim() : '',
+                    termsConditions: termsInput ? termsInput.value.trim() : ''
                 };
 
                 saveSystemSettings(newSettings);
@@ -362,12 +390,12 @@
                     setTimeout(() => { indicator.style.display = 'none'; }, 4000);
                 }
 
-                alert("Support & Contact settings updated successfully! All public footers and contact links have been updated.");
+                alert("System Settings & Legal Policies saved successfully! All front page footers and policy modals have been updated.");
             });
 
             window.resetToDefaults = function() {
                 if (typeof igyrConfirm === 'function') {
-                    igyrConfirm("Are you sure you want to reset Support & Contact details to default values?", function() {
+                    igyrConfirm("Are you sure you want to reset System Settings and Legal Policies to default values?", function() {
                         const defaults = {
                             id: 'system_settings',
                             contactHeading: 'Support & Contact',
@@ -377,7 +405,9 @@
                             supportHours: 'Monday - Saturday: 9:00 AM - 6:00 PM IST',
                             helpCenterUrl: 'about.html#contact',
                             officeAddress: 'IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India',
-                            contactSubtext: 'Official 24/7 Educational Grievance & Technical Assistance Helpline'
+                            contactSubtext: 'Official 24/7 Educational Grievance & Technical Assistance Helpline',
+                            privacyPolicy: window.DEFAULT_PRIVACY_POLICY,
+                            termsConditions: window.DEFAULT_TERMS_CONDITIONS
                         };
                         loadSettingsIntoForm(defaults);
                         saveSystemSettings(defaults);

@@ -446,8 +446,8 @@
             navLinks.appendChild(navBtn);
         }
 
-        // 2. Attach click handlers to all install buttons (menu button + mobile header button)
-        document.querySelectorAll('.nav-install-btn, .nav-install-btn-mobile').forEach(btn => {
+        // 2. Attach click handlers to install button in 3-line menu / navbar
+        document.querySelectorAll('.nav-install-btn').forEach(btn => {
             btn.onclick = (e) => {
                 if (e) e.preventDefault();
                 closeMobileMenuIfOpen();

@@ -110,6 +110,60 @@ def init_db():
             "appliedAt": "2026-10-23 15:30"
         })
 
+    default_privacy = """INDIA GET YOUR RESULT (IGYR) - PRIVACY POLICY
+Last Updated: October 2026
+
+1. Overview
+India Get Your Result ("IGYR", "we", "our", or "platform") is committed to protecting the privacy and personal data of students, educational institutions, teachers, and visitors. This Privacy Policy outlines how we collect, store, process, and safeguard information published and accessed through our portal.
+
+2. Information We Collect
+- Student Examination Data: Registration numbers, roll numbers, candidate names, academic classes, subject marks, and grades published by verified affiliated educational institutions.
+- Institutional Details: School/college name, board affiliation, contact email, administrative credentials, and verification keys.
+- Technical & Log Data: IP addresses, browser types, device information, and access timestamps collected automatically for security and audit verification.
+
+3. Use of Information
+- Facilitating online access to verified examination marksheets and tabulation sheets.
+- Maintaining cryptographic verification identifiers (VID) to prevent credential falsification.
+- Communicating critical platform updates, system maintenance, and examination publication notices.
+
+4. Data Protection & Security
+All records are stored within protected cloud database architectures with strict role-based access control. Sensitive passwords and authentication tokens are encrypted using industry-standard hashing protocols. We never sell, rent, or trade student examination data to third-party commercial entities.
+
+5. Cookies & Offline Storage
+IGYR uses local caching (Service Workers & local storage) exclusively to enable fast offline access to examination results and ensure continuous availability.
+
+6. Grievance Redressal
+For privacy queries or data correction requests, contact the IGYR Secretariat:
+- Email: support@igyr.org
+- Helpline: +91 1800-889-4497
+- Address: IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India."""
+
+    default_terms = """INDIA GET YOUR RESULT (IGYR) - TERMS & CONDITIONS
+Last Updated: October 2026
+
+1. Acceptance of Terms
+By accessing or using India Get Your Result (https://igyr-india-get-your-result.onrender.com/), educational institutions, administrators, students, and parents agree to be bound by these Terms and Conditions.
+
+2. Purpose of the Platform
+IGYR provides a digital infrastructure allowing registered schools, colleges, and coaching institutions across India to digitally publish, archive, and verify examination results, tabulation registers, and student credentials.
+
+3. Institutional Responsibilities
+- Participating institutions warrant that all uploaded marks, roll numbers, and student identities are authentic and approved by their respective academic governing authorities.
+- Institutions are responsible for maintaining the confidentiality of their portal credentials and passwords.
+
+4. Student Marksheet Verification
+- Online marks and digital scorecards published via IGYR are digital representations intended for immediate access and official verification.
+- Every verified result is stamped with an official Verification Identifier (VID). Tampering with published results constitutes a punishable offense.
+
+5. Intellectual Property
+All platform software, user interface design, logos, brand assets, and proprietary tabulation systems are the intellectual property of India Get Your Result (IGYR) and its founder, Arnnav Panda.
+
+6. Limitation of Liability
+IGYR operates with continuous cloud uptime monitoring. While we implement high-availability safeguards, IGYR shall not be liable for localized internet interruptions or errors in raw marks submitted directly by institutions.
+
+7. Jurisdiction & Applicable Law
+These terms are governed by the laws of India. Any disputes arising out of the use of this portal shall be subject to the exclusive jurisdiction of the competent courts in India."""
+
     if settings_col.count_documents({}) == 0:
         settings_col.insert_one({
             "id": "system_settings",
@@ -120,8 +174,20 @@ def init_db():
             "helpCenterUrl": "about.html#contact",
             "whatsappSupport": "+91 98765 43210",
             "contactHeading": "Support & Contact",
-            "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline"
+            "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline",
+            "privacyPolicy": default_privacy,
+            "termsConditions": default_terms
         })
+    else:
+        existing = settings_col.find_one({"id": "system_settings"})
+        if existing:
+            updates = {}
+            if "privacyPolicy" not in existing or not existing["privacyPolicy"]:
+                updates["privacyPolicy"] = default_privacy
+            if "termsConditions" not in existing or not existing["termsConditions"]:
+                updates["termsConditions"] = default_terms
+            if updates:
+                settings_col.update_one({"id": "system_settings"}, {"$set": updates})
 
 init_db()
 
@@ -208,6 +274,18 @@ def pwa_install_script():
     res = send_from_directory('.', 'pwa-install.js', mimetype='application/javascript')
     res.headers['Cache-Control'] = 'no-cache'
     return res
+
+@app.route('/privacy.html')
+@app.route('/privacy')
+def privacy_page():
+    folder = get_asset_folder('privacy.html')
+    return send_from_directory(folder, 'privacy.html')
+
+@app.route('/terms.html')
+@app.route('/terms')
+def terms_page():
+    folder = get_asset_folder('terms.html')
+    return send_from_directory(folder, 'terms.html')
 
 
 @app.route('/institute-login.html')

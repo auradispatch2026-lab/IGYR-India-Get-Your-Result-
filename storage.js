@@ -4,7 +4,61 @@ let API_BASE = 'http://127.0.0.1:5005/api';
 if (window.location.hostname.includes('render.com')) {
     API_BASE = '/api';
 }
-// Global In-Memory DB (Loaded synchronously on page load from MongoDB)
+window.DEFAULT_PRIVACY_POLICY = `INDIA GET YOUR RESULT (IGYR) - PRIVACY POLICY
+Last Updated: October 2026
+
+1. Overview
+India Get Your Result ("IGYR", "we", "our", or "platform") is committed to protecting the privacy and personal data of students, educational institutions, teachers, and visitors. This Privacy Policy outlines how we collect, store, process, and safeguard information published and accessed through our portal.
+
+2. Information We Collect
+- Student Examination Data: Registration numbers, roll numbers, candidate names, academic classes, subject marks, and grades published by verified affiliated educational institutions.
+- Institutional Details: School/college name, board affiliation, contact email, administrative credentials, and verification keys.
+- Technical & Log Data: IP addresses, browser types, device information, and access timestamps collected automatically for security and audit verification.
+
+3. Use of Information
+- Facilitating online access to verified examination marksheets and tabulation sheets.
+- Maintaining cryptographic verification identifiers (VID) to prevent credential falsification.
+- Communicating critical platform updates, system maintenance, and examination publication notices.
+
+4. Data Protection & Security
+All records are stored within protected cloud database architectures with strict role-based access control. Sensitive passwords and authentication tokens are encrypted using industry-standard hashing protocols. We never sell, rent, or trade student examination data to third-party commercial entities.
+
+5. Cookies & Offline Storage
+IGYR uses local caching (Service Workers & local storage) exclusively to enable fast offline access to examination results and ensure continuous availability.
+
+6. Grievance Redressal
+For privacy queries or data correction requests, contact the IGYR Secretariat:
+- Email: support@igyr.org
+- Helpline: +91 1800-889-4497
+- Address: IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India.`;
+
+window.DEFAULT_TERMS_CONDITIONS = `INDIA GET YOUR RESULT (IGYR) - TERMS & CONDITIONS
+Last Updated: October 2026
+
+1. Acceptance of Terms
+By accessing or using India Get Your Result (https://igyr-india-get-your-result.onrender.com/), educational institutions, administrators, students, and parents agree to be bound by these Terms and Conditions.
+
+2. Purpose of the Platform
+IGYR provides a digital infrastructure allowing registered schools, colleges, and coaching institutions across India to digitally publish, archive, and verify examination results, tabulation registers, and student credentials.
+
+3. Institutional Responsibilities
+- Participating institutions warrant that all uploaded marks, roll numbers, and student identities are authentic and approved by their respective academic governing authorities.
+- Institutions are responsible for maintaining the confidentiality of their portal credentials and passwords.
+
+4. Student Marksheet Verification
+- Online marks and digital scorecards published via IGYR are digital representations intended for immediate access and official verification.
+- Every verified result is stamped with an official Verification Identifier (VID). Tampering with published results constitutes a punishable offense.
+
+5. Intellectual Property
+All platform software, user interface design, logos, brand assets, and proprietary tabulation systems are the intellectual property of India Get Your Result (IGYR) and its founder, Arnnav Panda.
+
+6. Limitation of Liability
+IGYR operates with continuous cloud uptime monitoring. While we implement high-availability safeguards, IGYR shall not be liable for localized internet interruptions or errors in raw marks submitted directly by institutions.
+
+7. Jurisdiction & Applicable Law
+These terms are governed by the laws of India. Any disputes arising out of the use of this portal shall be subject to the exclusive jurisdiction of the competent courts in India.`;
+
+// Global In-Memory DB (Loaded instantly from local cache, updated seamlessly in background)
 window.IGYR_DB = {
     institutes: [],
     results: [],
@@ -20,21 +74,52 @@ window.IGYR_DB = {
         helpCenterUrl: "about.html#contact",
         whatsappSupport: "+91 98765 43210",
         contactHeading: "Support & Contact",
-        contactSubtext: "Official 24/7 Educational Grievance & Technical Assistance Helpline"
+        contactSubtext: "Official 24/7 Educational Grievance & Technical Assistance Helpline",
+        privacyPolicy: window.DEFAULT_PRIVACY_POLICY,
+        termsConditions: window.DEFAULT_TERMS_CONDITIONS
     }
 };
 
-// 1. Synchronous fetch on initialization to ensure data is ready before admin.js/public.js runs
-function initStorage() {
-    try {
-        const xhr = new XMLHttpRequest();
-        // Use synchronous request (async: false) so the page blocks until data is ready.
-        // This preserves the exact architecture of localStorage without breaking the 70+ existing function calls.
-        xhr.open('GET', API_BASE + '/sync', false); 
-        xhr.send(null);
-        
-        if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
+// 1. Instant Cache Hydration: Load cached data immediately in 0ms (no screen freeze/hang)
+try {
+    const cached = localStorage.getItem('igyr_db_cache');
+    if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.institutes)) window.IGYR_DB.institutes = parsed.institutes;
+            if (Array.isArray(parsed.results)) window.IGYR_DB.results = parsed.results;
+            if (Array.isArray(parsed.notices)) window.IGYR_DB.notices = parsed.notices;
+            if (Array.isArray(parsed.quicklinks)) window.IGYR_DB.quicklinks = parsed.quicklinks;
+            if (Array.isArray(parsed.schemes)) window.IGYR_DB.schemes = parsed.schemes;
+            if (Array.isArray(parsed.applications)) window.IGYR_DB.applications = parsed.applications;
+            if (parsed.settings) window.IGYR_DB.settings = parsed.settings;
+        }
+    }
+} catch(e) {
+    console.warn("Storage cache read error:", e);
+}
+
+// 2. Non-blocking Asynchronous Background Sync
+let isSyncing = false;
+function syncWithServer(silent = true) {
+    if (isSyncing) return Promise.resolve();
+    isSyncing = true;
+    
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 10000) : null;
+    
+    return fetch(API_BASE + '/sync', controller ? { signal: controller.signal } : {})
+        .then(res => {
+            if (timeoutId) clearTimeout(timeoutId);
+            if (!res.ok) throw new Error("Sync failed with status " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            isSyncing = false;
+            if (!data || typeof data !== 'object') return;
+            
+            const prevHash = JSON.stringify(window.IGYR_DB);
+            
             window.IGYR_DB.institutes = data.institutes || [];
             window.IGYR_DB.results = data.results || [];
             window.IGYR_DB.notices = data.notices || [];
@@ -42,16 +127,25 @@ function initStorage() {
             window.IGYR_DB.schemes = data.schemes || [];
             window.IGYR_DB.applications = data.applications || [];
             if (data.settings) window.IGYR_DB.settings = data.settings;
-        } else {
-            console.error("Failed to sync from MongoDB:", xhr.status);
-        }
-    } catch(err) {
-        console.error("Error communicating with Python Backend:", err);
-    }
+            
+            try {
+                localStorage.setItem('igyr_db_cache', JSON.stringify(window.IGYR_DB));
+            } catch(e) {}
+            
+            const newHash = JSON.stringify(window.IGYR_DB);
+            if (prevHash !== newHash) {
+                window.dispatchEvent(new Event('igyr_data_updated'));
+            }
+        })
+        .catch(err => {
+            isSyncing = false;
+            if (!silent) console.warn("Background sync warning:", err);
+        });
 }
 
-// Call immediately when script loads
-initStorage();
+// Launch non-blocking sync in background immediately
+syncWithServer(true);
+
 
 // 2. Data Getters (Instantly return from memory)
 function getInstitutes() { return window.IGYR_DB.institutes; }
@@ -61,7 +155,7 @@ function getQuickLinks() { return window.IGYR_DB.quicklinks; }
 function getSchemes() { return window.IGYR_DB.schemes || []; }
 function getApplications() { return window.IGYR_DB.applications || []; }
 function getSystemSettings() {
-    return window.IGYR_DB.settings || {
+    const defaults = {
         supportEmail: "support@igyr.org",
         helplinePhone: "+91 1800-889-4497",
         supportHours: "Monday - Saturday: 9:00 AM - 6:00 PM IST",
@@ -69,8 +163,21 @@ function getSystemSettings() {
         helpCenterUrl: "about.html#contact",
         whatsappSupport: "+91 98765 43210",
         contactHeading: "Support & Contact",
-        contactSubtext: "Official 24/7 Educational Grievance & Technical Assistance Helpline"
+        contactSubtext: "Official 24/7 Educational Grievance & Technical Assistance Helpline",
+        privacyPolicy: window.DEFAULT_PRIVACY_POLICY,
+        termsConditions: window.DEFAULT_TERMS_CONDITIONS
     };
+    return Object.assign({}, defaults, window.IGYR_DB.settings || {});
+}
+
+function getPrivacyPolicy() {
+    const s = getSystemSettings();
+    return s.privacyPolicy || window.DEFAULT_PRIVACY_POLICY;
+}
+
+function getTermsConditions() {
+    const s = getSystemSettings();
+    return s.termsConditions || window.DEFAULT_TERMS_CONDITIONS;
 }
 
 // 3. Data Setters (Update memory immediately, and async POST to Python Backend)
@@ -83,8 +190,15 @@ function getAuthHeaders() {
     };
 }
 
+function persistLocalCache() {
+    try {
+        localStorage.setItem('igyr_db_cache', JSON.stringify(window.IGYR_DB));
+    } catch(e) {}
+}
+
 function saveInstitutes(institutes) { 
     window.IGYR_DB.institutes = institutes;
+    persistLocalCache();
     return fetch(API_BASE + '/institutes', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -100,6 +214,8 @@ function saveInstitutes(institutes) {
 
 function saveResults(results) { 
     window.IGYR_DB.results = results;
+    persistLocalCache();
+
     return fetch(API_BASE + '/results', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -115,6 +231,7 @@ function saveResults(results) {
 
 function saveNotices(notices) { 
     window.IGYR_DB.notices = notices;
+    persistLocalCache();
     return fetch(API_BASE + '/notices', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -142,6 +259,7 @@ function submitSchemeApplication(appData) {
 
 function saveApplications(applications) {
     window.IGYR_DB.applications = applications;
+    persistLocalCache();
     return fetch(API_BASE + '/applications/save-all', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -157,6 +275,7 @@ function saveApplications(applications) {
 
 function saveSchemes(schemes) { 
     window.IGYR_DB.schemes = schemes;
+    persistLocalCache();
     return fetch(API_BASE + '/schemes', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -172,6 +291,7 @@ function saveSchemes(schemes) {
 
 function saveQuickLinks(links) { 
     window.IGYR_DB.quicklinks = links;
+    persistLocalCache();
     return fetch(API_BASE + '/quicklinks', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -187,6 +307,7 @@ function saveQuickLinks(links) {
 
 function saveSystemSettings(settings) {
     window.IGYR_DB.settings = settings;
+    persistLocalCache();
     return fetch(API_BASE + '/settings', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -201,50 +322,26 @@ function saveSystemSettings(settings) {
 }
 
 
+
 // -----------------------------------------------------------
-// REAL-TIME POLLING ENGINE (Updates without refresh)
+// SMART REAL-TIME POLLING ENGINE (Battery & Server friendly)
 // -----------------------------------------------------------
+// Poll every 15s (only when user is actively viewing the tab to avoid hanging the server)
 setInterval(() => {
-    fetch(API_BASE + '/sync')
-        .then(res => res.json())
-        .then(data => {
-            // Compare stringified versions to detect any changes
-            const currentHash = JSON.stringify({
-                institutes: window.IGYR_DB.institutes,
-                results: window.IGYR_DB.results,
-                notices: window.IGYR_DB.notices,
-                quicklinks: window.IGYR_DB.quicklinks,
-                schemes: window.IGYR_DB.schemes,
-                applications: window.IGYR_DB.applications,
-                settings: window.IGYR_DB.settings
-            });
-            
-            const newHash = JSON.stringify({
-                institutes: data.institutes || [],
-                results: data.results || [],
-                notices: data.notices || [],
-                quicklinks: data.quicklinks || [],
-                schemes: data.schemes || [],
-                applications: data.applications || [],
-                settings: data.settings || window.IGYR_DB.settings
-            });
-            
-            if (currentHash !== newHash) {
-                console.log("Real-time update detected from another device!");
-                window.IGYR_DB.institutes = data.institutes || [];
-                window.IGYR_DB.results = data.results || [];
-                window.IGYR_DB.notices = data.notices || [];
-                window.IGYR_DB.quicklinks = data.quicklinks || [];
-                window.IGYR_DB.schemes = data.schemes || [];
-                window.IGYR_DB.applications = data.applications || [];
-                if (data.settings) window.IGYR_DB.settings = data.settings;
-                
-                // Fire custom event so pages can re-render automatically
-                window.dispatchEvent(new Event('igyr_data_updated'));
-            }
-        })
-        .catch(e => { /* Silently ignore network errors during polling */ });
-}, 2000); // Poll every 2 seconds
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncWithServer(true);
+    }
+}, 15000);
+
+// Sync immediately when the user returns/switches to this tab
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            syncWithServer(true);
+        }
+    });
+}
+
 
 
 // =========================================================================
