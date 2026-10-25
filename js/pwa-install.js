@@ -45,10 +45,10 @@
         floating.forEach(el => el.remove());
     }
 
-    // 1. Register Service Worker for PWA compliance & offline caching
+    // 1. Register Service Worker for PWA compliance & FCM push notifications
     if ('serviceWorker' in navigator) {
         const registerSw = () => {
-            navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' })
                 .then(reg => {
                     console.log('IGYR Service Worker registered, scope:', reg.scope);
                 })

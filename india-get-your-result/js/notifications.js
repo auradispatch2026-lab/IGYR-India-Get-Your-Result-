@@ -37,7 +37,24 @@ function initIgyrFirebase() {
         const title = payload.notification?.title || payload.data?.title || 'IGYR Exam Alert';
         const body = payload.notification?.body || payload.data?.body || 'New examination update available.';
         const targetUrl = payload.data?.url || '/search-result.html';
+        
+        // 1. Show in-app banner toast
         showIgyrInAppNotification(title, body, targetUrl);
+
+        // 2. Also trigger native Android / OS notification banner if permitted
+        if (Notification.permission === 'granted' && navigator.serviceWorker) {
+          navigator.serviceWorker.ready.then((reg) => {
+            reg.showNotification(title, {
+              body: body,
+              icon: '/favicon-192x192.png',
+              badge: '/favicon-96x96.png',
+              tag: 'igyr-exam-alert',
+              renotify: true,
+              vibrate: [200, 100, 200],
+              data: { url: targetUrl }
+            });
+          }).catch((err) => console.warn('Foreground system notification error:', err));
+        }
       });
     } catch (e) {
       console.warn('[FCM] Firebase messaging not supported or error:', e);

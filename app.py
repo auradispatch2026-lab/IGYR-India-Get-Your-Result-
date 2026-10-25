@@ -67,16 +67,44 @@ def send_push_notification_to_all(title, body, url="/search-result.html"):
         failure_count = 0
         invalid_tokens = []
 
+        full_url = url if str(url).startswith("http") else f"https://igyr-india-get-your-result.onrender.com{url}"
+        icon_url = "https://igyr-india-get-your-result.onrender.com/favicon-192x192.png"
+        badge_url = "https://igyr-india-get-your-result.onrender.com/favicon-96x96.png"
+
         chunk_size = 500
         for i in range(0, len(tokens), chunk_size):
             chunk = tokens[i:i + chunk_size]
             multicast_msg = messaging.MulticastMessage(
                 notification=messaging.Notification(
-                    title=title,
-                    body=body,
-                    image="https://igyr-india-get-your-result.onrender.com/favicon-192x192.png"
+                    title=str(title),
+                    body=str(body),
+                    image=icon_url
                 ),
-                data={"url": url},
+                data={
+                    "title": str(title),
+                    "body": str(body),
+                    "url": str(url)
+                },
+                webpush=messaging.WebpushConfig(
+                    headers={
+                        "Urgency": "high",
+                        "TTL": "86400"
+                    },
+                    notification=messaging.WebpushNotification(
+                        title=str(title),
+                        body=str(body),
+                        icon=icon_url,
+                        badge=badge_url,
+                        vibrate=[200, 100, 200, 100, 200],
+                        tag="igyr-exam-alert",
+                        renotify=True,
+                        require_interaction=True,
+                        data={"url": str(url)}
+                    ),
+                    fcm_options=messaging.WebpushFCMOptions(
+                        link=full_url
+                    )
+                ),
                 tokens=chunk
             )
             response = messaging.send_each_for_multicast(multicast_msg)
