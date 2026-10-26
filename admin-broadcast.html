@@ -270,7 +270,121 @@
                         </button>
                         <span id="fcm-status-msg" style="font-size: 13px; font-weight: 600; display: none;"></span>
                     </div>
+            </div>
+
+            <!-- SECTION 3: WHATSAPP BUSINESS AUTOMATION & WEBHOOK -->
+            <div class="card" style="border-top: 4px solid #25d366; margin-top: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+                    <div>
+                        <h3 style="color: #062b63; margin: 0 0 4px 0; font-size: 20px; display: flex; align-items: center; gap: 8px;">
+                            <span>💬 WhatsApp Business Automation &amp; Webhook</span>
+                            <span id="wa-status-pill" style="font-size: 11px; font-weight: 700; background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 20px;">
+                                🟢 Endpoint Ready
+                            </span>
+                        </h3>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">
+                            Connect your Meta WhatsApp Cloud API for automated student marksheet inquiries, result lookups, notice alerts, and 24/7 automated replies.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Webhook Meta Configuration Details (Copy-Paste for Meta Developer Portal) -->
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px; margin-bottom: 22px;">
+                    <div style="font-size: 12px; font-weight: 800; color: #166534; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <span>📋 Meta Developer Webhook Configuration Details</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 14px;">
+                            <label style="font-size: 11px; font-weight: 700; color: #64748b; display: block; text-transform: uppercase; margin-bottom: 4px;">Callback URL (Paste into Meta)</label>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <input type="text" id="wa-webhook-url" readonly value="https://igyr-india-get-your-result.onrender.com/api/whatsapp/webhook" style="font-size: 12px; font-family: monospace; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; flex: 1;">
+                                <button type="button" onclick="copyWaUrl()" class="btn-outline" style="padding: 6px 12px; font-size: 12px; white-space: nowrap;">📋 Copy</button>
+                            </div>
+                        </div>
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 14px;">
+                            <label style="font-size: 11px; font-weight: 700; color: #64748b; display: block; text-transform: uppercase; margin-bottom: 4px;">Verify Token (Paste into Meta)</label>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <input type="text" id="wa-verify-token-val" readonly value="igyr_whatsapp_webhook_2026" style="font-size: 12px; font-family: monospace; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; flex: 1;">
+                                <button type="button" onclick="copyWaToken()" class="btn-outline" style="padding: 6px 12px; font-size: 12px; white-space: nowrap;">📋 Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #166534; display: flex; align-items: center; gap: 6px;">
+                        <span>💡 In <strong>Meta for Developers</strong> &gt; WhatsApp &gt; Configuration &gt; <strong>Webhook</strong>: Click "Edit", paste the Callback URL and Verify Token, then click "Verify and save". Under Webhook fields, click "Manage" and check <strong>messages</strong>.</span>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Cloud API Settings Form -->
+                <form id="whatsapp-settings-form" onsubmit="return handleSaveWhatsAppConfig(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>WhatsApp Phone Number ID (from Meta Dashboard) *</label>
+                            <input type="text" id="wa-phone-number-id" placeholder="e.g. 109283746501928" style="font-family: monospace;">
+                        </div>
+                        <div class="form-group">
+                            <label>Verify Token (Secret match string for Meta)</label>
+                            <input type="text" id="wa-verify-token" placeholder="igyr_whatsapp_webhook_2026" value="igyr_whatsapp_webhook_2026">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Meta WhatsApp Permanent Access Token (Cloud API Token)</label>
+                        <input type="password" id="wa-access-token" placeholder="Paste your Meta System User Access Token (starts with EAAG...)" style="font-family: monospace;">
+                        <span id="wa-token-hint" style="font-size: 11px; color: #64748b; display: block; margin-top: 4px;"></span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 18px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="wa-auto-reply" checked style="width: 18px; height: 18px;">
+                            <span style="font-size: 13px; font-weight: 600; color: #1e293b;">Enable 24/7 Automated Bot Replies (Auto-replies to student Roll numbers, Notice requests, Help, and Greetings)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" id="wa-save-btn" class="btn-primary" style="background: #25d366; border: none; padding: 12px 24px;">
+                            💾 Save WhatsApp Automation Settings
+                        </button>
+                        <span id="wa-save-status" style="font-size: 13px; font-weight: 600; display: none;"></span>
+                    </div>
                 </form>
+
+                <!-- Test Message & Recent Activity -->
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed #cbd5e1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Test Send Card -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;">
+                        <h4 style="margin: 0 0 10px 0; color: #062b63; font-size: 15px;">🧪 Test Automated Message Dispatch</h4>
+                        <form id="wa-test-form" onsubmit="return handleTestWhatsAppSend(event)">
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Recipient Phone Number (with Country Code)</label>
+                                <input type="text" id="wa-test-phone" placeholder="e.g. 919876543210 or +91 98765 43210" required style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Simulated User Message / Keyword</label>
+                                <select id="wa-test-query" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                    <option value="HI">Welcome Greeting ("HI")</option>
+                                    <option value="RESULT 101">Student Result Inquiry ("RESULT 101")</option>
+                                    <option value="NOTICE">Latest Notice Circular ("NOTICE")</option>
+                                    <option value="HELP">Student Helpline &amp; Contact ("HELP")</option>
+                                    <option value="SCHEMES">Tabulation Schemes &amp; Pricing ("SCHEMES")</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="wa-test-btn" class="btn-outline" style="width: 100%; padding: 8px; font-size: 13px; font-weight: 700; color: #15803d; border-color: #22c55e;">
+                                🚀 Send Test Automated Message
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Recent WhatsApp Logs -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; color: #062b63; font-size: 15px;">📜 Recent Webhook Activity</h4>
+                            <button type="button" onclick="loadWhatsAppConfig()" class="btn-outline" style="padding: 2px 8px; font-size: 11px;">🔄 Refresh</button>
+                        </div>
+                        <div id="wa-logs-list" style="max-height: 180px; overflow-y: auto; font-size: 12px;">
+                            <p style="color: #64748b; text-align: center; padding: 20px 0;">No messages received yet.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -497,9 +611,185 @@
             }
         }
 
+        // ==========================================
+        // WHATSAPP BUSINESS AUTOMATION LOGIC
+        // ==========================================
+        function copyWaUrl() {
+            const input = document.getElementById('wa-webhook-url');
+            input.select();
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert('✅ Webhook Callback URL copied to clipboard!\n\nPaste this into Meta for Developers > WhatsApp > Configuration > Webhook.');
+            }).catch(() => {
+                prompt('Copy this Webhook Callback URL:', input.value);
+            });
+        }
+
+        function copyWaToken() {
+            const input = document.getElementById('wa-verify-token-val');
+            input.select();
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert('✅ Verify Token copied to clipboard!\n\nPaste this into Meta for Developers > WhatsApp > Configuration > Webhook.');
+            }).catch(() => {
+                prompt('Copy this Verify Token:', input.value);
+            });
+        }
+
+        async function loadWhatsAppConfig() {
+            if (!adminToken) return;
+            try {
+                const res = await fetch('/api/admin/whatsapp/config', {
+                    headers: { 'Authorization': 'Bearer ' + adminToken }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.phone_number_id) {
+                        document.getElementById('wa-phone-number-id').value = data.phone_number_id;
+                    }
+                    if (data.verify_token) {
+                        document.getElementById('wa-verify-token').value = data.verify_token;
+                        document.getElementById('wa-verify-token-val').value = data.verify_token;
+                    }
+                    if (typeof data.auto_reply_enabled !== 'undefined') {
+                        document.getElementById('wa-auto-reply').checked = Boolean(data.auto_reply_enabled);
+                    }
+
+                    const hintEl = document.getElementById('wa-token-hint');
+                    const pillEl = document.getElementById('wa-status-pill');
+
+                    if (data.is_token_set) {
+                        hintEl.innerHTML = `✅ Token currently configured in database: <code style="color:#059669;">${data.masked_token}</code> (Leave blank to keep existing, or type new token to update)`;
+                        pillEl.style.background = '#dcfce7';
+                        pillEl.style.color = '#15803d';
+                        pillEl.textContent = '🟢 Cloud API Connected';
+                    } else {
+                        hintEl.innerHTML = `⚠️ No permanent access token configured. Automated replies are currently simulated in logs. Add your Meta System User token to dispatch real messages.`;
+                        pillEl.style.background = '#fef3c7';
+                        pillEl.style.color = '#b45309';
+                        pillEl.textContent = '🟠 Webhook Ready (Awaiting Token)';
+                    }
+
+                    // Render Recent Message Logs
+                    const logsList = document.getElementById('wa-logs-list');
+                    if (data.logs && data.logs.length > 0) {
+                        let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+                        data.logs.forEach(l => {
+                            const statusColor = l.dispatch_status === 'SENT' ? '#15803d' : l.dispatch_status === 'FAILED' ? '#dc2626' : '#64748b';
+                            html += `
+                                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; line-height:1.4;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-weight:700;">
+                                        <span>📱 ${l.sender_name || 'User'} (${l.from})</span>
+                                        <span style="font-size:10px; color:${statusColor}; font-weight:800; text-transform:uppercase;">● ${l.dispatch_status}</span>
+                                    </div>
+                                    <div style="color:#1e293b; font-size:12px; margin-bottom:4px;"><strong>Received:</strong> "${l.incoming_message}"</div>
+                                    <div style="color:#64748b; font-size:11px; white-space:pre-wrap; max-height:60px; overflow-y:auto; background:#f8fafc; padding:6px; border-radius:4px;">${l.reply_message}</div>
+                                    <div style="font-size:10px; color:#94a3b8; margin-top:4px; text-align:right;">${l.timestamp}</div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        logsList.innerHTML = html;
+                    } else {
+                        logsList.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px 0;">No messages received yet. Send a message on WhatsApp to test!</p>';
+                    }
+                }
+            } catch (err) {
+                console.warn('Error loading WhatsApp config:', err);
+            }
+        }
+
+        async function handleSaveWhatsAppConfig(e) {
+            e.preventDefault();
+            const btn = document.getElementById('wa-save-btn');
+            const statusMsg = document.getElementById('wa-save-status');
+
+            const payload = {
+                phone_number_id: document.getElementById('wa-phone-number-id').value.trim(),
+                verify_token: document.getElementById('wa-verify-token').value.trim(),
+                token: document.getElementById('wa-access-token').value.trim(),
+                auto_reply_enabled: document.getElementById('wa-auto-reply').checked
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Saving...';
+            statusMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/admin/whatsapp/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + adminToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerHTML = '💾 Save WhatsApp Automation Settings';
+
+                if (res.ok && data.success) {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#059669';
+                    statusMsg.textContent = '✅ WhatsApp settings saved!';
+                    alert('✅ WhatsApp Automation Settings Saved!\n\nYour webhook endpoint is ready and automated replies will trigger whenever messages arrive.');
+                    document.getElementById('wa-access-token').value = '';
+                    loadWhatsAppConfig();
+                } else {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#dc2626';
+                    statusMsg.textContent = '❌ Error: ' + (data.error || 'Failed to save');
+                }
+            } catch(err) {
+                btn.disabled = false;
+                btn.innerHTML = '💾 Save WhatsApp Automation Settings';
+                statusMsg.style.display = 'inline';
+                statusMsg.style.color = '#dc2626';
+                statusMsg.textContent = '❌ Network error: ' + err.message;
+            }
+            return false;
+        }
+
+        async function handleTestWhatsAppSend(e) {
+            e.preventDefault();
+            const phone = document.getElementById('wa-test-phone').value.trim();
+            const query = document.getElementById('wa-test-query').value;
+            const btn = document.getElementById('wa-test-btn');
+
+            if (!phone) return alert('Please enter a valid phone number.');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Generating & Sending...';
+
+            try {
+                const res = await fetch('/api/admin/whatsapp/test-send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + adminToken
+                    },
+                    body: JSON.stringify({ to_phone: phone, query: query })
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Send Test Automated Message';
+
+                if (data.success) {
+                    alert(`✅ Test Message Dispatched Successfully to ${phone}!\n\nAutomated Message Sent:\n\n${data.message_preview}`);
+                } else {
+                    alert(`ℹ️ Message Generated via Automation Engine:\n\n${data.message_preview}\n\n⚠️ Meta Dispatch Status: ${data.dispatch_result ? (data.dispatch_result.error || 'Failed') : (data.error || 'Check Meta Token')}\n\nNote: If Meta Token is not added, messages are logged in Recent Webhook Activity for review.`);
+                }
+                loadWhatsAppConfig();
+            } catch(err) {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Send Test Automated Message';
+                alert('Test network error: ' + err.message);
+            }
+            return false;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadBannerData();
             loadFcmStats();
+            loadWhatsAppConfig();
         });
     </script>
 </body>

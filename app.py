@@ -4,6 +4,10 @@ from pymongo import MongoClient
 import os
 import html as html_lib
 from datetime import datetime
+import json
+import urllib.request
+import urllib.error
+import urllib.parse
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app, resources={r"/api/*": {"origins": ["https://igyr-india-get-your-result.onrender.com", "http://127.0.0.1:5005", "http://localhost:5005", "http://127.0.0.1:5500"]}})
@@ -23,6 +27,8 @@ applications_col = db['applications']
 settings_col = db['settings']
 fcm_tokens_col = db['fcm_tokens']
 banner_col = db['banner']
+whatsapp_config_col = db['whatsapp_config']
+whatsapp_logs_col = db['whatsapp_logs']
 
 # Initialize Firebase Admin SDK for FCM Web Push
 import json
@@ -932,6 +938,439 @@ def admin_broadcast_notification():
 
     res = send_push_notification_to_all(title=title, body=body, url=url)
     return jsonify(res), (200 if res.get('success') else 500)
+
+
+# =========================================================
+# WHATSAPP BUSINESS CLOUD API WEBHOOK & AUTOMATION ENGINE
+# =========================================================
+WHATSAPP_DEFAULT_VERIFY_TOKEN = os.environ.get("WHATSAPP_VERIFY_TOKEN", "igyr_whatsapp_webhook_2026")
+
+def get_whatsapp_config():
+    cfg = {
+        "verify_token": os.environ.get("WHATSAPP_VERIFY_TOKEN", WHATSAPP_DEFAULT_VERIFY_TOKEN),
+        "token": os.environ.get("WHATSAPP_TOKEN") or os.environ.get("WHATSAPP_ACCESS_TOKEN", ""),
+        "phone_number_id": os.environ.get("WHATSAPP_PHONE_NUMBER_ID", ""),
+        "auto_reply_enabled": True
+    }
+    try:
+        saved = whatsapp_config_col.find_one({"id": "whatsapp_config"}, {"_id": 0})
+        if saved:
+            if saved.get("verify_token"):
+                cfg["verify_token"] = saved["verify_token"]
+            if saved.get("token"):
+                cfg["token"] = saved["token"]
+            if saved.get("phone_number_id"):
+                cfg["phone_number_id"] = saved["phone_number_id"]
+            if "auto_reply_enabled" in saved:
+                cfg["auto_reply_enabled"] = bool(saved["auto_reply_enabled"])
+    except Exception as e:
+        print("Error fetching WhatsApp config:", e)
+    return cfg
+
+def send_whatsapp_message(to_phone, message_text, token=None, phone_number_id=None):
+    cfg = get_whatsapp_config()
+    token = token or cfg.get('token')
+    phone_number_id = phone_number_id or cfg.get('phone_number_id')
+
+    if not token or not phone_number_id:
+        return {
+            "success": False,
+            "error": "WhatsApp Access Token or Phone Number ID not configured."
+        }
+
+    # Clean phone number (keep digits only)
+    clean_phone = "".join(filter(str.isdigit, str(to_phone or "")))
+    if len(clean_phone) == 10:
+        clean_phone = "91" + clean_phone
+
+    if not clean_phone:
+        return {"success": False, "error": "Invalid recipient phone number."}
+
+    url = f"https://graph.facebook.com/v20.0/{phone_number_id}/messages"
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": clean_phone,
+        "type": "text",
+        "text": {
+            "preview_url": True,
+            "body": message_text
+        }
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            resp_data = json.loads(resp.read().decode('utf-8'))
+            return {"success": True, "data": resp_data}
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode('utf-8')
+        print(f"WhatsApp Cloud API Error ({e.code}): {err_body}")
+        try:
+            parsed_err = json.loads(err_body)
+            msg = parsed_err.get('error', {}).get('message', err_body)
+        except Exception:
+            msg = err_body
+        return {"success": False, "error": msg, "code": e.code}
+    except Exception as e:
+        print("WhatsApp dispatch exception:", e)
+        return {"success": False, "error": str(e)}
+
+def build_whatsapp_automated_response(incoming_text, sender_name="User"):
+    raw = (incoming_text or "").strip()
+    text = raw.lower()
+
+    # 1. Result Query (e.g. "RESULT 101", "Roll 101", "101", "IGYR001")
+    words = raw.split()
+    query_val = None
+    if len(words) >= 2 and words[0].lower() in ["result", "roll", "reg", "vid"]:
+        query_val = words[1].strip()
+    elif len(words) == 1 and (words[0].isdigit() or (words[0].isalnum() and len(words[0]) >= 4 and any(c.isdigit() for c in words[0]))):
+        # Ignore common non-roll keywords
+        if words[0].lower() not in ["help", "info", "menu", "start", "schemes", "scheme", "about"]:
+            query_val = words[0].strip()
+
+    if query_val:
+        regex_query = {"$regex": f"^{query_val}$", "$options": "i"}
+        res = results_col.find_one({
+            "$or": [
+                {"roll": regex_query},
+                {"reg": regex_query},
+                {"vid": regex_query}
+            ]
+        })
+
+        if res:
+            name = res.get('name', 'N/A')
+            roll = res.get('roll', 'N/A')
+            reg = res.get('reg', 'N/A')
+            exam = res.get('exam', 'N/A')
+            date = res.get('date', 'Recently')
+            vid = res.get('vid', 'IGYR-VERIFIED')
+            status = res.get('status', 'PUBLISHED')
+
+            inst = institutes_col.find_one({"id": res.get('instId')})
+            inst_name = inst.get('name', 'Affiliated Institution') if inst else 'Affiliated Institution'
+
+            if status == 'PUBLISHED':
+                marks_list = res.get('marks', [])
+                marks_text = ""
+                total_obt = 0
+                total_max = 0
+                if isinstance(marks_list, list) and marks_list:
+                    for m in marks_list[:6]:
+                        sub = m.get('sub', 'Subject')
+                        obt = m.get('obt', 0)
+                        mx = m.get('max', 100)
+                        try:
+                            total_obt += float(obt)
+                            total_max += float(mx)
+                        except Exception:
+                            pass
+                        marks_text += f"• {sub}: {obt}/{mx}\n"
+
+                score_summary = f"\n*Marks Breakdown:*\n{marks_text}*Total:* {int(total_obt)}/{int(total_max)}\n" if marks_text else ""
+
+                return (
+                    f"🎯 *IGYR Official Examination Result* 🎯\n\n"
+                    f"👤 *Candidate Name:* {name}\n"
+                    f"📝 *Roll Number:* {roll}\n"
+                    f"🎫 *Registration No:* {reg}\n"
+                    f"🏫 *Institution:* {inst_name}\n"
+                    f"📋 *Examination:* {exam}\n"
+                    f"📅 *Declared Date:* {date}\n"
+                    f"📊 *Result Status:* ✅ *PUBLISHED*\n"
+                    f"🔐 *Verification VID:* {vid}\n"
+                    f"{score_summary}\n"
+                    f"🌐 *View & Download Official Digital Marksheet:*\n"
+                    f"https://igyr-india-get-your-result.onrender.com/search-result.html\n\n"
+                    f"_India Get Your Result (IGYR) - National Education Secretariat_"
+                )
+            else:
+                return (
+                    f"⏳ *Examination Result Under Verification* ⏳\n\n"
+                    f"👤 *Candidate Name:* {name}\n"
+                    f"📝 *Roll Number:* {roll}\n"
+                    f"🏫 *Institution:* {inst_name}\n"
+                    f"📋 *Examination:* {exam}\n"
+                    f"📊 *Current Status:* ⏳ *UNDER COMPILATION / DRAFT*\n\n"
+                    f"Your affiliated institution has uploaded examination records and is conducting final verification. Your marksheet will be published online as soon as approved.\n\n"
+                    f"👉 Check back on the portal anytime:\n"
+                    f"https://igyr-india-get-your-result.onrender.com/search-result.html"
+                )
+        else:
+            return (
+                f"🔍 *Result Search Notice*\n\n"
+                f"No published result found matching: *{query_val}*.\n\n"
+                f"💡 *Helpful Tips:*\n"
+                f"1. Please verify your Roll Number or Registration No.\n"
+                f"2. Confirm that your affiliated school/college has published this exam.\n\n"
+                f"👉 Search directly on the official portal:\n"
+                f"https://igyr-india-get-your-result.onrender.com/search-result.html\n\n"
+                f"Send *HELP* to connect with support."
+            )
+
+    # 2. Notices & Announcements Query
+    if any(k in text for k in ["notice", "notices", "announcement", "announcements", "alert", "alerts", "news"]):
+        notices = list(notices_col.find({}, {'_id': 0}))
+        if notices:
+            n_text = ""
+            for idx, n in enumerate(notices[-3:], 1):
+                t_badge = "🔴 URGENT" if n.get('type') == 'urgent' else "🟠 WARNING" if n.get('type') == 'warning' else "🔵 INFO"
+                n_text += f"{idx}. [{t_badge}] {n.get('text', '')} ({n.get('date', 'Recent')})\n\n"
+            return (
+                f"📢 *Latest IGYR Official Announcements* 📢\n\n"
+                f"{n_text.strip()}\n\n"
+                f"🌐 *View All Portal Notices:*\n"
+                f"https://igyr-india-get-your-result.onrender.com/#notices"
+            )
+        else:
+            return (
+                f"📢 *IGYR Notices*\n\n"
+                f"No active urgent alerts at this moment.\n"
+                f"Visit the portal: https://igyr-india-get-your-result.onrender.com/#notices"
+            )
+
+    # 3. Help, Support & Contact Query
+    if any(k in text for k in ["help", "support", "contact", "phone", "email", "helpline", "call", "address"]):
+        s = settings_col.find_one({"id": "system_settings"}) or {}
+        email = s.get('supportEmail', 'indiagetyourresult@gmail.com')
+        phone = s.get('helplinePhone', '+91 6371132482')
+        hours = s.get('supportHours', 'Mon - Sat: 3:00 PM - 10:00 PM IST')
+        address = s.get('officeAddress', 'IGYR National Education Secretariat, Central IT Complex, New Delhi - 110001, India')
+        return (
+            f"📞 *IGYR Official Support & Helpline* 📞\n\n"
+            f"Official assistance for students, parents, and institutions:\n\n"
+            f"☎️ *Helpline Phone:* {phone}\n"
+            f"📧 *Official Email:* {email}\n"
+            f"🕒 *Working Hours:* {hours}\n"
+            f"📍 *Secretariat:* {address}\n\n"
+            f"🌐 *Help Center:* https://igyr-india-get-your-result.onrender.com/about.html#contact"
+        )
+
+    # 4. Schemes & Pricing Query
+    if any(k in text for k in ["scheme", "schemes", "rate", "rates", "price", "pricing", "cost", "register"]):
+        return (
+            f"📑 *IGYR Examination Tabulation Schemes* 📑\n\n"
+            f"Digital tabulation and marksheet hosting solutions for educational institutions:\n\n"
+            f"1️⃣ *Normal Tabulation Scheme:* ₹6 per student\n"
+            f"2️⃣ *Tabulation-Wise Rate Scheme:* ₹8 per student\n"
+            f"3️⃣ *Premium Digital & Verification Scheme:* ₹10 per student\n\n"
+            f"📝 *Submit Institution Application Online:*\n"
+            f"https://igyr-india-get-your-result.onrender.com/schemes.html"
+        )
+
+    # 5. Default Greeting & Menu
+    first_name = (sender_name or "Student").split()[0]
+    return (
+        f"👋 *Namaste {first_name}! Welcome to India Get Your Result (IGYR)* 🇮🇳\n"
+        f"_India's trusted digital platform for educational examination results & marksheet verification._\n\n"
+        f"How can we assist you today? Please reply with a keyword:\n\n"
+        f"• *RESULT <Roll No>* — Check examination marksheet instantly (e.g. `RESULT 101`)\n"
+        f"• *NOTICE* — View latest portal announcements & exam circulars\n"
+        f"• *HELP* — Connect with official student grievance helpline\n"
+        f"• *SCHEMES* — Review institutional tabulation plans & rates\n\n"
+        f"🌐 *Visit Official Portal:* https://igyr-india-get-your-result.onrender.com/"
+    )
+
+
+# ---------------------------------------------------------
+# META WHATSAPP WEBHOOK ROUTES (GET for verification, POST for events)
+# ---------------------------------------------------------
+@app.route('/api/whatsapp/webhook', methods=['GET', 'POST'])
+@app.route('/api/whatsapp/webhook/', methods=['GET', 'POST'])
+def whatsapp_webhook():
+    if request.method == 'GET':
+        mode = request.args.get('hub.mode')
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+
+        cfg = get_whatsapp_config()
+        expected_token = cfg.get('verify_token') or WHATSAPP_DEFAULT_VERIFY_TOKEN
+
+        if mode == 'subscribe' and token == expected_token:
+            print(f"✅ Meta WhatsApp Webhook verified successfully! challenge={challenge}")
+            # Meta requires the challenge string back as plain text with 200 OK
+            return str(challenge), 200
+        else:
+            print(f"❌ Meta WhatsApp Webhook verification mismatch: received '{token}', expected '{expected_token}'")
+            return "Verification token mismatch", 403
+
+    # POST: Incoming Webhook Event from Meta
+    data = request.json or {}
+
+    try:
+        entries = data.get('entry', [])
+        for entry in entries:
+            changes = entry.get('changes', [])
+            for change in changes:
+                value = change.get('value', {})
+                messages = value.get('messages', [])
+                contacts = value.get('contacts', [])
+                contact_name = "User"
+                if contacts and isinstance(contacts, list):
+                    contact_name = contacts[0].get('profile', {}).get('name', 'User')
+
+                for msg in messages:
+                    from_phone = msg.get('from')
+                    msg_type = msg.get('type')
+                    msg_id = msg.get('id')
+                    body_text = ""
+                    if msg_type == 'text':
+                        body_text = msg.get('text', {}).get('body', '')
+                    elif msg_type == 'button':
+                        body_text = msg.get('button', {}).get('text', '')
+                    elif msg_type == 'interactive':
+                        interactive = msg.get('interactive', {})
+                        body_text = (
+                            interactive.get('button_reply', {}).get('title') or
+                            interactive.get('list_reply', {}).get('title') or ""
+                        )
+
+                    if from_phone and body_text:
+                        print(f"📩 Incoming WhatsApp from {from_phone} ({contact_name}): {body_text}")
+
+                        # Generate Automated Response
+                        reply_text = build_whatsapp_automated_response(body_text, sender_name=contact_name)
+
+                        log_entry = {
+                            "from": from_phone,
+                            "sender_name": contact_name,
+                            "incoming_message": body_text,
+                            "reply_message": reply_text,
+                            "message_id": msg_id,
+                            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+                            "epoch": int(datetime.utcnow().timestamp())
+                        }
+
+                        cfg = get_whatsapp_config()
+                        if cfg.get("auto_reply_enabled", True) and cfg.get("token") and cfg.get("phone_number_id"):
+                            dispatch_res = send_whatsapp_message(from_phone, reply_text)
+                            log_entry["dispatch_status"] = "SENT" if dispatch_res.get("success") else "FAILED"
+                            log_entry["dispatch_error"] = dispatch_res.get("error")
+                        else:
+                            log_entry["dispatch_status"] = "SIMULATED_NO_META_TOKEN"
+
+                        try:
+                            whatsapp_logs_col.insert_one(log_entry)
+                        except Exception as log_err:
+                            print("Error logging WhatsApp message:", log_err)
+
+    except Exception as parse_err:
+        print("Error processing WhatsApp webhook payload:", parse_err)
+
+    # Meta requires a 200 OK response immediately
+    return jsonify({"status": "EVENT_RECEIVED"}), 200
+
+
+# ---------------------------------------------------------
+# ADMIN WHATSAPP AUTOMATION MANAGEMENT APIS
+# ---------------------------------------------------------
+@app.route('/api/admin/whatsapp/config', methods=['GET'])
+def get_admin_whatsapp_config():
+    if not verify_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    cfg = get_whatsapp_config()
+    # Mask token for security
+    raw_token = cfg.get("token") or ""
+    masked_token = (raw_token[:6] + "..." + raw_token[-4:]) if len(raw_token) > 12 else ("Configured" if raw_token else "")
+
+    # Get recent 20 message logs
+    recent_logs = []
+    try:
+        logs = list(whatsapp_logs_col.find({}, {"_id": 0}).sort("epoch", -1).limit(20))
+        recent_logs = logs
+    except Exception:
+        pass
+
+    return jsonify({
+        "success": True,
+        "webhook_url": "https://igyr-india-get-your-result.onrender.com/api/whatsapp/webhook",
+        "verify_token": cfg.get("verify_token"),
+        "phone_number_id": cfg.get("phone_number_id"),
+        "is_token_set": bool(raw_token),
+        "masked_token": masked_token,
+        "auto_reply_enabled": cfg.get("auto_reply_enabled", True),
+        "logs": recent_logs
+    })
+
+
+@app.route('/api/admin/whatsapp/config', methods=['POST'])
+def save_admin_whatsapp_config():
+    if not verify_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    verify_token = (data.get('verify_token') or "").strip() or WHATSAPP_DEFAULT_VERIFY_TOKEN
+    phone_number_id = (data.get('phone_number_id') or "").strip()
+    token = (data.get('token') or "").strip()
+    auto_reply_enabled = bool(data.get('auto_reply_enabled', True))
+
+    doc = {
+        "id": "whatsapp_config",
+        "verify_token": verify_token,
+        "phone_number_id": phone_number_id,
+        "auto_reply_enabled": auto_reply_enabled,
+        "updatedAt": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    }
+    # Only update token if provided (so admin doesn't wipe existing token on other edits)
+    if token:
+        doc["token"] = token
+    else:
+        existing = whatsapp_config_col.find_one({"id": "whatsapp_config"})
+        if existing and existing.get("token"):
+            doc["token"] = existing["token"]
+
+    whatsapp_config_col.update_one({"id": "whatsapp_config"}, {"$set": doc}, upsert=True)
+    return jsonify({"success": True, "message": "WhatsApp configuration updated successfully."})
+
+
+@app.route('/api/admin/whatsapp/test-send', methods=['POST'])
+def test_send_whatsapp():
+    if not verify_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    to_phone = (data.get('to_phone') or "").strip()
+    test_query = (data.get('query') or "HI").strip()
+
+    if not to_phone:
+        return jsonify({"success": False, "error": "Please provide a recipient phone number."}), 400
+
+    # Generate message through automation engine
+    automated_message = build_whatsapp_automated_response(test_query, sender_name="Admin Test")
+
+    # Attempt sending via Meta Cloud API
+    res = send_whatsapp_message(to_phone, automated_message)
+
+    # Log the test attempt
+    try:
+        whatsapp_logs_col.insert_one({
+            "from": to_phone,
+            "sender_name": "Admin Tester",
+            "incoming_message": f"[TEST SIMULATION] {test_query}",
+            "reply_message": automated_message,
+            "dispatch_status": "SENT" if res.get("success") else "FAILED",
+            "dispatch_error": res.get("error"),
+            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "epoch": int(datetime.utcnow().timestamp())
+        })
+    except Exception:
+        pass
+
+    return jsonify({
+        "success": res.get("success", False),
+        "message_preview": automated_message,
+        "dispatch_result": res
+    })
 
 
 if __name__ == '__main__':
