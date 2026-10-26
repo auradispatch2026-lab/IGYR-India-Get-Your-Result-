@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#071d49">
+
+    <title>Broadcast &amp; Announcement Banner - Super Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <style>
+        :root {
+            --admin-bg: #f3f8ff;
+            --admin-card: rgba(255, 255, 255, 0.95);
+            --admin-primary: #1266d6;
+            --admin-dark: #062b63;
+        }
+        body { background: var(--admin-bg); font-family: 'Inter', sans-serif; }
+        .dashboard { min-height: 100vh; display: flex; }
+        
+        .sidebar { background: linear-gradient(180deg, var(--admin-dark) 0%, #0a3d8c 100%); box-shadow: 4px 0 20px rgba(0,0,0,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+        .sidebar h2 { font-family: 'Poppins', sans-serif; font-size: 22px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 1px; color: #fce38a; }
+        .sidebar ul li a { font-size: 15px; padding: 12px 20px; margin-bottom: 8px; border-radius: 8px; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .sidebar ul li a:hover { background: rgba(255,255,255,0.1); transform: translateX(5px); }
+        .sidebar ul li a.active { background: rgba(255,255,255,0.18); color: #fce38a; font-weight: 700; }
+        
+        .main-content { padding: 40px; flex: 1; }
+        .main-content h1 { font-family: 'Poppins', sans-serif; font-size: 30px; color: var(--admin-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        
+        .card { 
+            background: var(--admin-card); 
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(7, 29, 73, 0.05); 
+            border-radius: 16px; 
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; }
+        
+        input, select, textarea { 
+            background: #f8fbff; 
+            border: 1px solid #cde0f5; 
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            transition: 0.3s; 
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--admin-primary); outline: none; box-shadow: 0 0 0 3px rgba(18,102,214,0.1); background: #fff; }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--admin-primary) 0%, #0a3d8c 100%); color: white; border: none; font-weight: 600; border-radius: 8px; padding: 12px 24px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(18,102,214,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(18,102,214,0.4); }
+        
+        .btn-outline { background: #fff; color: var(--admin-primary); border: 1px solid var(--admin-primary); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-outline:hover { background: #f0f7ff; }
+
+        .switch-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .switch-toggle input { display: none; }
+        .switch-slider {
+            width: 48px;
+            height: 26px;
+            background-color: #cbd5e1;
+            border-radius: 34px;
+            position: relative;
+            transition: .3s;
+        }
+        .switch-slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .switch-toggle input:checked + .switch-slider {
+            background-color: #10b981;
+        }
+        .switch-toggle input:checked + .switch-slider:before {
+            transform: translateX(22px);
+        }
+
+        .preview-box {
+            background: #0f172a;
+            border-radius: 14px;
+            padding: 20px;
+            color: #fff;
+            margin-top: 20px;
+            border: 1px solid #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h2>Super Admin</h2>
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-institutes.html">Manage Institutes</a></li>
+                <li><a href="admin-schemes.html">Manage Schemes</a></li>
+                <li><a href="admin-applications.html">Submission Forms</a></li>
+                <li><a href="admin-broadcast.html" class="active">Broadcast &amp; Banner</a></li>
+                <li><a href="admin-settings.html">System Settings</a></li>
+                <li><a href="admin-login-institute.html">Login Institute</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h1>📢 Broadcast &amp; Announcement Banner</h1>
+                    <p style="font-size: 14px; color: #64748b; margin-top: -5px;">
+                        Manage the full-screen welcome/announcement banner for website visitors, and send push notifications to student mobile phones.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="index.html" target="_blank" class="btn-outline" style="text-decoration: none; font-size: 13px;">
+                        👁️ Open Public Website ↗
+                    </a>
+                </div>
+            </div>
+
+            <!-- SECTION 1: FULL SCREEN ANNOUNCEMENT BANNER -->
+            <div class="card" style="border-top: 4px solid var(--admin-primary);">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h3 style="color: var(--admin-dark); font-size: 20px; margin: 0 0 4px 0;">
+                            🖥️ Full-Screen Announcement Banner (Web &amp; WebApp)
+                        </h3>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">
+                            When enabled, visitors will see this prominent full-screen announcement card when opening the portal.
+                        </p>
+                    </div>
+                    <div>
+                        <label class="switch-toggle">
+                            <input type="checkbox" id="banner-enabled">
+                            <span class="switch-slider"></span>
+                            <span id="banner-toggle-label" style="color: #64748b;">Disabled</span>
+                        </label>
+                    </div>
+                </div>
+
+                <form id="banner-form" onsubmit="return handleSaveBanner(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Banner Badge / Tag Text *</label>
+                            <input type="text" id="banner-badge" placeholder="e.g. 📢 OFFICIAL ANNOUNCEMENT or 🚨 URGENT EXAM NOTICE" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Banner Headline / Title *</label>
+                            <input type="text" id="banner-title" placeholder="e.g. Welcome to India Get Your Result (IGYR) Portal" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label>Announcement Message Body (Supports multi-line paragraphs) *</label>
+                        <textarea id="banner-message" rows="4" placeholder="Enter the official notice or message you want visitors to read when they open the website..." required></textarea>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Primary Action Button Label *</label>
+                            <input type="text" id="banner-btn-text" placeholder="e.g. Check Results Now →" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Action Destination URL *</label>
+                            <input type="text" id="banner-btn-url" placeholder="e.g. /search-result.html" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Display Frequency</label>
+                        <select id="banner-frequency">
+                            <option value="once">Show once per visitor session (Recommended - won't disturb repeated browsing)</option>
+                            <option value="always">Show on every page visit (Urgent alerts)</option>
+                        </select>
+                    </div>
+
+                    <!-- Live Interactive Preview Box -->
+                    <div style="background: #f8fbff; border: 1px dashed #93c5fd; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 12px; font-weight: 800; color: #1e40af; text-transform: uppercase;">
+                                📱 Real-Time Live Preview
+                            </span>
+                            <button type="button" onclick="previewBannerFullScreen()" class="btn-outline" style="padding: 4px 12px; font-size: 12px;">
+                                👁️ Test Full Screen On Screen
+                            </button>
+                        </div>
+                        <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.06); max-width: 520px; margin: 0 auto;">
+                            <div style="background: #071d49; color: white; padding: 12px 16px;">
+                                <span id="pv-badge" style="background: rgba(252, 227, 138, 0.2); color: #fce38a; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(252, 227, 138, 0.3);">
+                                    📢 OFFICIAL ANNOUNCEMENT
+                                </span>
+                                <h4 id="pv-title" style="margin: 8px 0 0 0; font-size: 15px; color: #ffffff;">
+                                    Announcement Title Preview
+                                </h4>
+                            </div>
+                            <div style="padding: 14px 16px; font-size: 13px; color: #334155; line-height: 1.5;" id="pv-message">
+                                Announcement body will appear here in real time as you type...
+                            </div>
+                            <div style="padding: 10px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                                <span style="font-size: 11px; color: #94a3b8; align-self: center;">Continue to Portal ✕</span>
+                                <span id="pv-btn" style="background: #1266d6; color: white; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 6px;">
+                                    View Details →
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button type="submit" id="save-banner-btn" class="btn-primary" style="background: #1266d6;">
+                            💾 Save &amp; Publish Announcement Banner
+                        </button>
+                        <span id="banner-status-msg" style="font-size: 13px; font-weight: 600; display: none;"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- SECTION 2: FCM PUSH NOTIFICATIONS -->
+            <div class="card" style="border-top: 4px solid #10b981;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+                    <div>
+                        <h3 style="color: #062b63; margin: 0 0 4px 0; font-size: 20px;">
+                            📲 Broadcast FCM Push Notification (Firebase)
+                        </h3>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">
+                            Instantly deliver mobile status bar alerts and push notifications to all registered student &amp; institute devices.
+                        </p>
+                    </div>
+                    <div style="background: #e0f2fe; padding: 6px 14px; border-radius: 8px; font-size: 13px; color: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <span>Active Subscribers:</span>
+                        <span id="fcm-sub-count" style="font-size: 16px; color: #0369a1;">Loading...</span>
+                        <button type="button" onclick="loadFcmStats()" style="background: transparent; border: none; cursor: pointer; font-size: 14px;" title="Refresh subscriber count">🔄</button>
+                        <button type="button" id="sync-sub-btn" onclick="syncSubscribers()" style="background: #0284c7; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-left: 4px;" title="Verify active devices with Google & remove uninstalled apps">
+                            🧹 Clean Stale
+                        </button>
+                    </div>
+                </div>
+
+                <form id="fcm-broadcast-form" onsubmit="return handleFcmBroadcast(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 5px;">Notification Title *</label>
+                        <input type="text" id="fcm-notif-title" placeholder="e.g. 🎯 Annual 2026 Results Declared!" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 5px;">Click Destination URL *</label>
+                        <input type="text" id="fcm-notif-url" value="/search-result.html" required style="width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label style="font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 5px;">Message Body *</label>
+                        <textarea id="fcm-notif-body" rows="2" placeholder="e.g. Odisha Public School has published Class 10th marksheets and tabulation registers. Check your marks now!" required style="width: 100%; box-sizing: border-box;"></textarea>
+                    </div>
+                    <div style="grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; margin-top: 5px;">
+                        <button type="submit" id="fcm-send-btn" class="btn-primary" style="background: #10b981; border: none; padding: 12px 26px;">
+                            🚀 Send Push Notification to All Devices
+                        </button>
+                        <span id="fcm-status-msg" style="font-size: 13px; font-weight: 600; display: none;"></span>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js?v=1000042"></script>
+    <script src="js/announcement-banner.js?v=1000042"></script>
+    <script>
+        // Check Admin Auth
+        const adminToken = sessionStorage.getItem('admin_token');
+        if (!adminToken) {
+            window.location.href = 'admin-login.html';
+        }
+
+        // Live preview synchronization
+        const bBadge = document.getElementById('banner-badge');
+        const bTitle = document.getElementById('banner-title');
+        const bMsg = document.getElementById('banner-message');
+        const bBtnText = document.getElementById('banner-btn-text');
+        const bEnabled = document.getElementById('banner-enabled');
+        const bToggleLabel = document.getElementById('banner-toggle-label');
+
+        function updatePreview() {
+            document.getElementById('pv-badge').textContent = bBadge.value || '📢 OFFICIAL ANNOUNCEMENT';
+            document.getElementById('pv-title').textContent = bTitle.value || 'Announcement Title Preview';
+            document.getElementById('pv-message').textContent = bMsg.value || 'Announcement message preview...';
+            document.getElementById('pv-btn').textContent = bBtnText.value || 'View Details →';
+            
+            if (bEnabled.checked) {
+                bToggleLabel.textContent = 'Active (Live on Website)';
+                bToggleLabel.style.color = '#059669';
+            } else {
+                bToggleLabel.textContent = 'Disabled (Hidden from Visitors)';
+                bToggleLabel.style.color = '#dc2626';
+            }
+        }
+
+        [bBadge, bTitle, bMsg, bBtnText, bEnabled].forEach(el => {
+            el.addEventListener('input', updatePreview);
+            el.addEventListener('change', updatePreview);
+        });
+
+        // Load Banner Data
+        async function loadBannerData() {
+            try {
+                const res = await fetch('/api/banner');
+                if (res.ok) {
+                    const b = await res.json();
+                    bEnabled.checked = Boolean(b.enabled);
+                    bBadge.value = b.badge || '📢 OFFICIAL ANNOUNCEMENT';
+                    bTitle.value = b.title || '';
+                    bMsg.value = b.message || '';
+                    bBtnText.value = b.buttonText || 'View Details →';
+                    document.getElementById('banner-btn-url').value = b.buttonUrl || '/search-result.html';
+                    document.getElementById('banner-frequency').value = (b.showOncePerSession !== false) ? 'once' : 'always';
+                    updatePreview();
+                }
+            } catch (err) {
+                console.warn('Error loading banner:', err);
+            }
+        }
+
+        // Save Banner Data
+        async function handleSaveBanner(e) {
+            e.preventDefault();
+            const btn = document.getElementById('save-banner-btn');
+            const statusMsg = document.getElementById('banner-status-msg');
+
+            const payload = {
+                enabled: bEnabled.checked,
+                badge: bBadge.value.trim(),
+                title: bTitle.value.trim(),
+                message: bMsg.value.trim(),
+                buttonText: bBtnText.value.trim(),
+                buttonUrl: document.getElementById('banner-btn-url').value.trim() || '/search-result.html',
+                showOncePerSession: document.getElementById('banner-frequency').value === 'once'
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Saving...';
+            statusMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/admin/banner', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + adminToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerHTML = '💾 Save &amp; Publish Announcement Banner';
+
+                if (res.ok && data.success) {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#059669';
+                    statusMsg.textContent = '✅ Banner settings updated successfully!';
+                    alert('✅ Announcement Banner Saved!\n\nStatus: ' + (payload.enabled ? 'ACTIVE (Visible to visitors)' : 'DISABLED') + '\n\nVisitors opening the website will see this announcement.');
+                } else {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#dc2626';
+                    statusMsg.textContent = '❌ Failed to save: ' + (data.error || 'Server error');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '💾 Save &amp; Publish Announcement Banner';
+                statusMsg.style.display = 'inline';
+                statusMsg.style.color = '#dc2626';
+                statusMsg.textContent = '❌ Network error: ' + err.message;
+            }
+            return false;
+        }
+
+        function previewBannerFullScreen() {
+            if (typeof window.showIgyrBannerPreview === 'function') {
+                window.showIgyrBannerPreview({
+                    enabled: true,
+                    badge: bBadge.value || '📢 OFFICIAL ANNOUNCEMENT',
+                    title: bTitle.value || 'Announcement Title Preview',
+                    message: bMsg.value || 'This is how your announcement will look to visitors across devices.',
+                    buttonText: bBtnText.value || 'View Details →',
+                    buttonUrl: document.getElementById('banner-btn-url').value || '#'
+                });
+            } else {
+                alert('Preview script loading, please try again in a second.');
+            }
+        }
+
+        // ==========================================
+        // FCM BROADCAST LOGIC
+        // ==========================================
+        function loadFcmStats() {
+            const countEl = document.getElementById('fcm-sub-count');
+            if (!countEl) return;
+            fetch('/api/admin/notifications/stats')
+                .then(r => r.json())
+                .then(d => {
+                    countEl.textContent = (d && typeof d.total_subscribers !== 'undefined') ? d.total_subscribers : '0';
+                })
+                .catch(() => {
+                    countEl.textContent = '0';
+                });
+        }
+
+        async function handleFcmBroadcast(e) {
+            e.preventDefault();
+            const title = document.getElementById('fcm-notif-title').value.trim();
+            const body = document.getElementById('fcm-notif-body').value.trim();
+            const url = document.getElementById('fcm-notif-url').value.trim() || '/search-result.html';
+            const btn = document.getElementById('fcm-send-btn');
+            const statusMsg = document.getElementById('fcm-status-msg');
+
+            if (!confirm(`Are you sure you want to broadcast this push notification to all registered phones and computers?\n\nTitle: ${title}\nBody: ${body}`)) {
+                return false;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Broadcasting to phones...';
+            statusMsg.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/admin/broadcast-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + adminToken
+                    },
+                    body: JSON.stringify({ title, body, url })
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Send Push Notification to All Devices';
+
+                if (res.ok && data.success) {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#059669';
+                    statusMsg.textContent = `✅ Successfully sent to ${data.sent_count} device(s)!`;
+                    const cleanNote = data.cleaned_count > 0 ? `\n🧹 Removed ${data.cleaned_count} uninstalled/deleted device(s)` : '';
+                    alert(`✅ Push Notification Sent!\n\nDelivered: ${data.sent_count} device(s)\nFailed: ${data.failure_count || 0}${cleanNote}\nActive Subscribers Remaining: ${data.total_devices || data.sent_count}`);
+                    loadFcmStats();
+                } else {
+                    statusMsg.style.display = 'inline';
+                    statusMsg.style.color = '#dc2626';
+                    statusMsg.textContent = `❌ Error: ${data.error || 'Failed to send'}`;
+                    alert('Broadcast error: ' + (data.error || 'Failed to send.'));
+                }
+            } catch(err) {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Send Push Notification to All Devices';
+                statusMsg.style.display = 'inline';
+                statusMsg.style.color = '#dc2626';
+                statusMsg.textContent = '❌ Network error: ' + err.message;
+            }
+            return false;
+        }
+
+        async function syncSubscribers() {
+            const btn = document.getElementById('sync-sub-btn');
+            const countEl = document.getElementById('fcm-sub-count');
+            if (!adminToken) return alert('Session expired. Please log in again.');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Verifying...';
+
+            try {
+                const res = await fetch('/api/admin/notifications/sync-subscribers', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + adminToken }
+                });
+                const data = await res.json();
+                btn.disabled = false;
+                btn.innerHTML = '🧹 Clean Stale';
+
+                if (data.success) {
+                    countEl.textContent = data.total_subscribers;
+                    alert(`✅ Subscriber Verification Complete!\n\nActive Devices: ${data.total_subscribers}\nUninstalled / Revoked Devices Removed: ${data.cleaned_count}`);
+                } else {
+                    alert('Sync error: ' + (data.error || 'Failed to sync with Google'));
+                }
+            } catch(e) {
+                btn.disabled = false;
+                btn.innerHTML = '🧹 Clean Stale';
+                alert('Network error: ' + e.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBannerData();
+            loadFcmStats();
+        });
+    </script>
+</body>
+</html>

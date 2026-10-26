@@ -3,6 +3,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 import os
 import html as html_lib
+from datetime import datetime
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app, resources={r"/api/*": {"origins": ["https://igyr-india-get-your-result.onrender.com", "http://127.0.0.1:5005", "http://localhost:5005", "http://127.0.0.1:5500"]}})
@@ -21,6 +22,7 @@ schemes_col = db['schemes']
 applications_col = db['applications']
 settings_col = db['settings']
 fcm_tokens_col = db['fcm_tokens']
+banner_col = db['banner']
 
 # Initialize Firebase Admin SDK for FCM Web Push
 import json
@@ -326,6 +328,19 @@ These terms are governed by the laws of India. Any disputes arising out of the u
             if updates:
                 settings_col.update_one({"id": "system_settings"}, {"$set": updates})
 
+    if banner_col.count_documents({}) == 0:
+        banner_col.insert_one({
+            "id": "global_banner",
+            "enabled": True,
+            "badge": "📢 OFFICIAL ANNOUNCEMENT",
+            "title": "Welcome to India Get Your Result (IGYR) Portal",
+            "message": "Welcome to the National Examination Result & Digital Marksheet Verification Portal. Students can search online marksheets, verify digital scorecards, and access government scholarship schemes directly from verified educational institutions across India.",
+            "buttonText": "Search Results Now →",
+            "buttonUrl": "/search-result.html",
+            "showOncePerSession": True,
+            "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+
 init_db()
 
 
@@ -594,6 +609,18 @@ def sync_data():
                 "contactSubtext": "Official 24/7 Educational Grievance & Technical Assistance Helpline"
             }
 
+        banner_doc = banner_col.find_one({"id": "global_banner"}, {'_id': 0}) or {
+            "id": "global_banner",
+            "enabled": False,
+            "badge": "📢 OFFICIAL ANNOUNCEMENT",
+            "title": "Welcome to IGYR",
+            "message": "Welcome to India Get Your Result Portal.",
+            "buttonText": "Explore Portal",
+            "buttonUrl": "/search-result.html",
+            "showOncePerSession": True,
+            "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
         _sync_cache = {
             "institutes": institutes,
             "results": results,
@@ -601,7 +628,8 @@ def sync_data():
             "quicklinks": quicklinks,
             "schemes": schemes,
             "applications": applications,
-            "settings": settings_doc
+            "settings": settings_doc,
+            "banner": banner_doc
         }
         _sync_cache_time = now
         return jsonify(_sync_cache)
@@ -735,6 +763,48 @@ def save_settings():
     data.pop('_id', None)
     invalidate_sync_cache()
     return jsonify({"status": "success", "settings": data})
+
+# =====================================================
+# FULL-SCREEN ANNOUNCEMENT BANNER ENDPOINTS
+# =====================================================
+
+@app.route('/api/banner', methods=['GET'])
+def get_banner():
+    banner_doc = banner_col.find_one({"id": "global_banner"}, {'_id': 0})
+    if not banner_doc:
+        banner_doc = {
+            "id": "global_banner",
+            "enabled": False,
+            "badge": "📢 OFFICIAL ANNOUNCEMENT",
+            "title": "Welcome to IGYR",
+            "message": "Welcome to India Get Your Result Portal.",
+            "buttonText": "Explore Portal",
+            "buttonUrl": "/search-result.html",
+            "showOncePerSession": True,
+            "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+    return jsonify(banner_doc), 200
+
+@app.route('/api/admin/banner', methods=['POST'])
+def save_banner():
+    if not verify_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    banner_data = {
+        "id": "global_banner",
+        "enabled": bool(data.get('enabled', False)),
+        "badge": str(data.get('badge') or "📢 OFFICIAL ANNOUNCEMENT").strip(),
+        "title": str(data.get('title') or "Official Notice").strip(),
+        "message": str(data.get('message') or "").strip(),
+        "buttonText": str(data.get('buttonText') or "View Details →").strip(),
+        "buttonUrl": str(data.get('buttonUrl') or "/search-result.html").strip(),
+        "showOncePerSession": bool(data.get('showOncePerSession', True)),
+        "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    banner_col.update_one({"id": "global_banner"}, {"$set": banner_data}, upsert=True)
+    invalidate_sync_cache()
+    return jsonify({"success": True, "banner": banner_data}), 200
 
 # =====================================================
 # FCM NOTIFICATION API ENDPOINTS
