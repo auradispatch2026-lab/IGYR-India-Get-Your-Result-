@@ -404,6 +404,20 @@ def webmanifest():
     folder = get_asset_folder('site.webmanifest')
     return send_from_directory(folder, 'site.webmanifest', mimetype='application/manifest+json')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    folder = get_asset_folder('sitemap.xml')
+    res = send_from_directory(folder, 'sitemap.xml', mimetype='application/xml')
+    res.headers['Cache-Control'] = 'public, max-age=3600'
+    return res
+
+@app.route('/robots.txt')
+def robots():
+    folder = get_asset_folder('robots.txt')
+    res = send_from_directory(folder, 'robots.txt', mimetype='text/plain')
+    res.headers['Cache-Control'] = 'public, max-age=3600'
+    return res
+
 @app.route('/sw.js')
 def service_worker():
     folder = get_asset_folder('sw.js')

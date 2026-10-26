@@ -1,4 +1,10 @@
 User-agent: *
-Disallow:
+Disallow: /admin-
+Disallow: /institute-dashboard
+Disallow: /institute-upload
+Disallow: /institute-tabulation
+Disallow: /institute-drafts
+Disallow: /institute-settings
+Disallow: /api/
 
 Sitemap: https://igyr-india-get-your-result.onrender.com/sitemap.xml
