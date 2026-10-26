@@ -29,7 +29,7 @@
     const safe = escapeHtml(text);
     return safe
       .split('\n\n')
-      .map(p => `<p style="margin: 0 0 12px 0;">${p.replace(/\n/g, '<br>')}</p>`)
+      .map(p => `<p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.6;">${p.replace(/\n/g, '<br>')}</p>`)
       .join('');
   }
 
@@ -54,6 +54,9 @@
     const existing = document.getElementById('igyr-global-banner-overlay');
     if (existing) existing.remove();
 
+    const isEnabled = banner && (banner.enabled === true || banner.enabled === 'true' || banner.enabled === 1 || banner.enabled === '1');
+    if (!isEnabled && !isPreview) return;
+
     const dismissKey = isPreview ? null : ('igyr_banner_dismissed_' + (banner.updatedAt || 'active'));
     if (!isPreview && banner.showOncePerSession && sessionStorage.getItem(dismissKey)) {
       return; // Already acknowledged in this session
@@ -71,12 +74,14 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(5, 18, 48, 0.82);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 9999999;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 18, 48, 0.86);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 99999999;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -93,12 +98,12 @@
       position: relative;
       background: #ffffff;
       width: 100%;
-      max-width: 620px;
-      max-height: 90vh;
+      max-width: 600px;
+      max-height: 88vh;
       display: flex;
       flex-direction: column;
       border-radius: 20px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
       overflow: hidden;
       transform: scale(0.92) translateY(20px);
       transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -106,24 +111,24 @@
 
     card.innerHTML = `
       <!-- Top Decorative Official Header Bar -->
-      <div style="background: linear-gradient(135deg, #071d49 0%, #0a3d8c 100%); padding: 22px 26px; position: relative; color: white;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(252, 227, 138, 0.15); border: 1px solid rgba(252, 227, 138, 0.35); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; color: #fce38a; letter-spacing: 0.5px; text-transform: uppercase;">
+      <div style="background: linear-gradient(135deg, #071d49 0%, #0a3d8c 100%); padding: 18px 22px; position: relative; color: white;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(252, 227, 138, 0.18); border: 1px solid rgba(252, 227, 138, 0.4); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; color: #fce38a; letter-spacing: 0.5px; text-transform: uppercase;">
             ${badgeText}
           </div>
-          <button id="igyr-banner-close-x" type="button" aria-label="Close" style="background: rgba(255, 255, 255, 0.15); border: none; width: 32px; height: 32px; border-radius: 50%; color: #ffffff; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+          <button id="igyr-banner-close-x" type="button" aria-label="Close" style="background: rgba(255, 255, 255, 0.18); border: none; width: 36px; height: 36px; border-radius: 50%; color: #ffffff; font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent;">
             ✕
           </button>
         </div>
-        <h2 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #ffffff; margin: 14px 0 0 0; line-height: 1.35;">
+        <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 700; color: #ffffff; margin: 12px 0 0 0; line-height: 1.35;">
           ${titleText}
         </h2>
       </div>
 
       <!-- Banner Body Content -->
-      <div style="padding: 24px 26px; overflow-y: auto; flex: 1; color: #334155; font-size: 14px; line-height: 1.65; max-height: 52vh;">
-        <div style="background: #f8fafc; border-left: 4px solid #1266d6; padding: 14px 18px; border-radius: 8px; margin-bottom: 16px;">
-          <div style="font-size: 12px; font-weight: 700; color: #1266d6; text-transform: uppercase; margin-bottom: 4px;">
+      <div style="padding: 20px 22px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; color: #334155; font-size: 14px; line-height: 1.65; max-height: 50vh;">
+        <div style="background: #f8fafc; border-left: 4px solid #1266d6; padding: 12px 16px; border-radius: 8px; margin-bottom: 14px;">
+          <div style="font-size: 11px; font-weight: 800; color: #1266d6; text-transform: uppercase; margin-bottom: 2px;">
             National Educational Notification
           </div>
           <div style="font-size: 11px; color: #64748b;">
@@ -134,11 +139,11 @@
       </div>
 
       <!-- Bottom Action Controls -->
-      <div style="padding: 18px 26px 22px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap;">
-        <button id="igyr-banner-dismiss-btn" type="button" style="background: transparent; border: 1px solid #cbd5e1; color: #64748b; font-weight: 600; font-size: 13px; padding: 10px 18px; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+      <div style="padding: 16px 22px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+        <button id="igyr-banner-dismiss-btn" type="button" style="background: #ffffff; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 13px; padding: 10px 18px; border-radius: 8px; cursor: pointer;">
           Continue to Portal ✕
         </button>
-        <a id="igyr-banner-action-btn" href="${buttonUrl}" style="background: linear-gradient(135deg, #1266d6 0%, #062b63 100%); color: #ffffff; font-weight: 700; font-size: 13px; text-decoration: none; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(18, 102, 214, 0.35); transition: transform 0.2s;">
+        <a id="igyr-banner-action-btn" href="${buttonUrl}" style="background: linear-gradient(135deg, #1266d6 0%, #062b63 100%); color: #ffffff; font-weight: 700; font-size: 13px; text-decoration: none; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(18, 102, 214, 0.35);">
           ${buttonText}
         </a>
       </div>
@@ -194,10 +199,11 @@
   async function initAnnouncementBanner() {
     try {
       const apiBase = getBannerApiBase();
-      const res = await fetch(apiBase + '/banner');
+      // Added cache-buster ?_t= to guarantee fresh load on mobile networks
+      const res = await fetch(apiBase + '/banner?_t=' + Date.now());
       if (!res.ok) return;
       const banner = await res.json();
-      if (banner && banner.enabled) {
+      if (banner && (banner.enabled === true || banner.enabled === 'true' || banner.enabled === 1 || banner.enabled === '1')) {
         renderBannerModal(banner, false);
       }
     } catch (err) {

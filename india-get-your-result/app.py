@@ -465,6 +465,22 @@ def pwa_install_script():
     res.headers['Cache-Control'] = 'no-cache'
     return res
 
+@app.route('/announcement-banner.js')
+@app.route('/js/announcement-banner.js')
+def announcement_banner_script():
+    for rel_path in ['announcement-banner.js', os.path.join('js', 'announcement-banner.js')]:
+        folder = get_asset_folder(rel_path)
+        file_path = os.path.join(folder, rel_path)
+        if os.path.isfile(file_path):
+            dir_name = os.path.dirname(file_path)
+            base_name = os.path.basename(file_path)
+            res = send_from_directory(dir_name, base_name, mimetype='application/javascript')
+            res.headers['Cache-Control'] = 'no-cache, must-revalidate'
+            return res
+    res = send_from_directory('.', 'announcement-banner.js', mimetype='application/javascript')
+    res.headers['Cache-Control'] = 'no-cache, must-revalidate'
+    return res
+
 @app.route('/privacy.html')
 @app.route('/privacy')
 def privacy_page():
