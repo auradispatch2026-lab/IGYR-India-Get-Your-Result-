@@ -23,7 +23,9 @@ window.handleGlobalNotice = function(e) {
         notices.push({
             text: text,
             type: type,
-            date: new Date().toLocaleDateString()
+            date: new Date().toLocaleDateString('en-GB'),
+            timestamp: Date.now(),
+            createdAt: new Date().toISOString()
         });
         saveNotices(notices);
         document.getElementById('global-notice-form').reset();
@@ -33,8 +35,11 @@ window.handleGlobalNotice = function(e) {
         noticeList.innerHTML = '';
         notices.forEach((n, idx) => {
             let badge = n.type === 'urgent' ? '<span style="color:#e55039;font-weight:bold;">URGENT</span>' : n.type === 'warning' ? '<span style="color:#fbc531;font-weight:bold;">WARNING</span>' : '<span style="color:#062b63;font-weight:bold;">INFO</span>';
+            let itemTime = n.timestamp || (n.date ? Date.parse(n.date) : null);
+            let isNew = itemTime ? ((Date.now() - itemTime) <= ((5 * 24 + 23) * 3600000)) : false;
+            let newTag = isNew ? '<span style="background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;margin-left:6px;">NEW</span>' : '';
             noticeList.innerHTML += `<tr>
-                <td style="white-space:nowrap;">${n.date}</td>
+                <td style="white-space:nowrap;">${n.date} ${newTag}</td>
                 <td>${badge}</td>
                 <td>${n.text}</td>
                 <td><button class="btn btn-outline" style="color:#e55039; border-color:#e55039; padding: 2px 8px;" onclick="deleteNotice(${idx})">Delete</button></td>
@@ -100,8 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 notices.forEach((n, idx) => {
                     let badge = n.type === 'urgent' ? '<span style="color:#e55039;font-weight:bold;">URGENT</span>' : n.type === 'warning' ? '<span style="color:#fbc531;font-weight:bold;">WARNING</span>' : '<span style="color:#062b63;font-weight:bold;">INFO</span>';
+                    let itemTime = n.timestamp || (n.date ? Date.parse(n.date) : null);
+                    let isNew = itemTime ? ((Date.now() - itemTime) <= ((5 * 24 + 23) * 3600000)) : false;
+                    let newTag = isNew ? '<span style="background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;margin-left:6px;">NEW</span>' : '';
                     noticeList.innerHTML += `<tr>
-                        <td style="white-space:nowrap;">${n.date}</td>
+                        <td style="white-space:nowrap;">${n.date} ${newTag}</td>
                         <td>${badge}</td>
                         <td>${n.text}</td>
                         <td><button class="btn btn-outline" style="color:#e55039; border-color:#e55039; padding: 2px 8px;" onclick="deleteNotice(${idx})">Delete</button></td>
