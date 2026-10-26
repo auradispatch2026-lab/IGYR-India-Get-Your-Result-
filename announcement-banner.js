@@ -65,8 +65,6 @@
     const badgeText = escapeHtml(banner.badge || '📢 OFFICIAL ANNOUNCEMENT');
     const titleText = escapeHtml(banner.title || 'Important Notice');
     const messageHtml = formatMessageBody(banner.message || '');
-    const buttonText = escapeHtml(banner.buttonText || 'View Details →');
-    const buttonUrl = escapeHtml(banner.buttonUrl || '/search-result.html');
 
     const overlay = document.createElement('div');
     overlay.id = 'igyr-global-banner-overlay';
@@ -126,26 +124,15 @@
       </div>
 
       <!-- Banner Body Content -->
-      <div style="padding: 20px 22px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; color: #334155; font-size: 14px; line-height: 1.65; max-height: 50vh;">
-        <div style="background: #f8fafc; border-left: 4px solid #1266d6; padding: 12px 16px; border-radius: 8px; margin-bottom: 14px;">
-          <div style="font-size: 11px; font-weight: 800; color: #1266d6; text-transform: uppercase; margin-bottom: 2px;">
-            National Educational Notification
-          </div>
-          <div style="font-size: 11px; color: #64748b;">
-            Official communication published via India Get Your Result (IGYR)
-          </div>
-        </div>
+      <div style="padding: 24px 22px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; color: #334155; font-size: 14px; line-height: 1.65; max-height: 52vh;">
         ${messageHtml}
       </div>
 
       <!-- Bottom Action Controls -->
-      <div style="padding: 16px 22px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
-        <button id="igyr-banner-dismiss-btn" type="button" style="background: #ffffff; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; font-size: 13px; padding: 10px 18px; border-radius: 8px; cursor: pointer;">
+      <div style="padding: 16px 22px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-end;">
+        <button id="igyr-banner-dismiss-btn" type="button" style="background: linear-gradient(135deg, #1266d6 0%, #062b63 100%); color: #ffffff; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(18, 102, 214, 0.35);">
           Continue to Portal ✕
         </button>
-        <a id="igyr-banner-action-btn" href="${buttonUrl}" style="background: linear-gradient(135deg, #1266d6 0%, #062b63 100%); color: #ffffff; font-weight: 700; font-size: 13px; text-decoration: none; padding: 10px 22px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(18, 102, 214, 0.35);">
-          ${buttonText}
-        </a>
       </div>
     `;
 
@@ -161,7 +148,6 @@
     // Event Listeners
     const closeBtn = card.querySelector('#igyr-banner-close-x');
     const dismissBtn = card.querySelector('#igyr-banner-dismiss-btn');
-    const actionBtn = card.querySelector('#igyr-banner-action-btn');
 
     const handleDismiss = (e) => {
       if (e) e.preventDefault();
@@ -170,14 +156,6 @@
 
     if (closeBtn) closeBtn.onclick = handleDismiss;
     if (dismissBtn) dismissBtn.onclick = handleDismiss;
-
-    if (actionBtn) {
-      actionBtn.onclick = () => {
-        if (dismissKey) {
-          try { sessionStorage.setItem(dismissKey, '1'); } catch (e) {}
-        }
-      };
-    }
 
     // Close when clicking outside card
     overlay.addEventListener('click', (e) => {

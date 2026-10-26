@@ -183,17 +183,6 @@
                         <textarea id="banner-message" rows="4" placeholder="Enter the official notice or message you want visitors to read when they open the website..." required></textarea>
                     </div>
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Primary Action Button Label *</label>
-                            <input type="text" id="banner-btn-text" placeholder="e.g. Check Results Now →" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Action Destination URL *</label>
-                            <input type="text" id="banner-btn-url" placeholder="e.g. /search-result.html" required>
-                        </div>
-                    </div>
-
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label>Display Frequency</label>
                         <select id="banner-frequency">
@@ -224,10 +213,9 @@
                             <div style="padding: 14px 16px; font-size: 13px; color: #334155; line-height: 1.5;" id="pv-message">
                                 Announcement body will appear here in real time as you type...
                             </div>
-                            <div style="padding: 10px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
-                                <span style="font-size: 11px; color: #94a3b8; align-self: center;">Continue to Portal ✕</span>
-                                <span id="pv-btn" style="background: #1266d6; color: white; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 6px;">
-                                    View Details →
+                            <div style="padding: 10px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                                <span style="background: #1266d6; color: white; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 6px;">
+                                    Continue to Portal ✕
                                 </span>
                             </div>
                         </div>
@@ -289,7 +277,7 @@
 
     <!-- Scripts -->
     <script src="js/storage.js?v=1000042"></script>
-    <script src="/announcement-banner.js?v=1000043"></script>
+    <script src="/announcement-banner.js?v=1000044"></script>
     <script>
         // Check Admin Auth
         const adminToken = sessionStorage.getItem('admin_token');
@@ -301,7 +289,6 @@
         const bBadge = document.getElementById('banner-badge');
         const bTitle = document.getElementById('banner-title');
         const bMsg = document.getElementById('banner-message');
-        const bBtnText = document.getElementById('banner-btn-text');
         const bEnabled = document.getElementById('banner-enabled');
         const bToggleLabel = document.getElementById('banner-toggle-label');
 
@@ -309,7 +296,6 @@
             document.getElementById('pv-badge').textContent = bBadge.value || '📢 OFFICIAL ANNOUNCEMENT';
             document.getElementById('pv-title').textContent = bTitle.value || 'Announcement Title Preview';
             document.getElementById('pv-message').textContent = bMsg.value || 'Announcement message preview...';
-            document.getElementById('pv-btn').textContent = bBtnText.value || 'View Details →';
             
             if (bEnabled.checked) {
                 bToggleLabel.textContent = 'Active (Live on Website)';
@@ -320,9 +306,11 @@
             }
         }
 
-        [bBadge, bTitle, bMsg, bBtnText, bEnabled].forEach(el => {
-            el.addEventListener('input', updatePreview);
-            el.addEventListener('change', updatePreview);
+        [bBadge, bTitle, bMsg, bEnabled].forEach(el => {
+            if (el) {
+                el.addEventListener('input', updatePreview);
+                el.addEventListener('change', updatePreview);
+            }
         });
 
         // Load Banner Data
@@ -335,8 +323,6 @@
                     bBadge.value = b.badge || '📢 OFFICIAL ANNOUNCEMENT';
                     bTitle.value = b.title || '';
                     bMsg.value = b.message || '';
-                    bBtnText.value = b.buttonText || 'View Details →';
-                    document.getElementById('banner-btn-url').value = b.buttonUrl || '/search-result.html';
                     document.getElementById('banner-frequency').value = (b.showOncePerSession !== false) ? 'once' : 'always';
                     updatePreview();
                 }
@@ -356,8 +342,8 @@
                 badge: bBadge.value.trim(),
                 title: bTitle.value.trim(),
                 message: bMsg.value.trim(),
-                buttonText: bBtnText.value.trim(),
-                buttonUrl: document.getElementById('banner-btn-url').value.trim() || '/search-result.html',
+                buttonText: '',
+                buttonUrl: '',
                 showOncePerSession: document.getElementById('banner-frequency').value === 'once'
             };
 
@@ -405,8 +391,8 @@
                     badge: bBadge.value || '📢 OFFICIAL ANNOUNCEMENT',
                     title: bTitle.value || 'Announcement Title Preview',
                     message: bMsg.value || 'This is how your announcement will look to visitors across devices.',
-                    buttonText: bBtnText.value || 'View Details →',
-                    buttonUrl: document.getElementById('banner-btn-url').value || '#'
+                    buttonText: '',
+                    buttonUrl: ''
                 });
             } else {
                 alert('Preview script loading, please try again in a second.');
