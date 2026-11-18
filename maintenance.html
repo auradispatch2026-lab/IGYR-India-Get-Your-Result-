@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>Platform Upgrade & Maintenance | India Get Your Result (IGYR)</title>
 <link rel="icon" type="image/png" href="/favicon-96x96.png">
 
@@ -13,80 +13,96 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    min-height: 100vh;
-    background: radial-gradient(circle at center, #527e9d, #174575 75%);
-    overflow: hidden;
-    color: white;
+:root {
+    --bg-grad-1: #527e9d;
+    --bg-grad-2: #174575;
+    --accent-cyan: #65e2d1;
+    --accent-green: #65f2c0;
+    --accent-yellow: #ffd166;
+    --accent-blue: #38bdf8;
 }
 
-/* BACKGROUND */
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: radial-gradient(circle at center, var(--bg-grad-1), var(--bg-grad-2) 78%);
+    color: white;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+/* BACKGROUND FLOATING HEXAGONS */
 
 .background {
     position: fixed;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
+    z-index: 0;
 }
 
 .hex {
     position: absolute;
     width: 65px;
     height: 65px;
-    border: 1px solid rgba(255,255,255,0.16);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     transform: rotate(30deg);
-    clip-path: polygon(25% 0%,75% 0%,100% 50%,
-    75% 100%,25% 100%,0% 50%);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    animation: hexFloat 8s ease-in-out infinite alternate;
 }
 
-.hex:nth-child(1) {top: 5%;right: 8%;}
-.hex:nth-child(2) {top: 15%;right: 2%;width: 35px;height:35px;}
-.hex:nth-child(3) {top: 0;right: 15%;width: 45px;height:45px;}
-.hex:nth-child(4) {bottom: 10%;left: 5%;width: 90px;height:90px;}
-.hex:nth-child(5) {bottom: 5%;left: 15%;width: 45px;height:45px;}
-.hex:nth-child(6) {top: 40%;left: 2%;}
+.hex:nth-child(1) { top: 5%; right: 8%; animation-delay: 0s; }
+.hex:nth-child(2) { top: 15%; right: 2%; width: 35px; height: 35px; animation-delay: 1.5s; }
+.hex:nth-child(3) { top: 2%; right: 15%; width: 45px; height: 45px; animation-delay: 3s; }
+.hex:nth-child(4) { bottom: 10%; left: 5%; width: 90px; height: 90px; animation-delay: 2s; }
+.hex:nth-child(5) { bottom: 5%; left: 15%; width: 45px; height: 45px; animation-delay: 4s; }
+.hex:nth-child(6) { top: 35%; left: 2%; animation-delay: 0.5s; }
 
-/* HEADER */
+@keyframes hexFloat {
+    0% { transform: rotate(30deg) translateY(0); }
+    100% { transform: rotate(45deg) translateY(-14px); }
+}
+
+/* HEADER BRANDING */
 
 header {
-    position: absolute;
-    top: 25px;
-    right: 35px;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    text-align: right;
+    width: 100%;
+    max-width: 1100px;
+    padding: 24px 28px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     z-index: 10;
 }
 
-header span {
-    font-size: 9px;
-    display: block;
-    text-align: right;
-    letter-spacing: 1.5px;
+.brand-title {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.brand-sub {
+    font-size: 10px;
+    letter-spacing: 1.8px;
     font-weight: 700;
     color: #bce7f8;
-    margin-top: 2px;
+    margin-top: 3px;
+    text-transform: uppercase;
 }
 
-/* MAIN */
-
-.container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 15px;
-}
-
-.scene {
-    width: 100%;
-    max-width: 850px;
-    text-align: center;
-}
-
-/* CLOUDS */
+/* CLOUDS DRIFTING */
 
 .cloud {
     position: absolute;
@@ -94,8 +110,12 @@ header span {
     height: 15px;
     background: #d8f1ff;
     border-radius: 30px;
-    top: 18%;
-    left: 25%;
+    top: 14%;
+    left: 20%;
+    opacity: 0.85;
+    animation: cloudDriftOne 22s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .cloud::before,
@@ -121,76 +141,143 @@ header span {
 }
 
 .cloud.two {
-    top: 22%;
-    left: 70%;
+    top: 18%;
+    left: 72%;
     transform: scale(1.2);
+    animation: cloudDriftTwo 28s ease-in-out infinite alternate;
 }
 
-/* CONSTRUCTION SCENE */
+@keyframes cloudDriftOne {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(45px); }
+}
+
+@keyframes cloudDriftTwo {
+    0% { transform: scale(1.2) translateX(0); }
+    100% { transform: scale(1.2) translateX(-50px); }
+}
+
+/* MAIN CONTENT CONTAINER */
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 16px 20px;
+    position: relative;
+    z-index: 5;
+}
+
+.scene {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* RESPONSIVE ILLUSTRATION WRAPPER */
+
+.illustration-wrapper {
+    width: 100%;
+    max-width: 700px;
+    height: 420px;
+    margin: 10px auto 25px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .illustration {
     position: relative;
-    width: 100%;
-    max-width: 700px;
-    height: 430px;
-    margin: 30px auto;
+    width: 700px;
+    height: 420px;
+    flex-shrink: 0;
+    transform-origin: center center;
 }
 
-/* COMPUTER SCREEN */
+/* COMPUTER MONITOR */
 
 .monitor {
     position: absolute;
-    width: 55%;
+    width: 385px;
     height: 230px;
-    left: 23%;
-    top: 100px;
+    left: 160px;
+    top: 95px;
     background: #dff5ff;
     border: 7px solid #bce7f8;
-    border-radius: 6px;
-    box-shadow: 0 15px 30px rgba(0,0,0,.25);
+    border-radius: 8px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     z-index: 3;
+    overflow: hidden;
 }
 
 .topbar {
-    height: 17px;
+    height: 18px;
     background: #f5faff;
     border-bottom: 2px solid #b6d9e8;
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding-left: 7px;
+    gap: 6px;
+    padding-left: 8px;
 }
 
 .dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #55a7bc;
+    animation: dotPulse 2.5s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { background: #ef4444; animation-delay: 0s; }
+.dot:nth-child(2) { background: #f59e0b; animation-delay: 0.4s; }
+.dot:nth-child(3) { background: #10b981; animation-delay: 0.8s; }
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(0.8); opacity: 0.4; }
 }
 
 .screen-content {
     display: grid;
-    grid-template-columns: 80px 1fr;
-    height: calc(100% - 17px);
+    grid-template-columns: 78px 1fr;
+    height: calc(100% - 18px);
 }
 
 .sidebar {
     background: #e7f5fa;
-    padding: 12px;
+    padding: 10px;
     border-right: 2px solid #c4e5f0;
 }
 
 .sidebar div {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #398da9;
     display: inline-block;
-    margin: 3px;
+    margin: 2px;
     border-radius: 3px;
+    transition: background 0.3s;
+    animation: iconBlink 4s infinite alternate;
+}
+
+.sidebar div:nth-child(2n) { animation-delay: 1s; }
+.sidebar div:nth-child(3n) { animation-delay: 2s; }
+
+@keyframes iconBlink {
+    0%, 80% { opacity: 1; }
+    90% { opacity: 0.3; }
+    100% { opacity: 1; }
 }
 
 .dashboard {
-    padding: 15px;
+    padding: 14px;
+    text-align: left;
 }
 
 .line {
@@ -199,39 +286,62 @@ header span {
     background: #70b7d0;
     margin-bottom: 10px;
     border-radius: 5px;
+    animation: lineShimmer 3s infinite ease-in-out;
 }
 
 .line.short {
     width: 45%;
+    animation-delay: 1.5s;
+}
+
+@keyframes lineShimmer {
+    0%, 100% { opacity: 0.8; width: 75%; }
+    50% { opacity: 1; width: 85%; }
 }
 
 .cards {
     display: flex;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 8px;
+    margin-top: 14px;
 }
 
 .card {
     flex: 1;
-    height: 75px;
+    height: 70px;
     background: #c8eaf3;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 6px;
+    padding: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
 .card::after {
     content: "";
     display: block;
-    width: 30px;
-    height: 30px;
-    margin: 8px auto;
-    border: 5px solid #398da9;
+    width: 26px;
+    height: 26px;
+    margin: 6px auto;
+    border: 4px solid #398da9;
+    border-top-color: transparent;
     border-radius: 50%;
+    animation: cardSpin 1.4s linear infinite;
 }
 
+.card:nth-child(2)::after {
+    animation-direction: reverse;
+    border-color: #28a9a4;
+    border-top-color: transparent;
+}
+
+@keyframes cardSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* REAL-TIME WORKING CHART BARS */
+
 .chart {
-    margin-top: 15px;
-    height: 35px;
+    margin-top: 14px;
+    height: 38px;
     display: flex;
     align-items: end;
     gap: 6px;
@@ -241,13 +351,20 @@ header span {
     flex: 1;
     background: #43a5b5;
     border-radius: 3px 3px 0 0;
+    transition: height 0.4s ease;
 }
 
-.chart span:nth-child(1) {height: 40%;}
-.chart span:nth-child(2) {height: 70%;}
-.chart span:nth-child(3) {height: 50%;}
-.chart span:nth-child(4) {height: 100%;}
-.chart span:nth-child(5) {height: 75%;}
+.chart span:nth-child(1) { animation: barLive1 2.8s ease-in-out infinite alternate; }
+.chart span:nth-child(2) { animation: barLive2 3.4s ease-in-out infinite alternate; }
+.chart span:nth-child(3) { animation: barLive3 2.2s ease-in-out infinite alternate; }
+.chart span:nth-child(4) { animation: barLive4 3.9s ease-in-out infinite alternate; }
+.chart span:nth-child(5) { animation: barLive5 2.6s ease-in-out infinite alternate; }
+
+@keyframes barLive1 { 0% { height: 35%; } 50% { height: 80%; } 100% { height: 45%; } }
+@keyframes barLive2 { 0% { height: 75%; } 50% { height: 30%; } 100% { height: 90%; } }
+@keyframes barLive3 { 0% { height: 40%; } 50% { height: 95%; } 100% { height: 60%; } }
+@keyframes barLive4 { 0% { height: 95%; } 50% { height: 50%; } 100% { height: 100%; } }
+@keyframes barLive5 { 0% { height: 65%; } 50% { height: 25%; } 100% { height: 75%; } }
 
 /* MONITOR STAND */
 
@@ -255,8 +372,8 @@ header span {
     position: absolute;
     width: 70px;
     height: 65px;
-    top: 330px;
-    left: 47%;
+    top: 325px;
+    left: 317px;
     background: #32839c;
     z-index: 2;
 }
@@ -272,11 +389,11 @@ header span {
     border-radius: 20px;
 }
 
-/* CONSTRUCTION CRANE */
+/* REAL-TIME MOVING CONSTRUCTION CRANE */
 
 .crane {
     position: absolute;
-    left: 8%;
+    left: 55px;
     top: 20px;
     width: 180px;
     height: 350px;
@@ -289,34 +406,151 @@ header span {
     top: 30px;
     height: 300px;
     width: 12px;
-    background: repeating-linear-gradient(
-        135deg,#b8e4ef 0 5px,#487c99 5px 9px
-    );
+    background: repeating-linear-gradient(135deg, #b8e4ef 0 5px, #487c99 5px 9px);
 }
 
 .crane-horizontal {
     position: absolute;
     left: 0;
     top: 30px;
-    width: 210px;
+    width: 220px;
     height: 12px;
-    background: repeating-linear-gradient(
-        45deg,#d4eff7 0 5px,#5d8da7 5px 9px
-    );
+    background: repeating-linear-gradient(45deg, #d4eff7 0 5px, #5d8da7 5px 9px);
+    transform-origin: 55px center;
     transform: rotate(-3deg);
+    animation: craneSway 5s ease-in-out infinite alternate;
 }
 
-.crane-horizontal::after {
+@keyframes craneSway {
+    0% { transform: rotate(-4deg); }
+    50% { transform: rotate(-1.5deg); }
+    100% { transform: rotate(-4deg); }
+}
+
+.crane-cable {
+    position: absolute;
+    width: 2px;
+    height: 110px;
+    background: rgba(255, 255, 255, 0.85);
+    top: 12px;
+    left: 175px;
+    transform-origin: top center;
+    animation: cableWiggle 5s ease-in-out infinite alternate;
+}
+
+@keyframes cableWiggle {
+    0% { height: 105px; }
+    50% { height: 125px; }
+    100% { height: 105px; }
+}
+
+/* MOVING FOLDER / DATA CARGO */
+
+.folder {
+    position: absolute;
+    width: 65px;
+    height: 50px;
+    background: #ffc84b;
+    left: 242px;
+    top: 145px;
+    z-index: 6;
+    border-radius: 4px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    animation: folderFloat 5s ease-in-out infinite alternate;
+}
+
+.folder::before {
     content: "";
     position: absolute;
-    width: 110px;
-    height: 2px;
-    background: white;
-    top: 30px;
-    left: 60px;
+    top: -9px;
+    left: 0;
+    width: 30px;
+    height: 12px;
+    background: #ffc84b;
+    border-radius: 4px 4px 0 0;
 }
 
-/* WORKERS */
+.folder::after {
+    content: "▲";
+    position: absolute;
+    top: -16px;
+    left: 26px;
+    color: white;
+    font-size: 11px;
+}
+
+@keyframes folderFloat {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(20px); }
+    100% { transform: translateY(0); }
+}
+
+/* REAL ACTIVE SERVER RACK WITH BLINKING LEDS */
+
+.server {
+    position: absolute;
+    left: 90px;
+    bottom: 25px;
+    width: 75px;
+    height: 105px;
+    background: #287b9f;
+    z-index: 4;
+    border-radius: 4px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.server div {
+    height: 24px;
+    border: 2px solid #9cd5e7;
+    margin-bottom: 2px;
+    position: relative;
+    background: #1c5f7d;
+}
+
+.server div::after {
+    content: "●";
+    position: absolute;
+    right: 7px;
+    top: 2px;
+    font-size: 11px;
+}
+
+.server div:nth-child(1)::after {
+    color: var(--accent-cyan);
+    animation: ledFlash1 1.2s infinite;
+}
+.server div:nth-child(2)::after {
+    color: var(--accent-green);
+    animation: ledFlash2 1.8s infinite;
+}
+.server div:nth-child(3)::after {
+    color: var(--accent-yellow);
+    animation: ledFlash3 2.4s infinite;
+}
+.server div:nth-child(4)::after {
+    color: var(--accent-blue);
+    animation: ledFlash4 1.5s infinite;
+}
+
+@keyframes ledFlash1 {
+    0%, 100% { opacity: 1; text-shadow: 0 0 6px var(--accent-cyan); }
+    50% { opacity: 0.2; text-shadow: none; }
+}
+@keyframes ledFlash2 {
+    0%, 100% { opacity: 0.3; text-shadow: none; }
+    60% { opacity: 1; text-shadow: 0 0 6px var(--accent-green); }
+}
+@keyframes ledFlash3 {
+    0%, 40% { opacity: 1; text-shadow: 0 0 6px var(--accent-yellow); }
+    80% { opacity: 0.2; text-shadow: none; }
+}
+@keyframes ledFlash4 {
+    0%, 100% { opacity: 0.25; text-shadow: none; }
+    45% { opacity: 1; text-shadow: 0 0 6px var(--accent-blue); }
+}
+
+/* REAL WORKING ANIMATED WORKERS */
 
 .worker {
     position: absolute;
@@ -343,6 +577,7 @@ header span {
     height: 42px;
     background: #28a9a4;
     border-radius: 8px 8px 2px 2px;
+    position: relative;
 }
 
 .leg {
@@ -355,196 +590,255 @@ header span {
     box-shadow: 12px 0 #172f49;
 }
 
+/* Worker 1: Working on the crane/left with spark effect */
 .worker.one {
-    left: 12%;
+    left: 85px;
     top: 170px;
+    animation: workerOneHammer 1.8s ease-in-out infinite;
+    transform-origin: bottom center;
 }
 
+.worker.one::after {
+    content: "⚡";
+    position: absolute;
+    top: 15px;
+    right: -10px;
+    font-size: 14px;
+    color: #ffeb3b;
+    animation: sparkFlicker 0.9s infinite alternate;
+}
+
+@keyframes workerOneHammer {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    40% { transform: rotate(-5deg) translateY(-2px); }
+    50% { transform: rotate(3deg) translateY(1px); }
+}
+
+@keyframes sparkFlicker {
+    0%, 70% { opacity: 0; transform: scale(0.6); }
+    85% { opacity: 1; transform: scale(1.3); }
+    100% { opacity: 0; }
+}
+
+/* Worker 2: High inspection on right */
 .worker.two {
-    right: 16%;
+    right: 110px;
     top: 90px;
+    animation: workerTwoInspect 3s ease-in-out infinite alternate;
 }
 
 .worker.two .body {
     background: #ffcf53;
 }
 
+@keyframes workerTwoInspect {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0); }
+}
+
+/* Worker 3: Typing & Operating at Center Console */
 .worker.three {
-    left: 30%;
+    left: 210px;
     top: 280px;
+    animation: workerThreeOperate 1.5s ease-in-out infinite alternate;
 }
 
 .worker.three .body {
     background: #239b83;
 }
 
+@keyframes workerThreeOperate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-3deg); }
+}
+
+/* Worker 4: Lower Right Overseer */
 .worker.four {
-    right: 9%;
+    right: 65px;
     top: 300px;
+    animation: workerFourBreath 4s ease-in-out infinite;
 }
 
 .worker.four .body {
     background: #5ab5c5;
 }
 
-/* FOLDER */
-
-.folder {
-    position: absolute;
-    width: 65px;
-    height: 50px;
-    background: #ffc84b;
-    left: 39%;
-    top: 135px;
-    z-index: 6;
-    border-radius: 4px;
+@keyframes workerFourBreath {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
 }
 
-.folder::before {
-    content: "";
-    position: absolute;
-    top: -9px;
-    left: 0;
-    width: 30px;
-    height: 12px;
-    background: #ffc84b;
-    border-radius: 4px 4px 0 0;
-}
-
-/* SERVER */
-
-.server {
-    position: absolute;
-    left: 13%;
-    bottom: 20px;
-    width: 75px;
-    height: 105px;
-    background: #287b9f;
-    z-index: 4;
-}
-
-.server div {
-    height: 25px;
-    border: 2px solid #9cd5e7;
-    margin-bottom: 2px;
-    position: relative;
-}
-
-.server div::after {
-    content: "●";
-    color: #65e2d1;
-    position: absolute;
-    right: 7px;
-    font-size: 12px;
-}
-
-/* FLOOR */
+/* FLOOR SHADOW */
 
 .floor {
     position: absolute;
     bottom: 0;
-    left: 5%;
-    width: 90%;
+    left: 35px;
+    width: 630px;
     height: 25px;
     background: #c7e9ed;
     border-radius: 50%;
-    opacity: .9;
+    opacity: 0.9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* TEXT */
+/* TYPOGRAPHY */
 
 h1 {
     font-size: 32px;
+    font-weight: 800;
     margin-top: 5px;
-    letter-spacing: .5px;
+    letter-spacing: -0.3px;
+    color: #ffffff;
+    line-height: 1.25;
 }
 
 .description {
     font-size: 15px;
-    line-height: 1.7;
+    line-height: 1.65;
     color: #d5e9f4;
-    max-width: 550px;
-    margin: 15px auto;
+    max-width: 560px;
+    margin: 14px auto 16px;
+    padding: 0 10px;
 }
 
 .status {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 15px;
-    padding: 12px 25px;
-    border: 1px solid rgba(255,255,255,.3);
+    gap: 10px;
+    padding: 12px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 30px;
-    background: rgba(255,255,255,.08);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
     font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
 }
 
 .status-dot {
     color: #65f2c0;
     display: inline-block;
-    animation: pulse 1.8s infinite;
+    animation: statusPulse 1.6s infinite ease-in-out;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.35; transform: scale(0.85); }
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; transform: scale(1.2); }
+    50% { opacity: 0.3; transform: scale(0.8); }
 }
 
 /* FOOTER */
 
 footer {
-    position: fixed;
-    bottom: 20px;
-    left: 25px;
-    font-size: 13px;
+    width: 100%;
+    max-width: 1100px;
+    padding: 20px 28px;
+    font-size: 12px;
     color: #d8e8f3;
+    text-align: left;
     z-index: 10;
 }
 
-/* MOBILE */
+/* RESPONSIVE SCALING FOR TABLETS & MOBILES */
 
-@media(max-width:600px) {
-
+@media (max-width: 720px) {
     header {
-        font-size: 22px;
-        right: 20px;
-        top: 20px;
+        padding: 16px 20px 5px;
+        align-items: center;
+        text-align: center;
     }
 
+    .brand-title {
+        font-size: 22px;
+    }
+
+    .brand-sub {
+        font-size: 9px;
+        letter-spacing: 1.2px;
+    }
+
+    .illustration-wrapper {
+        height: 290px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+
+    /* Fluid proportional scale preserving every pixel ratio */
     .illustration {
-        height: 300px;
-        transform: scale(.78);
-        transform-origin: center top;
-        margin-bottom: -60px;
-        width: 125%;
-        margin-left: -12.5%;
+        transform: scale(0.68);
     }
 
     h1 {
-        font-size: 24px;
+        font-size: 23px;
+        padding: 0 10px;
     }
 
     .description {
         font-size: 13px;
+        line-height: 1.55;
+        margin: 10px auto 14px;
     }
 
-    .container {
-        padding-top: 90px;
+    .status {
+        padding: 10px 22px;
+        font-size: 12px;
     }
 
     footer {
+        text-align: center;
+        padding: 14px 16px 20px;
         font-size: 11px;
-        left: 15px;
-        bottom: 15px;
     }
 }
 
+@media (max-width: 480px) {
+    .illustration-wrapper {
+        height: 245px;
+        margin-top: 0;
+        margin-bottom: 5px;
+    }
+
+    .illustration {
+        transform: scale(0.55);
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .description {
+        font-size: 12.5px;
+        padding: 0 14px;
+    }
+
+    .status {
+        padding: 9px 18px;
+        font-size: 11.5px;
+    }
+}
+
+@media (max-width: 360px) {
+    .illustration-wrapper {
+        height: 215px;
+    }
+
+    .illustration {
+        transform: scale(0.48);
+    }
+
+    h1 {
+        font-size: 19px;
+    }
+}
 </style>
 </head>
 
 <body>
 
+<!-- Hexagon ambient motion -->
 <div class="background">
     <div class="hex"></div>
     <div class="hex"></div>
@@ -555,119 +849,122 @@ footer {
 </div>
 
 <header>
-    IGYR
-    <span>INDIA GET YOUR RESULT</span>
+    <div class="brand-title">IGYR</div>
+    <div class="brand-sub">INDIA GET YOUR RESULT</div>
 </header>
 
 <div class="cloud"></div>
 <div class="cloud two"></div>
 
 <main class="container">
+    <section class="scene">
 
-<section class="scene">
+        <!-- Responsive Illustration Area -->
+        <div class="illustration-wrapper">
+            <div class="illustration">
 
-<div class="illustration">
-
-    <div class="crane">
-        <div class="crane-vertical"></div>
-        <div class="crane-horizontal"></div>
-    </div>
-
-    <div class="monitor">
-
-        <div class="topbar">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
-
-        <div class="screen-content">
-
-            <div class="sidebar">
-                <div></div><div></div>
-                <div></div><div></div>
-                <div></div><div></div>
-            </div>
-
-            <div class="dashboard">
-
-                <div class="line"></div>
-                <div class="line short"></div>
-
-                <div class="cards">
-                    <div class="card"></div>
-                    <div class="card"></div>
-                    <div class="card"></div>
+                <!-- Active Moving Crane -->
+                <div class="crane">
+                    <div class="crane-vertical"></div>
+                    <div class="crane-horizontal">
+                        <div class="crane-cable"></div>
+                    </div>
                 </div>
 
-                <div class="chart">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <!-- Central Computer Monitor -->
+                <div class="monitor">
+                    <div class="topbar">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+
+                    <div class="screen-content">
+                        <div class="sidebar">
+                            <div></div><div></div>
+                            <div></div><div></div>
+                            <div></div><div></div>
+                        </div>
+
+                        <div class="dashboard">
+                            <div class="line"></div>
+                            <div class="line short"></div>
+
+                            <div class="cards">
+                                <div class="card"></div>
+                                <div class="card"></div>
+                                <div class="card"></div>
+                            </div>
+
+                            <!-- Live Telemetry Bars -->
+                            <div class="chart">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
+                <!-- Monitor Stand -->
+                <div class="stand"></div>
 
+                <!-- Moving Floating Folder -->
+                <div class="folder"></div>
+
+                <!-- Real Server Tower Rack with Blinking LEDs -->
+                <div class="server">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <!-- Animated Working Figures -->
+                <div class="worker one">
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="leg"></div>
+                </div>
+
+                <div class="worker two">
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="leg"></div>
+                </div>
+
+                <div class="worker three">
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="leg"></div>
+                </div>
+
+                <div class="worker four">
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="leg"></div>
+                </div>
+
+                <!-- Isometric Floor Shadow -->
+                <div class="floor"></div>
+
+            </div>
         </div>
 
-    </div>
+        <h1 id="maint-heading">Platform Upgrade & Maintenance</h1>
 
-    <div class="stand"></div>
+        <p class="description" id="maint-text">
+            We're currently working behind the scenes to improve our platform performance, security, and user experience. We'll be back online soon!
+        </p>
 
-    <div class="folder"></div>
+        <div class="status" id="status-pill">
+            <span class="status-dot">●</span>
+            <span id="status-text">System Upgrade In Progress</span>
+        </div>
 
-    <div class="server">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
-
-    <div class="worker one">
-        <div class="head"></div>
-        <div class="body"></div>
-        <div class="leg"></div>
-    </div>
-
-    <div class="worker two">
-        <div class="head"></div>
-        <div class="body"></div>
-        <div class="leg"></div>
-    </div>
-
-    <div class="worker three">
-        <div class="head"></div>
-        <div class="body"></div>
-        <div class="leg"></div>
-    </div>
-
-    <div class="worker four">
-        <div class="head"></div>
-        <div class="body"></div>
-        <div class="leg"></div>
-    </div>
-
-    <div class="floor"></div>
-
-</div>
-
-<h1 id="maint-heading">Platform Upgrade & Maintenance</h1>
-
-<p class="description" id="maint-text">
-    We're currently working behind the scenes to improve
-    our platform performance, security and user experience.
-    We'll be back online soon!
-</p>
-
-<div class="status" id="status-pill">
-    <span class="status-dot">●</span>
-    <span id="status-text">System Upgrade In Progress</span>
-</div>
-
-</section>
-
+    </section>
 </main>
 
 <footer>
@@ -677,14 +974,13 @@ footer {
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Auto-reconnect working model: Checks platform status every 8 seconds
+    // Auto-reconnection loop: polls status and redirects immediately when website is back online
     async function checkPlatformStatus() {
         try {
             const res = await fetch('/api/status/maintenance?t=' + Date.now(), { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
 
-                // Dynamic update if custom message is broadcast by SOC
                 if (data.maintenance_title) {
                     document.getElementById('maint-heading').textContent = data.maintenance_title;
                 }
@@ -692,7 +988,6 @@ footer {
                     document.getElementById('maint-text').textContent = data.maintenance_message;
                 }
 
-                // If SOC switches website back ON, immediately redirect to homepage
                 if (data.website_active === true) {
                     const statusText = document.getElementById('status-text');
                     statusText.textContent = "Platform Restored! Redirecting...";
@@ -703,11 +998,10 @@ footer {
                 }
             }
         } catch (e) {
-            // Server undergoing restart or offline, retry on next loop
+            // Server restarting / temporarily busy
         }
     }
 
-    // Run check immediately and poll every 8 seconds
     checkPlatformStatus();
     setInterval(checkPlatformStatus, 8000);
 </script>
