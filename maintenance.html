@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduled System Maintenance | India Get Your Result (IGYR)</title>
+    <meta name="description" content="India Get Your Result (IGYR) is undergoing scheduled system upgrades and security enhancements. Normal operations will resume shortly.">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #090d16;
+            --bg-card: #0f172a;
+            --bg-card-hover: #131d35;
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(56, 189, 248, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-green: #10b981;
+            --glow-color: rgba(56, 189, 248, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient background glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .brand-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .brand-text h1 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-amber);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pulsing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-amber);
+            box-shadow: 0 0 10px var(--accent-amber);
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .container {
+            max-width: 860px;
+            width: 90%;
+            margin: 40px auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #f59e0b);
+        }
+
+        .icon-wrapper {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 24px;
+            border-radius: 20px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--border-highlight);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-cyan);
+        }
+
+        .icon-wrapper svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 14px;
+            color: #ffffff;
+            line-height: 1.25;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto 32px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .detail-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+
+        .detail-box-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .detail-box-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-tracker {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .status-tracker-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .radar-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-retry {
+            background: #ffffff;
+            color: #090d16;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-retry:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .security-notice {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .security-notice svg {
+            width: 18px;
+            height: 18px;
+            color: var(--accent-green);
+            flex-shrink: 0;
+        }
+
+        .footer {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .header { padding: 16px; }
+            .card { padding: 28px 20px; border-radius: 18px; }
+            .title { font-size: 24px; }
+            .subtitle { font-size: 14px; }
+            .status-tracker { flex-direction: column; align-items: flex-start; }
+            .btn-retry { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <a href="/" class="brand-link" id="brand-link">
+            <img src="/igyr-logo.jpg" alt="IGYR Logo" class="brand-logo" onerror="this.style.display='none'">
+            <div class="brand-text">
+                <h1>INDIA GET YOUR RESULT</h1>
+                <p>National Portal & Verification System</p>
+            </div>
+        </a>
+        <div class="live-badge">
+            <span class="pulsing-dot"></span>
+            <span>SYSTEM UPGRADE</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <div class="icon-wrapper">
+                <!-- High-tech Server/Shield SVG icon -->
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+
+            <h2 class="title" id="maint-title">Platform Upgrade & Maintenance</h2>
+            <p class="subtitle" id="maint-desc">
+                India Get Your Result is currently undergoing scheduled infrastructure upgrades and Security Operations Centre (SOC) optimization. Access to public services is temporarily paused to safeguard data integrity.
+            </p>
+
+            <div class="details-grid">
+                <div class="detail-box">
+                    <div class="detail-box-label">Maintenance Window</div>
+                    <div class="detail-box-value" id="maint-window">Active Upgrade</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-box-label">Security Protocol</div>
+                    <div class="detail-box-value" style="color: var(--accent-cyan);">SOC Hardening Level-4</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-box-label">Data Protection</div>
+                    <div class="detail-box-value" style="color: var(--accent-green);">100% Encrypted & Safe</div>
+                </div>
+            </div>
+
+            <div class="status-tracker">
+                <div class="status-tracker-info">
+                    <div class="radar-spinner" id="sync-spinner"></div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; color: #ffffff;" id="sync-status-title">Auto-Reconnection Active</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);" id="sync-status-sub">Checking every 10 seconds. You will be redirected automatically once online.</div>
+                    </div>
+                </div>
+                <button class="btn-retry" id="manual-recheck-btn" onclick="checkStatus(true)">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Check Now
+                </button>
+            </div>
+
+            <div class="security-notice">
+                <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span>Result publications, marksheet verification hashes, and institute records remain locked and immutable.</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; <span id="current-year">2026</span> India Get Your Result (IGYR). Managed by Security Operations Centre (SOC).</p>
+        <p style="margin-top: 6px; font-size: 12px;">Authorized operators can log in via <a href="/soc">SOC Command Center</a>.</p>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        let checkInterval = null;
+
+        async function checkStatus(isManual = false) {
+            const btn = document.getElementById('manual-recheck-btn');
+            const sub = document.getElementById('sync-status-sub');
+            if (isManual && btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.innerText = 'Checking...';
+            }
+
+            try {
+                const res = await fetch('/soc/api/status?t=' + Date.now(), { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+
+                    // Update UI text if customized by SOC
+                    if (data.maintenance_title) {
+                        document.getElementById('maint-title').textContent = data.maintenance_title;
+                    }
+                    if (data.maintenance_message) {
+                        document.getElementById('maint-desc').textContent = data.maintenance_message;
+                    }
+                    if (data.estimated_restoration) {
+                        document.getElementById('maint-window').textContent = data.estimated_restoration;
+                    }
+
+                    // Check if website was switched back ON
+                    if (data.website_active === true) {
+                        sub.textContent = 'Platform is now online! Redirecting to homepage...';
+                        sub.style.color = '#10b981';
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1200);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.log("Check attempt:", err);
+            } finally {
+                if (isManual && btn) {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Check Now`;
+                    }, 1000);
+                }
+            }
+        }
+
+        // Run immediately on page load
+        checkStatus();
+
+        // Check automatically every 10 seconds
+        checkInterval = setInterval(() => checkStatus(false), 10000);
+    </script>
+</body>
+</html>

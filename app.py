@@ -17,6 +17,10 @@ MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://auradispatch2026_db_user:
 client = MongoClient(MONGO_URI)
 db = client['igyr_database']
 
+# Initialize Maintenance & Security Guard (controlled remotely by SOC server)
+from maintenance_guard import init_maintenance_guard
+init_maintenance_guard(app, db)
+
 # Collections
 institutes_col = db['institutes']
 results_col = db['results']

@@ -1,0 +1,48 @@
+services:
+  # ==========================================
+  # SERVICE 1: Main Platform (Public Portal)
+  # ==========================================
+  - type: web
+    name: igyr-main-platform
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: india-get-your-result
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: MONGO_URI
+        sync: false
+      - key: SOC_USER
+        value: igyr
+      - key: SOC_PASSWORD
+        value: cutiee
+
+  # ==========================================
+  # SERVICE 2: Dedicated SOC Security Operations Centre
+  # ==========================================
+  - type: web
+    name: igyr-soc-center
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: india-get-your-result
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn soc_server:app
+    healthCheckPath: /soc/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: MONGO_URI
+        sync: false
+      - key: SOC_USER
+        value: igyr
+      - key: SOC_PASSWORD
+        value: cutiee
