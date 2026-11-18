@@ -1,462 +1,716 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scheduled System Maintenance | India Get Your Result (IGYR)</title>
-    <meta name="description" content="India Get Your Result (IGYR) is undergoing scheduled system upgrades and security enhancements. Normal operations will resume shortly.">
-    <link rel="icon" type="image/png" href="/favicon-96x96.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-base: #090d16;
-            --bg-card: #0f172a;
-            --bg-card-hover: #131d35;
-            --border-card: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(56, 189, 248, 0.25);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --accent-cyan: #38bdf8;
-            --accent-amber: #f59e0b;
-            --accent-green: #10b981;
-            --glow-color: rgba(56, 189, 248, 0.15);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Upgrade & Maintenance | India Get Your Result (IGYR)</title>
+<link rel="icon" type="image/png" href="/favicon-96x96.png">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-primary);
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow-x: hidden;
-            position: relative;
-        }
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #527e9d, #174575 75%);
+    overflow: hidden;
+    color: white;
+}
 
-        /* Ambient background glow */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0) 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
+/* BACKGROUND */
 
-        .header {
-            padding: 24px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 10;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
+.background {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
 
-        .brand-link {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            text-decoration: none;
-            color: inherit;
-        }
+.hex {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    border: 1px solid rgba(255,255,255,0.16);
+    transform: rotate(30deg);
+    clip-path: polygon(25% 0%,75% 0%,100% 50%,
+    75% 100%,25% 100%,0% 50%);
+}
 
-        .brand-logo {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
+.hex:nth-child(1) {top: 5%;right: 8%;}
+.hex:nth-child(2) {top: 15%;right: 2%;width: 35px;height:35px;}
+.hex:nth-child(3) {top: 0;right: 15%;width: 45px;height:45px;}
+.hex:nth-child(4) {bottom: 10%;left: 5%;width: 90px;height:90px;}
+.hex:nth-child(5) {bottom: 5%;left: 15%;width: 45px;height:45px;}
+.hex:nth-child(6) {top: 40%;left: 2%;}
 
-        .brand-text h1 {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: #ffffff;
-        }
+/* HEADER */
 
-        .brand-text p {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-weight: 600;
-        }
+header {
+    position: absolute;
+    top: 25px;
+    right: 35px;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    text-align: right;
+    z-index: 10;
+}
 
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 9999px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: var(--accent-amber);
-            font-size: 12px;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-        }
+header span {
+    font-size: 9px;
+    display: block;
+    text-align: right;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    color: #bce7f8;
+    margin-top: 2px;
+}
 
-        .pulsing-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--accent-amber);
-            box-shadow: 0 0 10px var(--accent-amber);
-            animation: pulse-glow 2s infinite ease-in-out;
-        }
+/* MAIN */
 
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 15px;
+}
 
-        .container {
-            max-width: 860px;
-            width: 90%;
-            margin: 40px auto;
-            position: relative;
-            z-index: 10;
-        }
+.scene {
+    width: 100%;
+    max-width: 850px;
+    text-align: center;
+}
 
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 24px;
-            padding: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(12px);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+/* CLOUDS */
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #38bdf8, #818cf8, #f59e0b);
-        }
+.cloud {
+    position: absolute;
+    width: 65px;
+    height: 15px;
+    background: #d8f1ff;
+    border-radius: 30px;
+    top: 18%;
+    left: 25%;
+}
 
-        .icon-wrapper {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 24px;
-            border-radius: 20px;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid var(--border-highlight);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-cyan);
-        }
+.cloud::before,
+.cloud::after {
+    content: "";
+    position: absolute;
+    background: #d8f1ff;
+    border-radius: 50%;
+}
 
-        .icon-wrapper svg {
-            width: 36px;
-            height: 36px;
-        }
+.cloud::before {
+    width: 25px;
+    height: 25px;
+    top: -15px;
+    left: 10px;
+}
 
-        .title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 14px;
-            color: #ffffff;
-            line-height: 1.25;
-        }
+.cloud::after {
+    width: 30px;
+    height: 30px;
+    top: -18px;
+    right: 10px;
+}
 
-        .subtitle {
-            font-size: 16px;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            max-width: 650px;
-            margin: 0 auto 32px;
-        }
+.cloud.two {
+    top: 22%;
+    left: 70%;
+    transform: scale(1.2);
+}
 
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-            text-align: left;
-        }
+/* CONSTRUCTION SCENE */
 
-        .detail-box {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 18px 20px;
-        }
+.illustration {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    height: 430px;
+    margin: 30px auto;
+}
 
-        .detail-box-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
+/* COMPUTER SCREEN */
 
-        .detail-box-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: #ffffff;
-            font-family: 'JetBrains Mono', monospace;
-        }
+.monitor {
+    position: absolute;
+    width: 55%;
+    height: 230px;
+    left: 23%;
+    top: 100px;
+    background: #dff5ff;
+    border: 7px solid #bce7f8;
+    border-radius: 6px;
+    box-shadow: 0 15px 30px rgba(0,0,0,.25);
+    z-index: 3;
+}
 
-        .status-tracker {
-            background: rgba(16, 185, 129, 0.05);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 16px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
+.topbar {
+    height: 17px;
+    background: #f5faff;
+    border-bottom: 2px solid #b6d9e8;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-left: 7px;
+}
 
-        .status-tracker-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-        }
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #55a7bc;
+}
 
-        .radar-spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(56, 189, 248, 0.2);
-            border-top-color: var(--accent-cyan);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+.screen-content {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    height: calc(100% - 17px);
+}
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+.sidebar {
+    background: #e7f5fa;
+    padding: 12px;
+    border-right: 2px solid #c4e5f0;
+}
 
-        .btn-retry {
-            background: #ffffff;
-            color: #090d16;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+.sidebar div {
+    width: 20px;
+    height: 20px;
+    background: #398da9;
+    display: inline-block;
+    margin: 3px;
+    border-radius: 3px;
+}
 
-        .btn-retry:hover {
-            background: #e2e8f0;
-            transform: translateY(-1px);
-        }
+.dashboard {
+    padding: 15px;
+}
 
-        .security-notice {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+.line {
+    height: 7px;
+    width: 80%;
+    background: #70b7d0;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
 
-        .security-notice svg {
-            width: 18px;
-            height: 18px;
-            color: var(--accent-green);
-            flex-shrink: 0;
-        }
+.line.short {
+    width: 45%;
+}
 
-        .footer {
-            padding: 24px;
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            z-index: 10;
-        }
+.cards {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
 
-        .footer a {
-            color: var(--accent-cyan);
-            text-decoration: none;
-        }
+.card {
+    flex: 1;
+    height: 75px;
+    background: #c8eaf3;
+    border-radius: 5px;
+    padding: 10px;
+}
 
-        .footer a:hover {
-            text-decoration: underline;
-        }
+.card::after {
+    content: "";
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 8px auto;
+    border: 5px solid #398da9;
+    border-radius: 50%;
+}
 
-        @media (max-width: 640px) {
-            .header { padding: 16px; }
-            .card { padding: 28px 20px; border-radius: 18px; }
-            .title { font-size: 24px; }
-            .subtitle { font-size: 14px; }
-            .status-tracker { flex-direction: column; align-items: flex-start; }
-            .btn-retry { width: 100%; justify-content: center; }
-        }
-    </style>
+.chart {
+    margin-top: 15px;
+    height: 35px;
+    display: flex;
+    align-items: end;
+    gap: 6px;
+}
+
+.chart span {
+    flex: 1;
+    background: #43a5b5;
+    border-radius: 3px 3px 0 0;
+}
+
+.chart span:nth-child(1) {height: 40%;}
+.chart span:nth-child(2) {height: 70%;}
+.chart span:nth-child(3) {height: 50%;}
+.chart span:nth-child(4) {height: 100%;}
+.chart span:nth-child(5) {height: 75%;}
+
+/* MONITOR STAND */
+
+.stand {
+    position: absolute;
+    width: 70px;
+    height: 65px;
+    top: 330px;
+    left: 47%;
+    background: #32839c;
+    z-index: 2;
+}
+
+.stand::after {
+    content: "";
+    position: absolute;
+    width: 140px;
+    height: 15px;
+    background: #295d75;
+    bottom: 0;
+    left: -35px;
+    border-radius: 20px;
+}
+
+/* CONSTRUCTION CRANE */
+
+.crane {
+    position: absolute;
+    left: 8%;
+    top: 20px;
+    width: 180px;
+    height: 350px;
+    z-index: 2;
+}
+
+.crane-vertical {
+    position: absolute;
+    left: 55px;
+    top: 30px;
+    height: 300px;
+    width: 12px;
+    background: repeating-linear-gradient(
+        135deg,#b8e4ef 0 5px,#487c99 5px 9px
+    );
+}
+
+.crane-horizontal {
+    position: absolute;
+    left: 0;
+    top: 30px;
+    width: 210px;
+    height: 12px;
+    background: repeating-linear-gradient(
+        45deg,#d4eff7 0 5px,#5d8da7 5px 9px
+    );
+    transform: rotate(-3deg);
+}
+
+.crane-horizontal::after {
+    content: "";
+    position: absolute;
+    width: 110px;
+    height: 2px;
+    background: white;
+    top: 30px;
+    left: 60px;
+}
+
+/* WORKERS */
+
+.worker {
+    position: absolute;
+    width: 35px;
+    height: 110px;
+    z-index: 5;
+}
+
+.head {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #d98b72;
+    border-radius: 50%;
+    left: 7px;
+    top: 0;
+}
+
+.body {
+    position: absolute;
+    top: 20px;
+    left: 5px;
+    width: 25px;
+    height: 42px;
+    background: #28a9a4;
+    border-radius: 8px 8px 2px 2px;
+}
+
+.leg {
+    position: absolute;
+    top: 60px;
+    left: 8px;
+    width: 7px;
+    height: 35px;
+    background: #172f49;
+    box-shadow: 12px 0 #172f49;
+}
+
+.worker.one {
+    left: 12%;
+    top: 170px;
+}
+
+.worker.two {
+    right: 16%;
+    top: 90px;
+}
+
+.worker.two .body {
+    background: #ffcf53;
+}
+
+.worker.three {
+    left: 30%;
+    top: 280px;
+}
+
+.worker.three .body {
+    background: #239b83;
+}
+
+.worker.four {
+    right: 9%;
+    top: 300px;
+}
+
+.worker.four .body {
+    background: #5ab5c5;
+}
+
+/* FOLDER */
+
+.folder {
+    position: absolute;
+    width: 65px;
+    height: 50px;
+    background: #ffc84b;
+    left: 39%;
+    top: 135px;
+    z-index: 6;
+    border-radius: 4px;
+}
+
+.folder::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 0;
+    width: 30px;
+    height: 12px;
+    background: #ffc84b;
+    border-radius: 4px 4px 0 0;
+}
+
+/* SERVER */
+
+.server {
+    position: absolute;
+    left: 13%;
+    bottom: 20px;
+    width: 75px;
+    height: 105px;
+    background: #287b9f;
+    z-index: 4;
+}
+
+.server div {
+    height: 25px;
+    border: 2px solid #9cd5e7;
+    margin-bottom: 2px;
+    position: relative;
+}
+
+.server div::after {
+    content: "●";
+    color: #65e2d1;
+    position: absolute;
+    right: 7px;
+    font-size: 12px;
+}
+
+/* FLOOR */
+
+.floor {
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+    width: 90%;
+    height: 25px;
+    background: #c7e9ed;
+    border-radius: 50%;
+    opacity: .9;
+}
+
+/* TEXT */
+
+h1 {
+    font-size: 32px;
+    margin-top: 5px;
+    letter-spacing: .5px;
+}
+
+.description {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #d5e9f4;
+    max-width: 550px;
+    margin: 15px auto;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 12px 25px;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 30px;
+    background: rgba(255,255,255,.08);
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.status-dot {
+    color: #65f2c0;
+    display: inline-block;
+    animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+/* FOOTER */
+
+footer {
+    position: fixed;
+    bottom: 20px;
+    left: 25px;
+    font-size: 13px;
+    color: #d8e8f3;
+    z-index: 10;
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+
+    header {
+        font-size: 22px;
+        right: 20px;
+        top: 20px;
+    }
+
+    .illustration {
+        height: 300px;
+        transform: scale(.78);
+        transform-origin: center top;
+        margin-bottom: -60px;
+        width: 125%;
+        margin-left: -12.5%;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .description {
+        font-size: 13px;
+    }
+
+    .container {
+        padding-top: 90px;
+    }
+
+    footer {
+        font-size: 11px;
+        left: 15px;
+        bottom: 15px;
+    }
+}
+
+</style>
 </head>
+
 <body>
 
-    <header class="header">
-        <a href="/" class="brand-link" id="brand-link">
-            <img src="/igyr-logo.jpg" alt="IGYR Logo" class="brand-logo" onerror="this.style.display='none'">
-            <div class="brand-text">
-                <h1>INDIA GET YOUR RESULT</h1>
-                <p>National Portal & Verification System</p>
-            </div>
-        </a>
-        <div class="live-badge">
-            <span class="pulsing-dot"></span>
-            <span>SYSTEM UPGRADE</span>
+<div class="background">
+    <div class="hex"></div>
+    <div class="hex"></div>
+    <div class="hex"></div>
+    <div class="hex"></div>
+    <div class="hex"></div>
+    <div class="hex"></div>
+</div>
+
+<header>
+    IGYR
+    <span>INDIA GET YOUR RESULT</span>
+</header>
+
+<div class="cloud"></div>
+<div class="cloud two"></div>
+
+<main class="container">
+
+<section class="scene">
+
+<div class="illustration">
+
+    <div class="crane">
+        <div class="crane-vertical"></div>
+        <div class="crane-horizontal"></div>
+    </div>
+
+    <div class="monitor">
+
+        <div class="topbar">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
         </div>
-    </header>
 
-    <main class="container">
-        <div class="card">
-            <div class="icon-wrapper">
-                <!-- High-tech Server/Shield SVG icon -->
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
+        <div class="screen-content">
+
+            <div class="sidebar">
+                <div></div><div></div>
+                <div></div><div></div>
+                <div></div><div></div>
             </div>
 
-            <h2 class="title" id="maint-title">Platform Upgrade & Maintenance</h2>
-            <p class="subtitle" id="maint-desc">
-                India Get Your Result is currently undergoing scheduled infrastructure upgrades and Security Operations Centre (SOC) optimization. Access to public services is temporarily paused to safeguard data integrity.
-            </p>
+            <div class="dashboard">
 
-            <div class="details-grid">
-                <div class="detail-box">
-                    <div class="detail-box-label">Maintenance Window</div>
-                    <div class="detail-box-value" id="maint-window">Active Upgrade</div>
+                <div class="line"></div>
+                <div class="line short"></div>
+
+                <div class="cards">
+                    <div class="card"></div>
+                    <div class="card"></div>
+                    <div class="card"></div>
                 </div>
-                <div class="detail-box">
-                    <div class="detail-box-label">Security Protocol</div>
-                    <div class="detail-box-value" style="color: var(--accent-cyan);">SOC Hardening Level-4</div>
+
+                <div class="chart">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
-                <div class="detail-box">
-                    <div class="detail-box-label">Data Protection</div>
-                    <div class="detail-box-value" style="color: var(--accent-green);">100% Encrypted & Safe</div>
-                </div>
+
             </div>
 
-            <div class="status-tracker">
-                <div class="status-tracker-info">
-                    <div class="radar-spinner" id="sync-spinner"></div>
-                    <div>
-                        <div style="font-size: 13px; font-weight: 700; color: #ffffff;" id="sync-status-title">Auto-Reconnection Active</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);" id="sync-status-sub">Checking every 10 seconds. You will be redirected automatically once online.</div>
-                    </div>
-                </div>
-                <button class="btn-retry" id="manual-recheck-btn" onclick="checkStatus(true)">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                    Check Now
-                </button>
-            </div>
-
-            <div class="security-notice">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                <span>Result publications, marksheet verification hashes, and institute records remain locked and immutable.</span>
-            </div>
         </div>
-    </main>
 
-    <footer class="footer">
-        <p>&copy; <span id="current-year">2026</span> India Get Your Result (IGYR). Managed by Security Operations Centre (SOC).</p>
-        <p style="margin-top: 6px; font-size: 12px;">Authorized operators can log in via <a href="/soc">SOC Command Center</a>.</p>
-    </footer>
+    </div>
 
-    <script>
-        document.getElementById('current-year').textContent = new Date().getFullYear();
+    <div class="stand"></div>
 
-        let checkInterval = null;
+    <div class="folder"></div>
 
-        async function checkStatus(isManual = false) {
-            const btn = document.getElementById('manual-recheck-btn');
-            const sub = document.getElementById('sync-status-sub');
-            if (isManual && btn) {
-                btn.disabled = true;
-                btn.style.opacity = '0.6';
-                btn.innerText = 'Checking...';
-            }
+    <div class="server">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
 
-            try {
-                const res = await fetch('/soc/api/status?t=' + Date.now(), { cache: 'no-store' });
-                if (res.ok) {
-                    const data = await res.json();
+    <div class="worker one">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="leg"></div>
+    </div>
 
-                    // Update UI text if customized by SOC
-                    if (data.maintenance_title) {
-                        document.getElementById('maint-title').textContent = data.maintenance_title;
-                    }
-                    if (data.maintenance_message) {
-                        document.getElementById('maint-desc').textContent = data.maintenance_message;
-                    }
-                    if (data.estimated_restoration) {
-                        document.getElementById('maint-window').textContent = data.estimated_restoration;
-                    }
+    <div class="worker two">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="leg"></div>
+    </div>
 
-                    // Check if website was switched back ON
-                    if (data.website_active === true) {
-                        sub.textContent = 'Platform is now online! Redirecting to homepage...';
-                        sub.style.color = '#10b981';
-                        setTimeout(() => {
-                            window.location.href = '/';
-                        }, 1200);
-                        return;
-                    }
+    <div class="worker three">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="leg"></div>
+    </div>
+
+    <div class="worker four">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="leg"></div>
+    </div>
+
+    <div class="floor"></div>
+
+</div>
+
+<h1 id="maint-heading">Platform Upgrade & Maintenance</h1>
+
+<p class="description" id="maint-text">
+    We're currently working behind the scenes to improve
+    our platform performance, security and user experience.
+    We'll be back online soon!
+</p>
+
+<div class="status" id="status-pill">
+    <span class="status-dot">●</span>
+    <span id="status-text">System Upgrade In Progress</span>
+</div>
+
+</section>
+
+</main>
+
+<footer>
+    &copy; <span id="year">2026</span> India Get Your Result (IGYR). Managed by Security Operations Centre.
+</footer>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Auto-reconnect working model: Checks platform status every 8 seconds
+    async function checkPlatformStatus() {
+        try {
+            const res = await fetch('/api/status/maintenance?t=' + Date.now(), { cache: 'no-store' });
+            if (res.ok) {
+                const data = await res.json();
+
+                // Dynamic update if custom message is broadcast by SOC
+                if (data.maintenance_title) {
+                    document.getElementById('maint-heading').textContent = data.maintenance_title;
                 }
-            } catch (err) {
-                console.log("Check attempt:", err);
-            } finally {
-                if (isManual && btn) {
+                if (data.maintenance_message) {
+                    document.getElementById('maint-text').textContent = data.maintenance_message;
+                }
+
+                // If SOC switches website back ON, immediately redirect to homepage
+                if (data.website_active === true) {
+                    const statusText = document.getElementById('status-text');
+                    statusText.textContent = "Platform Restored! Redirecting...";
+                    document.getElementById('status-pill').style.borderColor = "#65f2c0";
                     setTimeout(() => {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                        btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Check Now`;
-                    }, 1000);
+                        window.location.href = '/';
+                    }, 1200);
                 }
             }
+        } catch (e) {
+            // Server undergoing restart or offline, retry on next loop
         }
+    }
 
-        // Run immediately on page load
-        checkStatus();
+    // Run check immediately and poll every 8 seconds
+    checkPlatformStatus();
+    setInterval(checkPlatformStatus, 8000);
+</script>
 
-        // Check automatically every 10 seconds
-        checkInterval = setInterval(() => checkStatus(false), 10000);
-    </script>
 </body>
 </html>
