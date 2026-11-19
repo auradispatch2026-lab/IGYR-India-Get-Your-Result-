@@ -662,7 +662,7 @@ def institute_login():
 
 _sync_cache = None
 _sync_cache_time = 0
-CACHE_TTL = 15  # Serve from in-memory cache for up to 15s (1,000x faster, prevents server hanging)
+CACHE_TTL = 1  # 1s TTL ensures instant reflection of deletions and additions from Admin Panel
 
 def invalidate_sync_cache():
     global _sync_cache
@@ -674,9 +674,13 @@ def sync_data():
     global _sync_cache, _sync_cache_time
     now = time.time()
     
-    # Return in-memory cache if fresh (instant 1ms response, 0 DB roundtrips)
+    # Return in-memory cache if fresh (<1s)
     if _sync_cache is not None and (now - _sync_cache_time) < CACHE_TTL:
-        return jsonify(_sync_cache)
+        resp = make_response(jsonify(_sync_cache))
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        resp.headers['Pragma'] = 'no-cache'
+        resp.headers['Expires'] = '0'
+        return resp
 
     try:
         institutes = list(institutes_col.find({}, {'_id': 0}))
@@ -727,10 +731,16 @@ def sync_data():
             "banner": banner_doc
         }
         _sync_cache_time = now
-        return jsonify(_sync_cache)
+        resp = make_response(jsonify(_sync_cache))
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        resp.headers['Pragma'] = 'no-cache'
+        resp.headers['Expires'] = '0'
+        return resp
     except Exception as e:
         if _sync_cache is not None:
-            return jsonify(_sync_cache)
+            resp = make_response(jsonify(_sync_cache))
+            resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+            return resp
         return jsonify({"error": str(e)}), 500
 
 
