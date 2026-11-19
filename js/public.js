@@ -399,6 +399,114 @@ document.addEventListener('DOMContentLoaded', () => {
     window.renderSupportContact();
     window.renderFrontPagePolicies();
 
+    // =========================================================
+    // 5-DAY FRESHNESS CHECKER FOR RED "NEW" TAG
+    // =========================================================
+    function isNoticeNew(dateVal, timestampVal, days = 5) {
+        let targetTime = null;
+
+        if (typeof timestampVal === 'number' && !isNaN(timestampVal) && timestampVal > 0) {
+            targetTime = timestampVal;
+        } else if (typeof dateVal === 'number' && !isNaN(dateVal) && dateVal > 0) {
+            targetTime = dateVal;
+        } else if (timestampVal && typeof timestampVal === 'string' && !isNaN(Date.parse(timestampVal))) {
+            targetTime = Date.parse(timestampVal);
+        } else if (dateVal && typeof dateVal === 'string') {
+            const s = dateVal.trim();
+            const parsed = Date.parse(s);
+            if (!isNaN(parsed)) {
+                targetTime = parsed;
+            } else {
+                // Parse DD/MM/YYYY or DD-MM-YYYY (Indian educational standard format)
+                const parts = s.split(/[/\-.\s]/).filter(Boolean);
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) {
+                        targetTime = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)).getTime();
+                    } else if (parts[2].length === 4) {
+                        targetTime = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)).getTime();
+                    }
+                }
+            }
+        }
+
+        if (!targetTime || isNaN(targetTime)) return false;
+
+        const now = Date.now();
+        const diffMs = now - targetTime;
+        // Cover full 5 days from notice date (up to 5 days + 23 hours from creation/date)
+        const maxMs = (days * 24 + 23) * 60 * 60 * 1000;
+
+        // Active for 5 days from notice date (with up to 1 day future leeway for timezones)
+        return diffMs >= -86400000 && diffMs <= maxMs;
+    }
+
+    // =========================================================
+    // VERTICAL AUTO-SCROLL ENGINE (DOWN TO UP TICKER)
+    // =========================================================
+    function setupVerticalTicker(containerEl) {
+        if (!containerEl) return;
+
+        // Cancel previous animation loop if running
+        if (containerEl._tickerAnim) {
+            cancelAnimationFrame(containerEl._tickerAnim);
+            containerEl._tickerAnim = null;
+        }
+
+        const group1 = containerEl.querySelector('.igyr-ticker-group');
+        if (!group1) return;
+
+        let isPaused = false;
+        let resumeTimeout = null;
+
+        const pause = () => {
+            isPaused = true;
+            if (resumeTimeout) clearTimeout(resumeTimeout);
+        };
+
+        const resume = (delay = 1200) => {
+            if (resumeTimeout) clearTimeout(resumeTimeout);
+            resumeTimeout = setTimeout(() => {
+                isPaused = false;
+            }, delay);
+        };
+
+        if (!containerEl._hasTickerListeners) {
+            containerEl.addEventListener('mouseenter', pause);
+            containerEl.addEventListener('mouseleave', () => { isPaused = false; });
+            containerEl.addEventListener('touchstart', pause, { passive: true });
+            containerEl.addEventListener('touchend', () => resume(1500), { passive: true });
+            containerEl.addEventListener('wheel', () => {
+                pause();
+                resume(2200);
+            }, { passive: true });
+            containerEl._hasTickerListeners = true;
+        }
+
+        let lastStamp = performance.now();
+        const speed = 36; // 36 pixels per second (readable upwards vertical crawling)
+
+        function tick(now) {
+            if (!lastStamp) lastStamp = now;
+            const delta = Math.min((now - lastStamp) / 1000, 0.1);
+            lastStamp = now;
+
+            const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (!isPaused && !prefersReducedMotion && containerEl.scrollHeight > containerEl.clientHeight) {
+                containerEl.scrollTop += speed * delta;
+
+                const loopHeight = group1.offsetHeight + 14; // height of group1 + gap
+                if (loopHeight > 0 && containerEl.scrollTop >= loopHeight) {
+                    containerEl.scrollTop -= loopHeight;
+                }
+            }
+
+            containerEl._tickerAnim = requestAnimationFrame(tick);
+        }
+
+        containerEl._tickerAnim = requestAnimationFrame(tick);
+    }
+
     window.renderPublicData = function() {
         const noticeTicker = document.getElementById('notice-ticker');
         const annTicker = document.getElementById('announcement-ticker');
@@ -417,48 +525,122 @@ document.addEventListener('DOMContentLoaded', () => {
                 seen.add(key);
                 const inst = institutes.find(i => i.id === r.instId);
                 if (inst) {
-                    uniqueNotices.push({ exam: r.exam, instName: inst.name, district: inst.district || 'Unknown District', state: inst.state || 'Unknown State', date: r.date || 'Recently' });
+                    uniqueNotices.push({ 
+                        exam: r.exam, 
+                        instName: inst.name, 
+                        district: inst.district || 'Unknown District', 
+                        state: inst.state || 'Unknown State', 
+                        date: r.date || 'Recently',
+                        timestamp: r.timestamp || r.createdAt || r.date
+                    });
                 }
             }
         });
 
+        // 1. RENDER LATEST NOTICES (RESULTS)
         if (noticeTicker) {
-            let noticeHtml = '';
             if (uniqueNotices.length === 0) {
-                noticeHtml = '<p style="text-align:center; color:#888; font-size: 16px; padding: 20px;">No results published yet.</p>';
+                noticeTicker.innerHTML = '<p style="text-align:center; color:#888; font-size: 15px; padding: 40px 20px;">No examination results published yet.</p>';
             } else {
-                noticeHtml = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px;">';
+                let itemsHtml = '';
                 uniqueNotices.forEach(n => {
-                    noticeHtml += `<li style="background: #fff; padding: 20px; border: 1px solid rgba(6,43,99,0.1); border-left: 5px solid var(--primary); border-radius: 12px; display: flex; align-items: flex-start; gap: 15px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.03);"><div style="background: rgba(18,102,214,0.1); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">📄</div><div><h4 style="margin: 0 0 5px 0; color: #062b63; font-size: 17px; font-weight: 700;">${n.exam} Result Published</h4><p style="margin: 0; font-size: 14px; color: #4a5d7c; font-weight: 500;">🏫 ${n.instName}</p><p style="margin: 3px 0 0 0; font-size: 12px; color: #888;">📍 ${n.district}, ${n.state} &nbsp;&bull;&nbsp; 🕒 ${n.date}</p></div></li>`;
+                    const isNew = isNoticeNew(n.date, n.timestamp, 5);
+                    const newTag = isNew ? `<span class="igyr-badge-new"><span class="pulse-dot"></span> NEW</span>` : '';
+                    itemsHtml += `
+                        <li style="background: #ffffff; padding: 18px 20px; border: 1px solid rgba(6,43,99,0.08); border-left: 5px solid #1266d6; border-radius: 12px; display: flex; align-items: flex-start; gap: 14px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <div style="background: rgba(18,102,214,0.1); color: #1266d6; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">📄</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <h4 style="margin: 0 0 6px 0; color: #062b63; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                                    <span style="word-break: break-word;">${n.exam} Result Published</span>
+                                    ${newTag}
+                                </h4>
+                                <p style="margin: 0; font-size: 13.5px; color: #4a5d7c; font-weight: 500;">🏫 ${n.instName}</p>
+                                <p style="margin: 4px 0 0 0; font-size: 12px; color: #888; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    <span>📍 ${n.district}, ${n.state}</span>
+                                    <span>&bull;</span>
+                                    <span>🕒 ${n.date}</span>
+                                </p>
+                            </div>
+                        </li>`;
                 });
-                noticeHtml += '</ul>';
+
+                // Duplicate items as needed to guarantee seamless infinite vertical looping
+                let groupHtml = itemsHtml;
+                if (uniqueNotices.length === 1) {
+                    groupHtml = itemsHtml + itemsHtml + itemsHtml;
+                } else if (uniqueNotices.length === 2) {
+                    groupHtml = itemsHtml + itemsHtml;
+                }
+
+                noticeTicker.innerHTML = `
+                    <div class="igyr-ticker-track" style="display: flex; flex-direction: column; gap: 14px;">
+                        <ul class="igyr-ticker-group" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px;">
+                            ${groupHtml}
+                        </ul>
+                        <ul class="igyr-ticker-group igyr-ticker-clone" aria-hidden="true" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px;">
+                            ${groupHtml}
+                        </ul>
+                    </div>`;
+                setupVerticalTicker(noticeTicker);
             }
-            if (noticeTicker.innerHTML !== noticeHtml) noticeTicker.innerHTML = noticeHtml;
         }
 
+        // 2. RENDER ADMIN ANNOUNCEMENTS
         if (annTicker) {
-            let annHtml = '';
             if (globalNotices.length === 0) {
-                annHtml = '<p style="text-align:center; color:#888; font-size: 16px; padding: 20px;">No system announcements currently.</p>';
+                annTicker.innerHTML = '<p style="text-align:center; color:#888; font-size: 15px; padding: 40px 20px;">No official announcements currently.</p>';
             } else {
-                annHtml = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px;">';
+                let annItemsHtml = '';
                 globalNotices.forEach(n => {
                     let badge = n.type === 'urgent' ? '🔴' : n.type === 'warning' ? '🟠' : '🔵';
                     let bColor = n.type === 'urgent' ? '#dc2626' : n.type === 'warning' ? '#d97706' : '#062b63';
                     let bBg = n.type === 'urgent' ? 'rgba(220,38,38,0.1)' : n.type === 'warning' ? 'rgba(217,119,6,0.1)' : 'rgba(6,43,99,0.1)';
-                    annHtml += `<li style="background: #fff; padding: 20px; border: 1px solid ${bColor}; border-radius: 12px; display: flex; align-items: flex-start; gap: 18px; transition: 0.3s;"><div style="background: ${bBg}; color: ${bColor}; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px;">${badge}</div><div><h4 style="margin: 0 0 5px 0; color: ${bColor}; font-size: 16px; font-weight: 700; text-transform: uppercase;">${n.type} ALERT</h4><p style="margin: 0; font-size: 14px; color: #4a5d7c; line-height: 1.5;">${n.text}</p></div></li>`;
+                    const isNew = isNoticeNew(n.date, n.timestamp || n.createdAt, 5);
+                    const newTag = isNew ? `<span class="igyr-badge-new"><span class="pulse-dot"></span> NEW</span>` : '';
+
+                    annItemsHtml += `
+                        <li style="background: #ffffff; padding: 18px 20px; border: 1px solid ${bColor}; border-left: 5px solid ${bColor}; border-radius: 12px; display: flex; align-items: flex-start; gap: 14px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <div style="background: ${bBg}; color: ${bColor}; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;">${badge}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <h4 style="margin: 0 0 6px 0; color: ${bColor}; font-size: 16px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                                    <span>${n.type} ALERT</span>
+                                    ${newTag}
+                                </h4>
+                                <p style="margin: 0; font-size: 13.5px; color: #4a5d7c; line-height: 1.55; word-break: break-word;">${n.text}</p>
+                                ${n.date ? `<p style="margin: 6px 0 0 0; font-size: 12px; color: #888;">🕒 Published: ${n.date}</p>` : ''}
+                            </div>
+                        </li>`;
                 });
-                annHtml += '</ul>';
+
+                let annGroupHtml = annItemsHtml;
+                if (globalNotices.length === 1) {
+                    annGroupHtml = annItemsHtml + annItemsHtml + annItemsHtml;
+                } else if (globalNotices.length === 2) {
+                    annGroupHtml = annItemsHtml + annItemsHtml;
+                }
+
+                annTicker.innerHTML = `
+                    <div class="igyr-ticker-track" style="display: flex; flex-direction: column; gap: 14px;">
+                        <ul class="igyr-ticker-group" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px;">
+                            ${annGroupHtml}
+                        </ul>
+                        <ul class="igyr-ticker-group igyr-ticker-clone" aria-hidden="true" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px;">
+                            ${annGroupHtml}
+                        </ul>
+                    </div>`;
+                setupVerticalTicker(annTicker);
             }
-            if (annTicker.innerHTML !== annHtml) annTicker.innerHTML = annHtml;
         }
 
+        // 3. RENDER TOP BREAKING RESULT TICKER BAR
         if (tickerWrap && tickerContent) {
             if (uniqueNotices.length > 0) {
                 tickerWrap.style.display = 'block';
                 let tHtml = '';
                 uniqueNotices.slice(0, 10).forEach(n => {
-                    tHtml += `<span class="ticker-item">🎯 <strong>NEW RESULT DECLARED:</strong> ${n.exam} by ${n.instName} (${n.state})</span>`;
+                    const isNew = isNoticeNew(n.date, n.timestamp, 5);
+                    const newTag = isNew ? `<span class="igyr-badge-new" style="margin-left: 6px; padding: 1px 6px; font-size: 9px;"><span class="pulse-dot"></span> NEW</span>` : '';
+                    tHtml += `<span class="ticker-item">🎯 <strong>RESULT DECLARED:</strong> ${n.exam} by ${n.instName} (${n.state}) ${newTag}</span>`;
                 });
                 let finalTHtml = tHtml + tHtml;
                 if (tickerContent.innerHTML !== finalTHtml) tickerContent.innerHTML = finalTHtml;

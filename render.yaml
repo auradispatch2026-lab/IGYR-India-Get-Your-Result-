@@ -18,13 +18,29 @@ services:
         value: 3.9.16
       - key: MONGO_URI
         sync: false
-      - key: SOC_USER
-        value: igyr
-      - key: SOC_PASSWORD
-        value: cutiee
 
   # ==========================================
-  # SERVICE 2: Dedicated SOC Security Operations Centre
+  # SERVICE 2: Dedicated Admin Operations Deck
+  # ==========================================
+  - type: web
+    name: igyr-admin-panel
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: admin
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: MONGO_URI
+        sync: false
+
+  # ==========================================
+  # SERVICE 3: Dedicated SOC Security Operations Centre
   # ==========================================
   - type: web
     name: igyr-soc-center
@@ -32,10 +48,10 @@ services:
     region: oregon
     plan: free
     branch: main
-    rootDir: india-get-your-result
+    rootDir: soc
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn soc_server:app
-    healthCheckPath: /soc/health
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
@@ -46,3 +62,7 @@ services:
         value: igyr
       - key: SOC_PASSWORD
         value: cutiee
+      - key: MAIN_SERVER_URL
+        value: https://igyr-india-get-your-result.onrender.com
+      - key: ADMIN_SERVER_URL
+        value: https://igyr-admin-panel.onrender.com

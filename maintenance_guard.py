@@ -123,8 +123,6 @@ def init_maintenance_guard(app, db):
         if not guard_state.website_active:
             # If API request, return JSON
             if path.startswith('/api/'):
-                if path.startswith('/api/auth/admin'):
-                    return None
                 return jsonify({
                     "status": "maintenance",
                     "code": 503,

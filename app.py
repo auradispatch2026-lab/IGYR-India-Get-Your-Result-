@@ -44,6 +44,7 @@ try:
         fb_creds_env = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
         app_dir = os.path.dirname(os.path.abspath(__file__))
         sa_candidates = [
+            "/etc/secrets/firebase-service-account.json",
             os.path.join(app_dir, "firebase-service-account.json"),
             os.path.join(app_dir, "..", "firebase-service-account.json"),
             os.path.join(app_dir, "india-get-your-result", "firebase-service-account.json"),
@@ -51,14 +52,35 @@ try:
         ]
         sa_file = next((f for f in sa_candidates if os.path.isfile(f)), None)
 
+        cred_dict = None
         if fb_creds_env:
-            cred = credentials.Certificate(json.loads(fb_creds_env))
+            raw_val = fb_creds_env.strip()
+            if not raw_val.startswith('{'):
+                try:
+                    import base64
+                    raw_val = base64.b64decode(raw_val).decode('utf-8')
+                except Exception:
+                    pass
+            try:
+                cred_dict = json.loads(raw_val)
+            except Exception as parse_err:
+                print("⚠️ Error parsing FIREBASE_SERVICE_ACCOUNT_JSON:", parse_err)
+
+        if not cred_dict and sa_file:
+            try:
+                with open(sa_file, 'r', encoding='utf-8') as f:
+                    cred_dict = json.load(f)
+            except Exception as file_err:
+                print(f"⚠️ Error reading {sa_file}:", file_err)
+
+        if cred_dict and isinstance(cred_dict, dict):
+            if "private_key" in cred_dict and isinstance(cred_dict["private_key"], str):
+                pk = cred_dict["private_key"]
+                if "\\n" in pk:
+                    cred_dict["private_key"] = pk.replace("\\n", "\n")
+            cred = credentials.Certificate(cred_dict)
             firebase_admin.initialize_app(cred)
-            print("✅ Firebase Admin SDK initialized from environment variable.")
-        elif sa_file:
-            cred = credentials.Certificate(sa_file)
-            firebase_admin.initialize_app(cred)
-            print(f"✅ Firebase Admin SDK initialized from file: {sa_file}")
+            print("✅ Firebase Admin SDK initialized successfully.")
         else:
             print("⚠️ Firebase Admin credentials not found. Provide FIREBASE_SERVICE_ACCOUNT_JSON or firebase-service-account.json.")
 except Exception as fb_init_err:
@@ -571,6 +593,53 @@ def institute_login_removed():
 
 
 
+
+
+@app.route('/admin-login.html')
+@app.route('/admin-login')
+@app.route('/admin-dashboard.html')
+@app.route('/admin-dashboard')
+@app.route('/admin')
+@app.route('/admin/')
+@app.route('/admin-applications.html')
+@app.route('/admin-broadcast.html')
+@app.route('/admin-institutes.html')
+@app.route('/admin-schemes.html')
+@app.route('/admin-settings.html')
+@app.route('/admin-login-institute.html')
+def block_admin_on_public_portal():
+    admin_panel_url = os.environ.get("ADMIN_PANEL_URL", "").rstrip('/')
+    if admin_panel_url:
+        target = f"{admin_panel_url}{request.path}"
+        return redirect(target, code=302)
+
+    html_404 = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>404 Not Found - IGYR</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #070d1a; color: #f8fafc; text-align: center; padding: 100px 20px; margin: 0; }
+        .box { max-width: 480px; margin: 0 auto; background: #0f172a; padding: 40px 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        h1 { font-size: 54px; margin: 0 0 10px; color: #38bdf8; font-weight: 900; }
+        h2 { font-size: 20px; margin: 0 0 15px; color: #ffffff; font-weight: 700; }
+        p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
+        a { display: inline-block; background: #0284c7; color: white; text-decoration: none; padding: 12px 26px; border-radius: 8px; font-weight: 700; font-size: 14px; transition: background 0.2s; }
+        a:hover { background: #0369a1; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>404</h1>
+        <h2>Administrative Node Restricted</h2>
+        <p>The Administrative Operations Deck operates on a dedicated private node and is not accessible from the public citizen platform.</p>
+        <a href="/">← Return to Public Homepage</a>
+    </div>
+</body>
+</html>"""
+    return make_response(html_404, 404)
 
 
 @app.route('/api/auth/admin', methods=['POST'])
