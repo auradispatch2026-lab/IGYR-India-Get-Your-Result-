@@ -75,11 +75,12 @@ def init_maintenance_guard(app, db):
     def intercept_maintenance():
         path = request.path
 
-        # Always exempt static assets, health probes, and the maintenance page itself
+        # Always exempt static assets, health probes, status checks, and the maintenance page itself
         if (path in ('/health', '/maintenance.html', '/favicon.ico', '/favicon.png',
                      '/favicon-48x48.png', '/favicon-96x96.png', '/favicon-192x192.png',
                      '/favicon-512x512.png', '/apple-touch-icon.png', '/site.webmanifest',
-                     '/sw.js', '/firebase-messaging-sw.js') or
+                     '/sw.js', '/firebase-messaging-sw.js', '/igyr-logo.jpg', '/logo.png',
+                     '/api/status/maintenance', '/soc/api/status', '/api/admin/login-status') or
             path.startswith('/css/') or
             path.startswith('/js/') or
             path.startswith('/assets/')):
