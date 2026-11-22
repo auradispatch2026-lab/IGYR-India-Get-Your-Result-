@@ -56,12 +56,15 @@
                     </div>
                     <div style="margin-top: 12px;">
                         <label for="marksheet-template" style="display:block; font-size: 13px; font-weight: 700; color: #062b63; margin-bottom: 5px;">Select Marksheet Template Style:</label>
-                        <select id="marksheet-template" style="width: 100%; padding: 10px; border: 1px solid #cde0f5; border-radius: 6px; font-size: 14px; background: #fff; font-weight: 600; color: #062b63;">
-                            <option value="photo_pro" selected>⭐ Photo Pro Marksheet (With Student Photo Frame)</option>
-                            <option value="classic">🏛️ Classic Royal Marksheet</option>
-                            <option value="modern">🎨 Modern Elegance Marksheet</option>
-                            <option value="certificate">📜 Academic Diploma Certificate</option>
-                        </select>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <select id="marksheet-template" style="flex: 1; min-width: 250px; padding: 10px; border: 1px solid #cde0f5; border-radius: 6px; font-size: 14px; background: #fff; font-weight: 600; color: #062b63;">
+                                <option value="photo_pro" selected>⭐ Photo Pro Marksheet (With Student Photo Frame)</option>
+                                <option value="classic">🏛️ Classic Royal Marksheet</option>
+                                <option value="modern">🎨 Modern Elegance Marksheet</option>
+                                <option value="certificate">📜 Academic Diploma Certificate</option>
+                            </select>
+                            <button type="button" id="btn-preview-tpl" onclick="openTemplatePreview(document.getElementById('marksheet-template') ? document.getElementById('marksheet-template').value : 'photo_pro')" class="btn" style="background:#062b63; color:#fff; padding:10px 16px; font-size:13px; font-weight:700; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">👁️ Preview Template</button>
+                        </div>
                         <p style="margin: 6px 0 0 0; font-size: 12px; color: #64748b;">ℹ️ You can upload student photos one by one in the <strong>All Tabulation</strong> register after saving or anytime.</p>
                     </div>
                 </div>
@@ -76,5 +79,6 @@
     </div>
     <script src="js/storage.js?v=1000035"></script>
     <script src="js/excel.js?v=1000035?v=3"></script>
+    <script src="js/template-preview.js?v=1000042"></script>
 </body>
 </html>

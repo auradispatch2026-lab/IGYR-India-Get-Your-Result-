@@ -15,9 +15,10 @@
     `);
 
     function getPreviewData(tpl) {
-        const instId = sessionStorage.getItem('inst_logged_in') || 'IGYR001';
         let instName = 'IGYR Educational Institution';
+        let instId = 'IGYR001';
         try {
+            instId = sessionStorage.getItem('inst_logged_in') || 'IGYR001';
             if (typeof getInstitutes === 'function') {
                 const inst = getInstitutes().find(i => i.id === instId);
                 if (inst && inst.name) instName = inst.name;
@@ -34,7 +35,7 @@
             instName: instName,
             exam: "SENIOR ACADEMIC BOARD EXAMINATION",
             date: new Date().toLocaleDateString('en-GB'),
-            vid: `IGYR-DEMO-2026101-9482`,
+            vid: "IGYR-DEMO-2026101-9482",
             template: tpl || 'photo_pro',
             photo: samplePortrait,
             marks: [
@@ -47,60 +48,77 @@
         };
     }
 
-    window.openTemplatePreview = function(initialTpl = 'photo_pro') {
+    window.openTemplatePreview = function(initialTpl) {
+        initialTpl = initialTpl || 'photo_pro';
         let modal = document.getElementById('tpl-preview-modal');
+
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'tpl-preview-modal';
             modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(7, 29, 73, 0.75); backdrop-filter: blur(8px);
-                z-index: 100000; display: flex; flex-direction: column;
-                align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+                position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+                background: rgba(7, 29, 73, 0.8) !important; backdrop-filter: blur(8px) !important;
+                z-index: 9999999 !important; display: flex !important; flex-direction: column !important;
+                align-items: center !important; justify-content: center !important; padding: 15px !important; box-sizing: border-box !important;
             `;
 
             modal.innerHTML = `
-                <div style="background: #ffffff; width: 100%; max-width: 950px; height: 92vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.3);">
+                <div style="background: #ffffff; width: 100%; max-width: 980px; height: 92vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.4);">
                     <!-- Modal Header -->
                     <div style="background: #062b63; color: #fff; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4af37;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="font-size: 20px;">🎨</span>
-                            <h3 style="margin: 0; font-size: 17px; font-weight: 800; letter-spacing: 0.5px;">Official Marksheet Template Live Previewer</h3>
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff;">Official Marksheet Template Live Previewer</h3>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <button id="tpl-modal-popout" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">↗ Open Fullscreen</button>
-                            <button id="tpl-modal-close" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; line-height: 1; padding: 0 4px;">✕</button>
+                            <button id="tpl-modal-popout" type="button" style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">↗ Open Fullscreen</button>
+                            <button id="tpl-modal-close" type="button" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; line-height: 1; padding: 0 6px;">✕</button>
                         </div>
                     </div>
                     
                     <!-- Tabs Bar -->
                     <div style="background: #f1f5f9; padding: 10px 18px; display: flex; gap: 8px; border-bottom: 1px solid #cbd5e1; overflow-x: auto;" id="tpl-tab-bar">
-                        <button class="tpl-tab-btn" data-tpl="photo_pro" style="padding: 7px 15px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63;">⭐ Photo Pro (With Photo)</button>
-                        <button class="tpl-tab-btn" data-tpl="classic" style="padding: 7px 15px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63;">🏛️ Classic Royal</button>
-                        <button class="tpl-tab-btn" data-tpl="modern" style="padding: 7px 15px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63;">🎨 Modern Elegance</button>
-                        <button class="tpl-tab-btn" data-tpl="certificate" style="padding: 7px 15px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63;">📜 Academic Diploma</button>
+                        <button type="button" class="tpl-tab-btn" data-tpl="photo_pro" style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63; white-space: nowrap;">⭐ Photo Pro (With Photo Frame)</button>
+                        <button type="button" class="tpl-tab-btn" data-tpl="classic" style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63; white-space: nowrap;">🏛️ Classic Royal</button>
+                        <button type="button" class="tpl-tab-btn" data-tpl="modern" style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63; white-space: nowrap;">🎨 Modern Elegance</button>
+                        <button type="button" class="tpl-tab-btn" data-tpl="certificate" style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-weight: 700; font-size: 13px; cursor: pointer; color: #062b63; white-space: nowrap;">📜 Academic Diploma Certificate</button>
                     </div>
 
                     <!-- Iframe Container -->
                     <div style="flex: 1; background: #e2e8f0; position: relative;">
-                        <iframe id="tpl-preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+                        <iframe id="tpl-preview-iframe" title="Marksheet Preview" style="width: 100%; height: 100%; border: none;"></iframe>
                     </div>
                 </div>
             `;
             document.body.appendChild(modal);
 
             // Close listeners
-            document.getElementById('tpl-modal-close').onclick = () => { modal.style.display = 'none'; };
+            const closeBtn = document.getElementById('tpl-modal-close');
+            if (closeBtn) {
+                closeBtn.onclick = () => { modal.style.display = 'none'; };
+            }
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) modal.style.display = 'none';
             });
 
+            // ESC key to close
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display !== 'none') {
+                    modal.style.display = 'none';
+                }
+            });
+
             // Popout listener
-            document.getElementById('tpl-modal-popout').onclick = () => {
-                const currentTpl = modal.getAttribute('data-active-tpl') || 'photo_pro';
-                sessionStorage.setItem('current_result', JSON.stringify(getPreviewData(currentTpl)));
-                window.open('result.html', '_blank');
-            };
+            const popoutBtn = document.getElementById('tpl-modal-popout');
+            if (popoutBtn) {
+                popoutBtn.onclick = () => {
+                    const currentTpl = modal.getAttribute('data-active-tpl') || 'photo_pro';
+                    try {
+                        sessionStorage.setItem('current_result', JSON.stringify(getPreviewData(currentTpl)));
+                    } catch(e) {}
+                    window.open('result.html?preview=1&tpl=' + encodeURIComponent(currentTpl), '_blank');
+                };
+            }
 
             // Tab listeners
             modal.querySelectorAll('.tpl-tab-btn').forEach(btn => {
@@ -111,7 +129,7 @@
             });
         }
 
-        modal.style.display = 'flex';
+        modal.style.setProperty('display', 'flex', 'important');
         switchPreviewTab(initialTpl);
     };
 
@@ -133,44 +151,73 @@
             }
         });
 
-        // Load preview data into sessionStorage and reload iframe
-        const sampleData = getPreviewData(tpl);
-        sessionStorage.setItem('current_result', JSON.stringify(sampleData));
+        // Set sample result in sessionStorage
+        try {
+            sessionStorage.setItem('current_result', JSON.stringify(getPreviewData(tpl)));
+        } catch(e) {}
 
         const iframe = document.getElementById('tpl-preview-iframe');
         if (iframe) {
-            iframe.src = 'result.html?v=' + Date.now();
+            iframe.src = 'result.html?preview=1&tpl=' + encodeURIComponent(tpl) + '&v=' + Date.now();
         }
     }
 
-    // Auto-wire buttons on DOM load
-    document.addEventListener('DOMContentLoaded', () => {
-        // Step 2 Preview button on upload page
-        const btnUploadPreview = document.getElementById('btn-preview-tpl');
-        if (btnUploadPreview) {
-            btnUploadPreview.addEventListener('click', () => {
+    // Direct event delegation so any button works immediately without waiting for DOMContentLoaded
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('#btn-open-tpl-gallery, #btn-preview-tpl, #btn-tab-preview-tpl, [data-open-tpl-preview]');
+        if (btn) {
+            e.preventDefault();
+            let tpl = 'photo_pro';
+            if (btn.id === 'btn-preview-tpl') {
                 const sel = document.getElementById('marksheet-template');
-                const tpl = sel ? sel.value : 'photo_pro';
-                openTemplatePreview(tpl);
-            });
-        }
-
-        // Dashboard gallery button
-        const btnGallery = document.getElementById('btn-open-tpl-gallery');
-        if (btnGallery) {
-            btnGallery.addEventListener('click', () => {
-                openTemplatePreview('photo_pro');
-            });
-        }
-
-        // Tabulation template preview button
-        const btnTabPreview = document.getElementById('btn-tab-preview-tpl');
-        if (btnTabPreview) {
-            btnTabPreview.addEventListener('click', () => {
+                if (sel && sel.value) tpl = sel.value;
+            } else if (btn.id === 'btn-tab-preview-tpl') {
                 const sel = document.getElementById('exam-template-changer');
-                const tpl = sel ? sel.value : 'photo_pro';
-                openTemplatePreview(tpl);
-            });
+                if (sel && sel.value) tpl = sel.value;
+            } else if (btn.dataset && btn.dataset.openTplPreview) {
+                tpl = btn.dataset.openTplPreview;
+            }
+            window.openTemplatePreview(tpl);
         }
     });
+
+    // Auto-wire buttons if DOM is ready or becomes ready
+    function wireButtons() {
+        const btnGallery = document.getElementById('btn-open-tpl-gallery');
+        if (btnGallery && !btnGallery._tplWired) {
+            btnGallery._tplWired = true;
+            btnGallery.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.openTemplatePreview('photo_pro');
+            });
+        }
+
+        const btnUploadPreview = document.getElementById('btn-preview-tpl');
+        if (btnUploadPreview && !btnUploadPreview._tplWired) {
+            btnUploadPreview._tplWired = true;
+            btnUploadPreview.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sel = document.getElementById('marksheet-template');
+                const tpl = sel ? sel.value : 'photo_pro';
+                window.openTemplatePreview(tpl);
+            });
+        }
+
+        const btnTabPreview = document.getElementById('btn-tab-preview-tpl');
+        if (btnTabPreview && !btnTabPreview._tplWired) {
+            btnTabPreview._tplWired = true;
+            btnTabPreview.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sel = document.getElementById('exam-template-changer');
+                const tpl = sel ? sel.value : 'photo_pro';
+                window.openTemplatePreview(tpl);
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', wireButtons);
+    } else {
+        wireButtons();
+    }
 })();

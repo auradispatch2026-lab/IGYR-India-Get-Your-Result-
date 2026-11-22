@@ -541,14 +541,56 @@
     <script src="js/storage.js?v=1000035"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const resData = sessionStorage.getItem('current_result');
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPreview = urlParams.get('preview') === '1' || window.self !== window.top;
+            const queryTpl = urlParams.get('tpl');
+            let resData = sessionStorage.getItem('current_result');
+
+            if (!resData && isPreview) {
+                const samplePortrait = "data:image/svg+xml;utf8," + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="160" height="200" viewBox="0 0 160 200">
+                        <rect width="160" height="200" fill="#e2e8f0"/>
+                        <circle cx="80" cy="70" r="38" fill="#94a3b8"/>
+                        <path d="M20 190 C20 130, 140 130, 140 190 Z" fill="#64748b"/>
+                        <circle cx="80" cy="65" r="30" fill="#f8fafc"/>
+                        <path d="M50 65 Q80 100 110 65" stroke="#64748b" stroke-width="3" fill="none"/>
+                        <rect x="0" y="175" width="160" height="25" fill="#062b63"/>
+                        <text x="80" y="192" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">OFFICIAL SAMPLE</text>
+                    </svg>
+                `);
+                resData = JSON.stringify({
+                    name: "AARAV RAJESH SHARMA",
+                    fname: "RAJESH SHARMA",
+                    mname: "SUNITA SHARMA",
+                    roll: "2026101",
+                    reg: "IGYR-REG-94821",
+                    instId: "IGYR001",
+                    instName: "IGYR Educational Institution",
+                    exam: "SENIOR ACADEMIC BOARD EXAMINATION",
+                    date: new Date().toLocaleDateString('en-GB'),
+                    vid: "IGYR-DEMO-2026101-9482",
+                    template: queryTpl || 'photo_pro',
+                    photo: samplePortrait,
+                    marks: [
+                        { sub: "Physics", max: 100, obt: 94 },
+                        { sub: "Chemistry", max: 100, obt: 89 },
+                        { sub: "Mathematics", max: 100, obt: 98 },
+                        { sub: "English Core", max: 100, obt: 91 },
+                        { sub: "Computer Science", max: 100, obt: 96 }
+                    ]
+                });
+            }
+
             if(!resData) {
                 alert('No result data found. Please search or select an exam result.');
-                window.location.href = 'search-result.html';
+                window.location.href = window.location.pathname.includes('/admin/') ? 'admin-dashboard.html' : 'search-result.html';
                 return;
             }
 
             const res = JSON.parse(resData);
+            if (queryTpl) {
+                res.template = queryTpl;
+            }
             const institutes = getInstitutes();
             const inst = institutes.find(i => i.id === res.instId) || {
                 name: res.instName || 'Educational Institution',

@@ -35,6 +35,15 @@ banner_col = db['banner']
 whatsapp_config_col = db['whatsapp_config']
 whatsapp_logs_col = db['whatsapp_logs']
 
+# Automatic database self-healing for published results
+try:
+    results_col.update_many(
+        {"hideNotice": True, "status": "DRAFT"},
+        {"$set": {"status": "PUBLISHED"}}
+    )
+except Exception:
+    pass
+
 # Initialize Firebase Admin SDK for FCM Web Push
 import json
 import firebase_admin
@@ -797,6 +806,45 @@ def save_results():
             print("Auto push notification failed:", push_err)
     invalidate_sync_cache()
     return jsonify({"status": "success"})
+
+@app.route('/api/admin/dismiss-auto-notice', methods=['POST'])
+def dismiss_auto_notice():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
+    data = request.json or {}
+    inst_id = (data.get('instId') or "").strip()
+    exam = (data.get('exam') or "").strip()
+    if not inst_id or not exam:
+        return jsonify({"error": "Missing instId or exam"}), 400
+    
+    # Safely flag hideNotice: True and GUARANTEE status remains PUBLISHED without wiping or deleting any records
+    results_col.update_many(
+        {"instId": inst_id, "exam": exam},
+        {"$set": {"hideNotice": True, "status": "PUBLISHED"}}
+    )
+    invalidate_sync_cache()
+    return jsonify({
+        "success": True,
+        "message": f"Notice for '{exam}' removed from public ticker. Results remain securely published."
+    }), 200
+
+@app.route('/api/admin/restore-auto-notice', methods=['POST'])
+def restore_auto_notice():
+    if not verify_token(): return jsonify({"error": "Unauthorized"}), 401
+    data = request.json or {}
+    inst_id = (data.get('instId') or "").strip()
+    exam = (data.get('exam') or "").strip()
+    if not inst_id or not exam:
+        return jsonify({"error": "Missing instId or exam"}), 400
+    
+    results_col.update_many(
+        {"instId": inst_id, "exam": exam},
+        {"$set": {"hideNotice": False, "status": "PUBLISHED"}}
+    )
+    invalidate_sync_cache()
+    return jsonify({
+        "success": True,
+        "message": f"Notice for '{exam}' restored to public ticker."
+    }), 200
 
 @app.route('/api/verify-vid/<path:vid>', methods=['GET'])
 def verify_vid(vid):
