@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tickerWrap = document.getElementById('top-ticker-wrap');
         const tickerContent = document.getElementById('top-ticker-content');
         
-        const publishedResults = getResults().filter(r => r.status === 'PUBLISHED');
+        const publishedResults = getResults().filter(r => r.status === 'PUBLISHED' && !r.hideNotice);
         const institutes = getInstitutes();
         const globalNotices = typeof getNotices === "function" ? getNotices() : [];
         
@@ -564,13 +564,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </li>`;
                 });
 
-                // Duplicate items as needed to guarantee seamless infinite vertical looping
+                // Render clean list without repeating duplicate items inside the same group
                 let groupHtml = itemsHtml;
-                if (uniqueNotices.length === 1) {
-                    groupHtml = itemsHtml + itemsHtml + itemsHtml;
-                } else if (uniqueNotices.length === 2) {
-                    groupHtml = itemsHtml + itemsHtml;
-                }
 
                 noticeTicker.innerHTML = `
                     <div class="igyr-ticker-track" style="display: flex; flex-direction: column; gap: 14px;">
@@ -613,11 +608,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 let annGroupHtml = annItemsHtml;
-                if (globalNotices.length === 1) {
-                    annGroupHtml = annItemsHtml + annItemsHtml + annItemsHtml;
-                } else if (globalNotices.length === 2) {
-                    annGroupHtml = annItemsHtml + annItemsHtml;
-                }
 
                 annTicker.innerHTML = `
                     <div class="igyr-ticker-track" style="display: flex; flex-direction: column; gap: 14px;">

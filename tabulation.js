@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <option value="certificate" ${currentTemplate === 'certificate' ? 'selected' : ''}>📜 Academic Diploma Certificate</option>
                     </select>
                     <button id="btn-save-exam-template" class="btn" style="background:#1266d6; color:white; padding:6px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer;">Update Template for All</button>
+                    <button id="btn-tab-preview-tpl" class="btn" style="background:#062b63; color:white; padding:6px 14px; font-size:12.5px; font-weight:700; border-radius:6px; cursor:pointer;">👁️ Preview Template</button>
                 </div>
             </div>
 
@@ -331,6 +332,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveResults(freshResults);
                 showToast(`🎉 Marksheet template updated to "${newTpl.toUpperCase()}" for ${count} students!`);
                 renderTabulation();
+            });
+        }
+
+        // Attach Tabulation Template Preview listener
+        const btnTabPreview = document.getElementById('btn-tab-preview-tpl');
+        if (btnTabPreview) {
+            btnTabPreview.addEventListener('click', () => {
+                const sel = document.getElementById('exam-template-changer');
+                const tpl = sel ? sel.value : 'photo_pro';
+                if (typeof window.openTemplatePreview === 'function') {
+                    window.openTemplatePreview(tpl);
+                }
             });
         }
     }

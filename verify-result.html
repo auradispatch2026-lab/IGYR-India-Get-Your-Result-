@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Verify Marksheet Authenticity - IGYR Official Portal</title>
 
     <!-- Favicon & Touch Icons -->
@@ -35,81 +35,143 @@
             --gold: #d4af37;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        .header-top {
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 12px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+            width: 100%;
         }
-        .header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+
+        /* Standard Responsive Navigation Header */
+        .header {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #edf1f6;
+            z-index: 9999;
+        }
+
+        .nav-container {
+            width: min(1300px, 94%);
+            height: 76px;
+            margin: auto;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
-        .brand-link {
+
+        .brand {
             display: flex;
             align-items: center;
             gap: 12px;
             text-decoration: none;
         }
-        .brand-link img {
+
+        .brand-logo {
             height: 48px;
             object-fit: contain;
         }
-        .brand-info h1 {
-            font-size: 18px;
+
+        .brand-text h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 19px;
             font-weight: 800;
+            letter-spacing: -0.5px;
             color: var(--navy);
-            margin: 0;
-            line-height: 1.1;
+            line-height: 1;
         }
-        .brand-info p {
-            font-size: 11px;
+
+        .brand-text p {
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--blue);
+            margin: 3px 0 0 0;
+        }
+
+        .brand-text span {
+            display: block;
+            font-size: 10px;
             color: #64748b;
-            margin: 2px 0 0 0;
-            font-weight: 600;
-            letter-spacing: 0.5px;
         }
-        .nav-links-wrap {
+
+        .nav-links {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 28px;
         }
-        .nav-links-wrap a {
+
+        .nav-links a {
             text-decoration: none;
-            color: #334155;
+            color: #1e293b;
             font-weight: 600;
-            font-size: 14px;
-            padding: 6px 12px;
+            font-size: 14.5px;
+            padding: 8px 12px;
             border-radius: 6px;
             transition: 0.2s;
         }
-        .nav-links-wrap a:hover {
+
+        .nav-links a:hover,
+        .nav-links a.active {
             color: var(--blue);
             background: var(--light-blue);
         }
-        .nav-links-wrap a.active {
-            color: var(--blue);
-            background: var(--light-blue);
-            font-weight: 700;
+
+        .menu-btn {
+            display: none;
+            border: 0;
+            background: transparent;
+            font-size: 28px;
+            color: var(--navy);
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        /* Mobile Header Rules */
+        @media (max-width: 900px) {
+            .menu-btn {
+                display: block;
+            }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 76px;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+                padding: 10px 5%;
+                box-shadow: 0 15px 30px rgba(7, 29, 73, 0.12);
+                border-bottom: 2px solid var(--blue);
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .nav-links a {
+                padding: 14px 10px;
+                border-bottom: 1px solid #edf1f6;
+                font-size: 15px;
+            }
         }
 
         /* Hero Banner */
         .verify-hero {
             background: linear-gradient(135deg, #071d49 0%, #0a3d8c 100%);
             color: #ffffff;
-            padding: 50px 20px 40px;
+            padding: 45px 20px 35px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -124,43 +186,43 @@
         }
         .verify-hero h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(26px, 4vw, 36px);
+            font-size: clamp(24px, 4.5vw, 36px);
             font-weight: 800;
             margin: 0 0 10px;
             letter-spacing: -0.5px;
         }
         .verify-hero p {
-            font-size: 15px;
+            font-size: 14.5px;
             color: #cbd5e1;
             max-width: 650px;
-            margin: 0 auto 25px;
+            margin: 0 auto 20px;
             line-height: 1.5;
         }
         .trust-pills {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .trust-pill {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 600;
             color: #e2e8f0;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         /* Main Container */
         .verify-container {
             max-width: 900px;
-            margin: -30px auto 60px;
-            padding: 0 20px;
+            margin: -25px auto 60px;
+            padding: 0 16px;
             position: relative;
             z-index: 10;
         }
@@ -169,36 +231,37 @@
         .search-card {
             background: #ffffff;
             border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 15px 40px rgba(7, 29, 73, 0.08);
+            padding: 26px;
+            box-shadow: 0 12px 35px rgba(7, 29, 73, 0.08);
             border: 1px solid #e2e8f0;
         }
         .search-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             color: var(--navy);
-            margin: 0 0 15px;
+            margin: 0 0 14px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         .input-group {
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
         }
         .verify-input {
             flex: 1;
-            min-width: 260px;
-            padding: 14px 18px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 13px 16px;
+            font-size: 15.5px;
+            font-weight: 700;
             border: 2px solid #cbd5e1;
             border-radius: 10px;
             outline: none;
             transition: 0.2s;
             font-family: 'Inter', monospace;
             text-transform: uppercase;
+            width: 100%;
+            -webkit-appearance: none;
         }
         .verify-input:focus {
             border-color: var(--blue);
@@ -208,7 +271,7 @@
             background: var(--blue);
             color: #ffffff;
             border: none;
-            padding: 14px 28px;
+            padding: 13px 26px;
             font-size: 15px;
             font-weight: 700;
             border-radius: 10px;
@@ -216,46 +279,45 @@
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-family: 'Inter', sans-serif;
+            white-space: nowrap;
         }
         .verify-btn:hover {
             background: #0d4fa8;
-            transform: translateY(-1px);
         }
         .search-hint {
-            font-size: 12.5px;
+            font-size: 12px;
             color: #64748b;
             margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            line-height: 1.4;
         }
 
         /* Result Verification Card */
         .result-verified-card {
-            margin-top: 30px;
+            margin-top: 25px;
             background: #ffffff;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 15px 40px rgba(7, 29, 73, 0.08);
             border: 1px solid #e2e8f0;
-            animation: fadeIn 0.4s ease-out;
+            animation: fadeIn 0.35s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .verified-banner {
             background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
             color: #ffffff;
-            padding: 18px 25px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
         .verified-title-block {
             display: flex;
@@ -263,42 +325,45 @@
             gap: 12px;
         }
         .verified-badge-icon {
-            font-size: 28px;
+            font-size: 26px;
             background: rgba(255,255,255,0.2);
-            width: 44px; height: 44px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
         .verified-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             letter-spacing: 0.5px;
+            line-height: 1.2;
         }
         .verified-subtitle {
             font-size: 12px;
             opacity: 0.9;
+            margin-top: 2px;
         }
         .verified-timestamp {
-            font-size: 12px;
+            font-size: 11.5px;
             background: rgba(0,0,0,0.15);
-            padding: 6px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         /* Identity Section */
         .identity-section {
-            padding: 25px;
+            padding: 22px;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
-            gap: 25px;
+            gap: 20px;
             align-items: center;
-            flex-wrap: wrap;
             background: #fafcff;
         }
         .student-photo-wrapper {
-            width: 100px;
-            height: 125px;
+            width: 95px;
+            height: 120px;
             background: #ffffff;
             border: 2px solid var(--blue);
             border-radius: 8px;
@@ -308,33 +373,30 @@
             justify-content: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.06);
             flex-shrink: 0;
-            position: relative;
         }
         .student-photo-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        .photo-fallback {
-            font-size: 32px;
-            color: #94a3b8;
+            display: block;
         }
         .identity-details {
             flex: 1;
-            min-width: 250px;
+            min-width: 0;
         }
         .student-name-heading {
             font-family: 'Poppins', sans-serif;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--navy);
-            margin: 0 0 6px;
+            margin: 0 0 8px;
             text-transform: uppercase;
+            word-break: break-word;
         }
         .identity-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 8px 16px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 6px 16px;
             font-size: 13.5px;
         }
         .identity-item {
@@ -344,17 +406,17 @@
             color: #1e293b;
         }
 
-        /* Exam Details Section */
+        /* Details Section */
         .details-section {
-            padding: 25px;
+            padding: 22px;
         }
         .section-subhead {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
             color: var(--navy);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -363,31 +425,30 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
-            padding: 16px 20px;
-            margin-bottom: 25px;
+            padding: 14px 18px;
+            margin-bottom: 22px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px 18px;
             font-size: 13.5px;
         }
         .exam-info-box div strong {
             color: var(--navy);
         }
 
-        /* Score & Pass Badge Cards */
+        /* Score Cards Row */
         .score-cards-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
         }
         .score-stat-card {
             background: #ffffff;
             border: 1px solid #cbd5e1;
             border-radius: 10px;
-            padding: 15px;
+            padding: 14px 12px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
             position: relative;
             overflow: hidden;
         }
@@ -404,15 +465,15 @@
             background: #dc2626;
         }
         .score-card-title {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .score-card-value {
             font-family: 'Poppins', sans-serif;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: #0f172a;
         }
@@ -423,66 +484,29 @@
             color: #dc2626;
         }
 
-        /* Marks Table */
-        .marks-breakdown-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            margin-bottom: 25px;
-        }
-        .marks-breakdown-table th {
-            background: #062b63;
-            color: #ffffff;
-            padding: 10px 12px;
-            text-align: center;
-            font-weight: 700;
-        }
-        .marks-breakdown-table th.text-left {
-            text-align: left;
-        }
-        .marks-breakdown-table td {
-            padding: 9px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: center;
-            font-weight: 500;
-        }
-        .marks-breakdown-table td.text-left {
-            text-align: left;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .marks-breakdown-table tr:nth-child(even) {
-            background: #f8fafc;
-        }
-        .marks-breakdown-table tfoot td {
-            background: #e2e8f0;
-            font-weight: 800;
-            color: var(--navy);
-            border-top: 2px solid var(--navy);
-        }
-
         /* Action Buttons */
         .verification-actions {
             display: flex;
             gap: 12px;
             justify-content: flex-end;
-            flex-wrap: wrap;
-            padding-top: 10px;
+            padding-top: 6px;
         }
         .btn-view-marksheet {
             background: var(--navy);
             color: #ffffff;
             text-decoration: none;
-            padding: 12px 24px;
+            padding: 12px 22px;
             border-radius: 8px;
             font-weight: 700;
             font-size: 14px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             transition: 0.2s;
             cursor: pointer;
             border: none;
+            width: auto;
         }
         .btn-view-marksheet:hover {
             background: var(--blue);
@@ -490,48 +514,147 @@
 
         /* Error Message Card */
         .error-card {
-            margin-top: 30px;
+            margin-top: 25px;
             background: #fff5f5;
             border: 1px solid #fecaca;
-            border-left: 6px solid #dc2626;
+            border-left: 5px solid #dc2626;
             border-radius: 12px;
-            padding: 20px 25px;
+            padding: 18px 20px;
             display: flex;
             align-items: flex-start;
-            gap: 15px;
+            gap: 14px;
         }
         .error-card-icon {
-            font-size: 26px;
+            font-size: 24px;
+            line-height: 1;
         }
         .error-card h3 {
-            margin: 0 0 6px;
+            margin: 0 0 5px;
             color: #991b1b;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
         }
         .error-card p {
             margin: 0;
             color: #7f1d1d;
-            font-size: 13.5px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        /* ========================================================
+           COMPREHENSIVE MOBILE OPTIMIZATIONS (< 600px)
+           ======================================================== */
+        @media (max-width: 600px) {
+            .verify-hero {
+                padding: 30px 14px 26px;
+            }
+            .verify-hero h1 {
+                font-size: 22px;
+            }
+            .verify-hero p {
+                font-size: 13px;
+                margin-bottom: 15px;
+            }
+            .verify-container {
+                margin: -15px auto 40px;
+                padding: 0 12px;
+            }
+            .search-card {
+                padding: 18px 14px;
+                border-radius: 12px;
+            }
+            .search-title {
+                font-size: 15px;
+                margin-bottom: 10px;
+            }
+            .input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .verify-input {
+                width: 100%;
+                font-size: 14.5px;
+                padding: 12px 14px;
+            }
+            .verify-btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 14.5px;
+                justify-content: center;
+            }
+            .verified-banner {
+                padding: 14px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .verified-title {
+                font-size: 15.5px;
+            }
+            .identity-section {
+                padding: 16px 14px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 14px;
+            }
+            .student-name-heading {
+                font-size: 18px;
+            }
+            .identity-grid {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                text-align: left;
+                width: 100%;
+            }
+            .details-section {
+                padding: 16px 14px;
+            }
+            .exam-info-box {
+                padding: 12px 14px;
+                grid-template-columns: 1fr;
+                gap: 8px;
+                font-size: 13px;
+            }
+            .score-cards-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .score-stat-card {
+                padding: 10px 8px;
+            }
+            .score-card-value {
+                font-size: 17px;
+            }
+            .verification-actions {
+                width: 100%;
+            }
+            .btn-view-marksheet {
+                width: 100%;
+                padding: 13px;
+                font-size: 14px;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="header-top">
-        <div class="header-inner">
-            <a href="index.html" class="brand-link">
-                <img src="igyr-logo.jpg" alt="IGYR">
-                <div class="brand-info">
-                    <h1>India Get Your Result</h1>
-                    <p>OFFICIAL DIGITAL VERIFICATION PORTAL</p>
+    <!-- Responsive Navigation Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <img src="igyr-logo.jpg" alt="IGYR Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>IGYR</h1>
+                    <p>INDIA GET YOUR RESULT</p>
+                    <span>Education Empowers Tomorrow</span>
                 </div>
             </a>
-            <nav class="nav-links-wrap">
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+            <nav class="nav-links" id="navLinks">
                 <a href="index.html">Home</a>
-                <a href="search-result.html">Search Results</a>
+                <a href="search-result.html">Results</a>
                 <a href="verify-result.html" class="active">Verify Marksheet</a>
                 <a href="schemes.html">Schemes</a>
             </nav>
@@ -545,8 +668,7 @@
         <div class="trust-pills">
             <span class="trust-pill">🛡️ 100% Tamper Proof</span>
             <span class="trust-pill">🏫 Direct Institute Issuance</span>
-            <span class="trust-pill">⚡ Instant Real-Time Verification</span>
-            <span class="trust-pill">🔒 Central Registry Secured</span>
+            <span class="trust-pill">⚡ Instant Verification</span>
         </div>
     </section>
 
@@ -565,7 +687,7 @@
                     </button>
                 </div>
                 <div class="search-hint">
-                    <span>💡 Look for the <strong>Verification ID (VID)</strong> or QR code located on the official student marksheet.</span>
+                    <span>💡 Enter the unique <strong>Verification ID (VID)</strong> printed on the official IGYR marksheet.</span>
                 </div>
             </form>
         </div>
@@ -575,13 +697,29 @@
 
     </main>
 
-    <footer style="text-align: center; padding: 30px 20px; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; background: #fff;">
-        <p style="margin: 0;">&copy; 2026 India Get Your Result (IGYR). Empowering Education and Trust Across India.</p>
+    <footer style="text-align: center; padding: 25px 15px; font-size: 12.5px; color: #64748b; border-top: 1px solid #e2e8f0; background: #fff;">
+        <p style="margin: 0;">&copy; 2026 India Get Your Result (IGYR). All rights reserved.</p>
     </footer>
 
     <script src="js/storage.js?v=1000035"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById("menuBtn");
+            const navLinks = document.getElementById("navLinks");
+            if (menuBtn && navLinks) {
+                menuBtn.addEventListener("click", () => {
+                    navLinks.classList.toggle("open");
+                    menuBtn.innerHTML = navLinks.classList.contains("open") ? "✕" : "☰";
+                });
+                document.querySelectorAll(".nav-links a").forEach(link => {
+                    link.addEventListener("click", () => {
+                        navLinks.classList.remove("open");
+                        menuBtn.innerHTML = "☰";
+                    });
+                });
+            }
+
             const verifyInput = document.getElementById('verify-id');
             const verifyBtn = document.getElementById('btn-verify');
             const verifyForm = document.getElementById('verify-form');
@@ -662,11 +800,9 @@
 
                 let totMax = 0, totObt = 0;
                 let hasFailed = false;
-                let marksRowsHtml = '';
 
                 if (res.marks && Array.isArray(res.marks)) {
-                    res.marks.forEach((m, idx) => {
-                        let sub = m.sub || m.subject || ('Subject ' + (idx + 1));
+                    res.marks.forEach(m => {
                         let maxM = parseInt(m.max || m.full || 100);
                         let obtM = parseInt(m.obt || m.marks || 0);
                         let passM = parseInt(m.pass || Math.floor(maxM * 0.33));
@@ -674,17 +810,6 @@
                         totMax += maxM;
                         totObt += obtM;
                         if (obtM < passM) hasFailed = true;
-
-                        const grade = getGrade(obtM, maxM);
-                        marksRowsHtml += `
-                            <tr>
-                                <td>${idx + 1}</td>
-                                <td class="text-left">${sub}</td>
-                                <td>${maxM}</td>
-                                <td>${obtM}</td>
-                                <td style="font-weight:700; color:${grade === 'F' ? '#dc2626' : '#16a34a'};">${grade}</td>
-                            </tr>
-                        `;
                     });
                 }
 
@@ -694,12 +819,14 @@
                 const statusText = isPass ? 'PASS' : 'FAIL';
                 const nowStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-                // Student Photo HTML
-                let photoHtml = '';
+                // Student Photo HTML (only show photo wrapper if photo image exists)
+                let photoWrapHtml = '';
                 if (res.photo && res.photo.length > 30) {
-                    photoHtml = `<img src="${res.photo}" alt="${res.name}">`;
-                } else {
-                    photoHtml = `<div class="photo-fallback">👤</div>`;
+                    photoWrapHtml = `
+                        <div class="student-photo-wrapper">
+                            <img src="${res.photo}" alt="${res.name}">
+                        </div>
+                    `;
                 }
 
                 outputArea.innerHTML = `
@@ -721,9 +848,7 @@
 
                         <!-- Identity Card -->
                         <div class="identity-section">
-                            <div class="student-photo-wrapper">
-                                ${photoHtml}
-                            </div>
+                            ${photoWrapHtml}
                             <div class="identity-details">
                                 <h3 class="student-name-heading">${res.name}</h3>
                                 <div class="identity-grid">
@@ -751,12 +876,12 @@
                                 </div>
                             </div>
 
-                            <!-- Performance Cards Row -->
+                            <!-- Performance Cards Row (Score, Percentage, Pass/Fail, Grade) -->
                             <div class="section-subhead">📊 Score &amp; Overall Performance</div>
                             <div class="score-cards-row">
                                 <div class="score-stat-card">
                                     <div class="score-card-title">Marks Obtained</div>
-                                    <div class="score-card-value">${totObt} <span style="font-size:14px;color:#94a3b8;">/ ${totMax}</span></div>
+                                    <div class="score-card-value">${totObt} <span style="font-size:13px;color:#94a3b8;">/ ${totMax}</span></div>
                                 </div>
                                 <div class="score-stat-card">
                                     <div class="score-card-title">Percentage</div>
@@ -771,31 +896,6 @@
                                     <div class="score-card-value" style="color:var(--navy);">${getGrade(totObt, totMax || 100)}</div>
                                 </div>
                             </div>
-
-                            <!-- Subject-wise Marks Table -->
-                            <div class="section-subhead">📋 Subject-Wise Marks Breakdown</div>
-                            <table class="marks-breakdown-table">
-                                <thead>
-                                    <tr>
-                                        <th width="10%">Sl. No.</th>
-                                        <th width="45%" class="text-left">Subject Name</th>
-                                        <th width="15%">Max Marks</th>
-                                        <th width="15%">Marks Obtained</th>
-                                        <th width="15%">Grade</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${marksRowsHtml}
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="2" class="text-left">TOTAL SCORE</td>
-                                        <td>${totMax}</td>
-                                        <td>${totObt}</td>
-                                        <td>${perc}%</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
 
                             <!-- Action Buttons -->
                             <div class="verification-actions">
@@ -822,7 +922,7 @@
                         <div>
                             <h3>No Verified Marksheet Found</h3>
                             <p>We could not find any official examination record matching the ID <strong>"${query}"</strong>.</p>
-                            <p style="margin-top:6px; font-size:12.5px; color:#64748b;">Please double-check the Verification ID (VID), Roll Number, or contact the educational institute directly.</p>
+                            <p style="margin-top:6px; font-size:12px; color:#64748b;">Please double-check the Verification ID (VID), Roll Number, or contact the educational institute directly.</p>
                         </div>
                     </div>
                 `;
