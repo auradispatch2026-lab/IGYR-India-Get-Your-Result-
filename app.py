@@ -654,11 +654,34 @@ def block_admin_on_public_portal():
 
 @app.route('/api/auth/admin', methods=['POST'])
 def admin_login():
+    # Enforce SOC Master Security Control for Super Admin Login
+    try:
+        ctrl = soc_control_col.find_one({"id": "system_state"})
+        if ctrl and ctrl.get("admin_login_enabled") is False:
+            return jsonify({
+                "success": False,
+                "locked_by_soc": True,
+                "message": "Super Admin Login is currently LOCKED by Security Operations Centre (SOC). Access restricted."
+            }), 403
+    except Exception:
+        pass
+
     data = request.json
     # The secure password is ONLY stored here on the server
     if data and data.get('username') == 'admin' and data.get('password') == 'cutiee':
         return jsonify({"success": True, "token": "igyr_super_secret_auth_token_8829"}), 200
     return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+@app.route('/api/admin/login-status', methods=['GET'])
+def get_admin_login_status():
+    enabled = True
+    try:
+        ctrl = soc_control_col.find_one({"id": "system_state"})
+        if ctrl and ctrl.get("admin_login_enabled") is False:
+            enabled = False
+    except Exception:
+        pass
+    return jsonify({"success": True, "admin_login_enabled": enabled}), 200
 
 @app.route('/api/auth/institute', methods=['POST'])
 def institute_login():
