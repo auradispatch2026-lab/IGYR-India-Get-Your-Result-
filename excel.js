@@ -99,9 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
+            const templateSelect = document.getElementById('marksheet-template');
+            const selectedTemplate = templateSelect ? templateSelect.value : 'photo_pro';
             const instId = sessionStorage.getItem('inst_logged_in') || 'IGYR001';
             const results = getResults();
-            parsedData.forEach(row => {
+            parsedData.forEach((row, rIdx) => {
                 let m = [];
                 let fKey = Object.keys(row).find(k => k.toLowerCase().replace(/[^a-z]/g, '').includes('father'));
                 let mKey = Object.keys(row).find(k => k.toLowerCase().replace(/[^a-z]/g, '').includes('mother'));
@@ -121,6 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let rollKey = Object.keys(row).find(k => k.toLowerCase().includes('roll'));
                 let nameKey = Object.keys(row).find(k => k.toLowerCase() === 'name' || k.toLowerCase() === 'student name');
 
+                const cleanInst = (instId || 'INST').replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+                const cleanRoll = String(row[rollKey] || ('STU' + (rIdx + 1))).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                const randDigits = Math.floor(1000 + Math.random() * 9000);
+                const studentVid = `IGYR-${cleanInst}-${cleanRoll}-${randDigits}`;
+
                 results.push({
                     reg: row[regKey] || 'N/A',
                     roll: row[rollKey] || 'N/A',
@@ -132,12 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     date: resultDate,
                     class: 'N/A',
                     marks: m,
-                    vid: 'IGYR-' + Math.floor(Math.random()*1000000),
+                    template: selectedTemplate,
+                    photo: row.photo || '',
+                    vid: studentVid,
                     status: 'DRAFT'
                 });
             });
             saveResults(results);
-            alert(`Results for ${examName} saved as DRAFT successfully!\n\nYou can publish it from the Dashboard when ready.`);
+            alert(`Results for ${examName} saved as DRAFT successfully!\n\nTemplate chosen: ${selectedTemplate.toUpperCase()}\n\nYou can now go to "All Tabulation" to upload individual student photos and view their marksheets.`);
             window.location.href = 'institute-dashboard.html';
         });
     }

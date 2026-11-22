@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result Card - IGYR</title>
+    <title>Official Marksheet - IGYR</title>
 
     <!-- Favicon & Touch Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -16,7 +16,7 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="manifest" href="/site.webmanifest">
     <meta name="theme-color" content="#071d49">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -32,15 +32,15 @@
             background: #ffffff;
             position: relative;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-            padding: 25mm 15mm; /* Inner padding */
-            position: relative;
+            padding: 22mm 15mm 25mm; /* Inner padding */
             overflow: hidden;
+            transition: all 0.3s ease;
         }
         
-        /* Top and Bottom Wave Decor (Pure CSS geometric forms) */
+        /* Top and Bottom Wave Decor */
         .wave-top, .wave-bottom {
             position: absolute;
-            left: 0; width: 100%; height: 25px;
+            left: 0; width: 100%; height: 20px;
             background: #062b63;
         }
         .wave-top { top: 0; border-bottom: 4px solid #d4af37; }
@@ -60,16 +60,16 @@
 
         .header-grid {
             display: grid;
-            grid-template-columns: 120px 1fr 120px;
-            gap: 20px;
+            grid-template-columns: 110px 1fr 110px;
+            gap: 15px;
             align-items: center;
             border-bottom: 2px solid #062b63;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .inst-logo-container {
-            width: 110px; height: 110px;
+            width: 100px; height: 100px;
             border: 2px dashed #062b63;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
@@ -86,145 +86,330 @@
         }
         .inst-name {
             font-family: 'Poppins', sans-serif;
-            color: #062b63; font-size: 26px; font-weight: 800; text-transform: uppercase;
+            color: #062b63; font-size: 24px; font-weight: 800; text-transform: uppercase;
             letter-spacing: 0.5px; margin-bottom: 3px;
         }
         .inst-slogan {
-            color: #d4af37; font-size: 13px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
+            color: #d4af37; font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
         }
         .inst-address, .inst-contact {
-            font-size: 13px; color: #4a5568; line-height: 1.5;
+            font-size: 12.5px; color: #4a5568; line-height: 1.4;
         }
-        .inst-contact { font-weight: 500; margin-top: 5px; color: #2d3748; }
 
-        .header-right {
-            text-align: right;
-        }
-        .motivational-text {
-            font-family: 'Poppins', sans-serif; color: #062b63; font-size: 14px;
-            font-weight: 700; line-height: 1.6; text-transform: uppercase;
-        }
-        .motivational-text span { display: block; color: #d4af37; }
-
-        .main-title-sec { text-align: center; margin-bottom: 30px; }
+        .main-title-sec { text-align: center; margin-bottom: 20px; }
         .result-card-badge {
             display: inline-block;
             border: 2px solid #d4af37;
             background: #062b63; color: white;
-            padding: 8px 30px; border-radius: 4px;
-            font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px;
+            padding: 6px 28px; border-radius: 4px;
+            font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 2px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .exam-title { font-size: 16px; font-weight: 700; color: #2d3748; margin-top: 15px; text-transform: uppercase;}
-        .marks-statement { font-size: 14px; font-weight: 600; color: #718096; letter-spacing: 4px; margin-top: 5px; }
+        .exam-title { font-size: 15px; font-weight: 700; color: #2d3748; margin-top: 10px; text-transform: uppercase;}
+        .marks-statement { font-size: 13px; font-weight: 600; color: #718096; letter-spacing: 3px; margin-top: 4px; }
 
-        /* Student Info */
+        /* Student Info Box & Photo Integration */
         .student-info-box {
             background: #eaf6ff;
             border-radius: 12px;
-            padding: 20px 25px;
-            margin-bottom: 30px;
+            padding: 16px 20px;
+            margin-bottom: 22px;
             border: 1px solid #cde0f5;
         }
-        .info-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px 30px;
+        .student-info-flex {
+            display: flex;
+            align-items: stretch;
+            gap: 20px;
         }
-        .info-row { display: flex; font-size: 14px; }
-        .info-label { width: 140px; font-weight: 700; color: #062b63; }
-        .info-value { flex: 1; color: #2d3748; font-weight: 500; text-transform: uppercase;}
-        .info-colon { margin-right: 15px; color: #062b63; font-weight: 700; }
+        .info-grid {
+            flex: 1;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px;
+        }
+        .info-row { display: flex; font-size: 13.5px; align-items: baseline; }
+        .info-label { width: 130px; font-weight: 700; color: #062b63; }
+        .info-value { flex: 1; color: #2d3748; font-weight: 600; text-transform: uppercase;}
+        .info-colon { margin-right: 12px; color: #062b63; font-weight: 700; }
+
+        /* Student Photo Frame */
+        .student-photo-frame {
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            padding: 6px;
+            border: 2px solid #1266d6;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(6, 43, 99, 0.08);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .photo-img-wrap {
+            width: 108px;
+            height: 135px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #cbd5e1;
+        }
+        .photo-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .photo-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            background: #f8fafc;
+        }
+        .photo-stamp {
+            margin-top: 4px;
+            font-size: 9px;
+            font-weight: 800;
+            color: #1266d6;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Verification ID Box & QR Bar */
+        .verification-seal-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px dashed #062b63;
+            border-radius: 8px;
+            padding: 10px 18px;
+            margin-bottom: 22px;
+        }
+        .vid-badge-wrap {
+            flex: 1;
+        }
+        .vid-badge-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #062b63;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .vid-badge-code {
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1266d6;
+            letter-spacing: 1px;
+            display: inline-block;
+            background: #eaf6ff;
+            padding: 3px 10px;
+            border-radius: 4px;
+            border: 1px solid #cde0f5;
+        }
+        .vid-badge-hint {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .vid-badge-hint a {
+            color: #1266d6;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+        .verification-qr-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .verification-qr-box img {
+            width: 70px;
+            height: 70px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 2px;
+            background: #fff;
+        }
 
         /* Marks Table */
         .marks-table {
-            width: 100%; border-collapse: collapse; margin-bottom: 30px;
-            font-size: 13.5px;
+            width: 100%; border-collapse: collapse; margin-bottom: 24px;
+            font-size: 13px;
         }
         .marks-table th {
             background: #062b63; color: white;
-            padding: 12px 10px; text-align: center;
-            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px;
+            padding: 10px 8px; text-align: center;
+            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12.5px;
             border: 1px solid #062b63;
         }
         .marks-table td {
-            padding: 10px; text-align: center;
+            padding: 8px 10px; text-align: center;
             border: 1px solid #cbd5e1; color: #1e293b; font-weight: 500;
         }
         .marks-table td.text-left { text-align: left; }
         .marks-table tr:nth-child(even) { background: #f8fafc; }
-        .marks-table tr:hover { background: #f1f5f9; }
         .total-row td {
-            background: #e2e8f0; font-weight: 700; color: #062b63; font-size: 14.5px; border-top: 2px solid #062b63;
+            background: #e2e8f0; font-weight: 700; color: #062b63; font-size: 14px; border-top: 2px solid #062b63;
         }
 
         /* Summary Panel */
         .summary-panel {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
-            margin-bottom: 35px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+            margin-bottom: 25px;
         }
         .summary-card {
             background: white; border: 1px solid #cbd5e1; border-radius: 8px;
-            padding: 15px; text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            padding: 12px; text-align: center;
             position: relative; overflow: hidden;
         }
         .summary-card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #062b63;
         }
-        .summary-title { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-        .summary-val { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 800; color: #0f172a; }
-        
+        .summary-title { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+        .summary-val { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 800; color: #0f172a; }
         .val-pass { color: #16a34a; }
         .val-fail { color: #dc2626; }
 
         /* Bottom Section */
         .bottom-section {
             display: flex; justify-content: space-between; align-items: flex-end;
-            margin-bottom: 40px; font-size: 14px; font-weight: 500; color: #334155;
+            margin-bottom: 25px; font-size: 13px; font-weight: 500; color: #334155;
         }
         .signature-box {
             text-align: center;
-        }
-        .signature-line {
-            width: 200px; border-bottom: 1px solid #334155; margin-bottom: 8px;
         }
 
         /* Disclaimer */
         .disclaimer {
             background: #fffcf0; border: 1px solid #fce38a; border-radius: 6px;
-            padding: 15px 20px; position: relative;
+            padding: 12px 16px; position: relative;
         }
         .disclaimer h4 {
-            color: #d97706; font-size: 13px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+            color: #d97706; font-size: 12px; font-weight: 800; margin-bottom: 4px; text-transform: uppercase; display: flex; align-items: center; gap: 6px;
         }
         .disclaimer p {
-            color: #78350f; font-size: 11.5px; line-height: 1.5; text-align: justify;
+            color: #78350f; font-size: 11px; line-height: 1.45; text-align: justify;
         }
 
-        /* Footer text */
-        .footer-text {
-            text-align: center; font-family: 'Caveat', cursive, sans-serif; font-size: 16px;
-            color: #94a3b8; font-weight: 600; margin-top: 20px;
-        }
-        
         /* Action buttons for preview screen */
-        .actions { text-align: center; margin-bottom: 25px; }
+        .actions { 
+            text-align: center; 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+        }
         .actions button {
-            background: #062b63; color: white; border: none; padding: 12px 25px;
-            font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;
+            background: #062b63; color: white; border: none; padding: 10px 20px;
+            font-size: 14.5px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;
             transition: 0.3s;
         }
         .actions button:hover { background: #1266d6; }
+
+        /* ========================================================
+           MARKSHEET TEMPLATE VARIATIONS
+           ======================================================== */
+        
+        /* 1. Photo Pro (Default & High Identity) */
+        .template-photo_pro .student-photo-frame {
+            border: 2px solid #ff8a00;
+            box-shadow: 0 4px 15px rgba(255, 138, 0, 0.15);
+        }
+        .template-photo_pro .photo-stamp {
+            color: #ff8a00;
+        }
+        .template-photo_pro .verification-seal-bar {
+            border: 2px solid #1266d6;
+            background: #f0f7ff;
+        }
+
+        /* 2. Modern Elegance */
+        .template-modern {
+            border: 1px solid #e2e8f0;
+        }
+        .template-modern .wave-top, .template-modern .wave-bottom {
+            background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
+            border: none;
+            height: 10px;
+        }
+        .template-modern .result-card-badge {
+            background: #0284c7;
+            border-color: #38bdf8;
+        }
+        .template-modern .student-info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .template-modern .marks-table th {
+            background: #0f172a;
+            border-color: #0f172a;
+        }
+
+        /* 3. Academic Diploma Certificate */
+        .template-certificate {
+            background: #fffdfa;
+            border: 12px double #854d0e;
+            padding: 16mm 12mm 20mm;
+        }
+        .template-certificate .wave-top, .template-certificate .wave-bottom {
+            display: none;
+        }
+        .template-certificate .inst-name {
+            font-family: 'Cinzel', serif;
+            color: #713f12;
+            letter-spacing: 1px;
+        }
+        .template-certificate .result-card-badge {
+            background: #713f12;
+            border: 2px solid #ca8a04;
+            font-family: 'Cinzel', serif;
+        }
+        .template-certificate .student-info-box {
+            background: #fefce8;
+            border: 1px solid #fef08a;
+        }
+        .template-certificate .marks-table th {
+            background: #713f12;
+            border-color: #713f12;
+            font-family: 'Cinzel', serif;
+        }
+        .template-certificate .student-photo-frame {
+            border: 2px solid #ca8a04;
+            border-radius: 50% 50% 4px 4px;
+        }
     </style>
 </head>
 <body>
 
     <div class="actions no-print">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:#fff; padding:6px 14px; border-radius:6px; border:1px solid #cbd5e1;">
+            <label for="template-switcher" style="font-weight:700; color:#062b63; font-size:13.5px;">Template:</label>
+            <select id="template-switcher" style="padding:6px 10px; border-radius:4px; border:1px solid #cbd5e1; font-weight:600; font-size:13.5px; background:#fff; color:#062b63;">
+                <option value="photo_pro">⭐ Photo Pro (With Student Photo)</option>
+                <option value="classic">🏛️ Classic Royal Marksheet</option>
+                <option value="modern">🎨 Modern Elegance Marksheet</option>
+                <option value="certificate">📜 Academic Diploma Certificate</option>
+            </select>
+        </div>
         <button onclick="window.print()">🖨️ Print / Download PDF</button>
-        <button onclick="window.location.href='index.html'" style="background:#475569; margin-left:10px;">← Home</button>
+        <button id="btn-verify-this" style="background:#16a34a;">🔍 Verify Authenticity</button>
+        <button onclick="window.location.href='index.html'" style="background:#475569;">← Home</button>
     </div>
 
-    <div class="a4-sheet" id="result-container">
+    <div class="a4-sheet template-photo_pro" id="result-container">
         <div class="wave-top"></div>
 
         <!-- HEADER -->
@@ -234,39 +419,68 @@
             </div>
             <div class="header-center">
                 <div class="inst-name" id="card-inst-name">INSTITUTE NAME</div>
-                
+                <div class="inst-slogan" id="card-inst-slogan">OFFICIAL STATEMENT OF MARKS</div>
                 <div class="inst-address" id="card-inst-address">📍 Address, City, State - PIN</div>
-                
             </div>
-            <div class="header-right">
-                
+            <div class="header-right" style="text-align: right;">
+                <img src="igyr-logo.jpg" alt="IGYR" style="height: 48px; object-fit: contain; margin-left: auto;">
+                <div style="font-size: 10px; font-weight: 700; color: #062b63; margin-top: 4px;">IGYR PORTAL</div>
             </div>
         </div>
 
         <!-- TITLE -->
         <div class="main-title-sec">
             <div class="result-card-badge">RESULT CARD</div>
-            <div class="exam-title" id="card-exam-title">ACADEMIC EXAMINATION - 2025</div>
-            <div class="marks-statement">MARKS STATEMENT</div>
+            <div class="exam-title" id="card-exam-title">ACADEMIC EXAMINATION</div>
+            <div class="marks-statement">ANNUAL MARKS STATEMENT</div>
         </div>
 
-        <!-- STUDENT INFO -->
+        <!-- STUDENT INFO & PHOTO -->
         <div class="student-info-box">
-            <div class="info-grid">
-                <!-- Col 1 -->
-                <div>
-                    <div class="info-row"><div class="info-label">Student Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-name">-</div></div>
-                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Father's Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-fname">-</div></div>
-                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Mother's Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-mname">-</div></div>
-                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Roll Number</div><div class="info-colon">:</div><div class="info-value" id="card-stu-roll">-</div></div>
+            <div class="student-info-flex">
+                <div class="info-grid">
+                    <!-- Col 1 -->
+                    <div>
+                        <div class="info-row"><div class="info-label">Student Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-name">-</div></div>
+                        <div class="info-row" style="margin-top:6px;"><div class="info-label">Father's Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-fname">-</div></div>
+                        <div class="info-row" style="margin-top:6px;"><div class="info-label">Mother's Name</div><div class="info-colon">:</div><div class="info-value" id="card-stu-mname">-</div></div>
+                        <div class="info-row" style="margin-top:6px;"><div class="info-label">Roll Number</div><div class="info-colon">:</div><div class="info-value" id="card-stu-roll">-</div></div>
+                    </div>
+                    <!-- Col 2 -->
+                    <div>
+                        <div class="info-row"><div class="info-label">Institute</div><div class="info-colon">:</div><div class="info-value" id="card-stu-inst">-</div></div>
+                        <div class="info-row" style="margin-top:6px;"><div class="info-label">Examination</div><div class="info-colon">:</div><div class="info-value" id="card-stu-exam">-</div></div>
+                        <div class="info-row" style="margin-top:6px;"><div class="info-label">Registration No.</div><div class="info-colon">:</div><div class="info-value" id="card-stu-reg">-</div></div>
+                        <div class="info-row" style="margin-top:6px;"><div class="info-label">Declaration Date</div><div class="info-colon">:</div><div class="info-value" id="card-stu-date">-</div></div>
+                    </div>
                 </div>
-                <!-- Col 2 -->
-                <div>
-                    <div class="info-row"><div class="info-label">Institute</div><div class="info-colon">:</div><div class="info-value" id="card-stu-inst">-</div></div>
-                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Examination</div><div class="info-colon">:</div><div class="info-value" id="card-stu-exam">-</div></div>
-                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Registration No.</div><div class="info-colon">:</div><div class="info-value" id="card-stu-reg">-</div></div>
-                    <div class="info-row" style="margin-top:8px;"><div class="info-label">Declaration Date</div><div class="info-colon">:</div><div class="info-value" id="card-stu-date">-</div></div>
+
+                <!-- Student Photo Frame -->
+                <div class="student-photo-frame" id="stu-photo-frame">
+                    <div class="photo-img-wrap">
+                        <img id="card-stu-photo" src="" alt="Student Photo" style="display:none;">
+                        <div id="photo-placeholder" class="photo-placeholder">
+                            <span style="font-size: 28px;">👤</span>
+                            <span style="font-size: 9.5px; font-weight: 700; margin-top: 4px;">STUDENT PHOTO</span>
+                        </div>
+                    </div>
+                    <div class="photo-stamp">OFFICIAL VERIFIED</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- VERIFICATION ID & QR CODE BAR -->
+        <div class="verification-seal-bar">
+            <div class="vid-badge-wrap">
+                <div class="vid-badge-title">🛡️ OFFICIAL MARKSHEET VERIFICATION ID (VID)</div>
+                <div class="vid-badge-code" id="card-stu-vid">IGYR-XXXX-XXXX</div>
+                <div class="vid-badge-hint">
+                    Direct online verification link: <a id="card-verify-link" href="#" target="_blank">Verify at IGYR Official Portal</a>
+                </div>
+            </div>
+            <div class="verification-qr-box">
+                <img id="vid-qr-image" src="" alt="QR Code">
+                <span style="font-size: 9px; font-weight: 700; color: #4a5568;">SCAN TO VERIFY</span>
             </div>
         </div>
 
@@ -274,11 +488,11 @@
         <table class="marks-table">
             <thead>
                 <tr>
-                    <th width="10%">Sl. No.</th>
-                    <th width="45%" class="text-left">Subject Name</th>
-                    <th width="15%">Max Marks</th>
-                    <th width="15%">Marks Obtained</th>
-                    <th width="15%">Grade</th>
+                    <th width="8%">Sl. No.</th>
+                    <th width="44%" class="text-left" style="padding-left:14px;">Subject Name</th>
+                    <th width="16%">Max Marks</th>
+                    <th width="16%">Marks Obtained</th>
+                    <th width="16%">Grade</th>
                 </tr>
             </thead>
             <tbody id="marks-tbody">
@@ -286,7 +500,7 @@
             </tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="2" class="text-left" style="padding-left:15px;">TOTAL</td>
+                    <td colspan="2" class="text-left" style="padding-left:14px;">TOTAL SCORE</td>
                     <td id="tot-max">0</td>
                     <td id="tot-obt">0</td>
                     <td></td>
@@ -298,7 +512,7 @@
         <div class="summary-panel">
             <div class="summary-card">
                 <div class="summary-title">TOTAL MARKS</div>
-                <div class="summary-val"><span id="sum-obt">0</span> <span style="font-size:14px;color:#94a3b8;">/ <span id="sum-max">0</span></span></div>
+                <div class="summary-val"><span id="sum-obt">0</span> <span style="font-size:13px;color:#94a3b8;">/ <span id="sum-max">0</span></span></div>
             </div>
             <div class="summary-card">
                 <div class="summary-title">PERCENTAGE</div>
@@ -309,32 +523,30 @@
                 <div class="summary-val" id="sum-grade">-</div>
             </div>
             <div class="summary-card">
-                <div class="summary-title">RESULT</div>
+                <div class="summary-title">RESULT STATUS</div>
                 <div class="summary-val" id="sum-result">-</div>
             </div>
         </div>
 
-        <!-- BOTTOM SIGNATURE -->
+        <!-- BOTTOM SIGNATURE & DATE -->
         <div class="bottom-section">
             <div>
-                <div style="margin-bottom:5px;">Date : <span id="sign-date">-</span></div>
-                <div>Place : <span id="sign-place">-</span></div>
+                <div style="margin-bottom:4px;">Date of Issue : <span id="sign-date" style="font-weight:700;">-</span></div>
+                <div>Place : <span id="sign-place" style="font-weight:700;">-</span></div>
             </div>
             <div class="signature-box" id="signature-block" style="display: none;">
-                <!-- Injected via JS if signature exists -->
+                <!-- Injected via JS -->
             </div>
         </div>
 
         <!-- DISCLAIMER -->
         <div class="disclaimer">
-            <h4>⚠️ DISCLAIMER</h4>
-            <p>Neither IGYR nor the school / institute whose result is published is responsible for any inadvertent errors that may have crept in the results published in the website due to technical issues. The results published in the website are for immediate information to the examinees. These can not be treated as original mark sheets which will be issued by the Board or Institution separately.</p>
+            <h4>⚠️ DISCLAIMER &amp; AUTHENTICITY NOTICE</h4>
+            <p>This is a digitally verified electronic marksheet issued via the India Get Your Result (IGYR) portal. In accordance with digital record regulations, this statement is verified directly by the educational institution. The authenticity of this marksheet can be independently validated anytime by entering the unique Marksheet Verification ID (VID) or scanning the QR code.</p>
         </div>
 
-        <div style="text-align: center; margin-top: 25px;">
-            <img src="igyr-logo.jpg" alt="IGYR" style="height: 40px; object-fit: contain; display: inline-block;">
-            <div class="footer-text" style="margin-top: 5px; font-size: 14px;">Building Better Futures Together</div>
-            <div style="margin-top: 15px; text-align: center;">
+        <div style="text-align: center; margin-top: 20px;">
+            <div style="margin-top: 10px; text-align: center;">
                 <img id="student-barcode" />
             </div>
         </div>
@@ -347,18 +559,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             const resData = sessionStorage.getItem('current_result');
             if(!resData) {
-                alert('No result data found. Please search again.');
+                alert('No result data found. Please search or select an exam result.');
                 window.location.href = 'search-result.html';
                 return;
             }
 
             const res = JSON.parse(resData);
             const institutes = getInstitutes();
-            const inst = institutes.find(i => i.id === res.instId);
+            const inst = institutes.find(i => i.id === res.instId) || {
+                name: res.instName || 'Educational Institution',
+                address: '',
+                district: '',
+                state: ''
+            };
 
-            if(!inst) {
-                alert('Institute data missing.');
-                return;
+            // Ensure VID exists
+            if (!res.vid) {
+                const cInst = (res.instId || 'INST').replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+                const cRoll = String(res.roll || 'STU').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                res.vid = `IGYR-${cInst}-${cRoll}-${Math.floor(1000 + Math.random() * 9000)}`;
             }
 
             // Populate Header
@@ -369,7 +588,7 @@
             }
             document.getElementById('card-inst-name').textContent = inst.name;
             const addressText = (inst.address ? inst.address + ', ' : '') + (inst.district ? inst.district + ', ' : '') + (inst.state || '');
-            document.getElementById('card-inst-address').textContent = '📍 ' + addressText;
+            document.getElementById('card-inst-address').textContent = '📍 ' + (addressText || 'Official Educational Board');
             
             // Populate Student Details
             document.getElementById('card-exam-title').textContent = res.exam;
@@ -383,20 +602,54 @@
             document.getElementById('card-stu-date').textContent = res.date || 'N/A';
             
             document.getElementById('sign-date').textContent = res.date || 'N/A';
-            document.getElementById('sign-place').textContent = inst.city || inst.district || 'N/A';
+            document.getElementById('sign-place').textContent = inst.city || inst.district || 'India';
             
+            // Populate Student Photo
+            const photoImg = document.getElementById('card-stu-photo');
+            const photoPlaceholder = document.getElementById('photo-placeholder');
+            if (res.photo && res.photo.length > 30) {
+                photoImg.src = res.photo;
+                photoImg.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+            } else {
+                photoImg.style.display = 'none';
+                photoPlaceholder.style.display = 'flex';
+            }
+
+            // Populate Verification ID & QR Code
+            document.getElementById('card-stu-vid').textContent = res.vid;
+            const verifyUrl = `${window.location.origin}/verify-result.html?vid=${encodeURIComponent(res.vid)}`;
+            const verifyLink = document.getElementById('card-verify-link');
+            verifyLink.href = verifyUrl;
+            verifyLink.textContent = `Verify Online: ${window.location.host}/verify-result.html?vid=${res.vid}`;
+
+            const qrImg = document.getElementById('vid-qr-image');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(verifyUrl)}`;
+
+            const btnVerifyThis = document.getElementById('btn-verify-this');
+            if (btnVerifyThis) {
+                btnVerifyThis.addEventListener('click', () => {
+                    window.open(verifyUrl, '_blank');
+                });
+            }
+
+            // Signature block
             const sigBlock = document.getElementById('signature-block');
             if (inst.signature && inst.signature.length > 10) {
                 sigBlock.innerHTML = `
-                    <img src="${inst.signature}" style="height: 45px; object-fit: contain; margin-bottom: 5px;">
-                    <div style="font-weight:700;">Controller of Examinations</div>
+                    <img src="${inst.signature}" style="height: 42px; object-fit: contain; margin-bottom: 4px;">
+                    <div style="font-weight:700; font-size:12px;">Controller of Examinations</div>
                 `;
                 sigBlock.style.display = 'block';
             } else {
-                sigBlock.style.display = 'none';
+                sigBlock.innerHTML = `
+                    <div style="width: 140px; border-bottom: 1px solid #334155; margin-bottom: 6px;"></div>
+                    <div style="font-weight:700; font-size:12px;">Authorized Signatory</div>
+                `;
+                sigBlock.style.display = 'block';
             }
 
-            // Calculate grade helper
+            // Grade helper
             function getGrade(obt, full) {
                 const p = (obt / full) * 100;
                 if(p >= 90) return {g: 'O', gp: '10.0'};
@@ -414,39 +667,41 @@
             let totMax = 0, totObt = 0;
             let hasFailed = false;
 
-            res.marks.forEach((m, idx) => {
-                let sName = m.sub || m.subject || "Unknown";
-                let sMax = parseInt(m.max || m.full || 100);
-                let sObt = parseInt(m.obt || m.ob || 0);
-                let sPass = parseInt(m.pass || Math.floor(sMax * 0.33));
-                
-                totMax += sMax;
-                totObt += sObt;
-                
-                if (sObt < sPass) hasFailed = true;
+            if (res.marks && Array.isArray(res.marks)) {
+                res.marks.forEach((m, idx) => {
+                    let sName = m.sub || m.subject || "Subject " + (idx + 1);
+                    let sMax = parseInt(m.max || m.full || 100);
+                    let sObt = parseInt(m.obt || m.marks || 0);
+                    let sPass = parseInt(m.pass || Math.floor(sMax * 0.33));
+                    
+                    totMax += sMax;
+                    totObt += sObt;
+                    
+                    if (sObt < sPass) hasFailed = true;
 
-                const gInfo = getGrade(sObt, sMax);
+                    const gInfo = getGrade(sObt, sMax);
 
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${idx + 1}</td>
-                    <td class="text-left" style="padding-left:15px; font-weight:600;">${sName}</td>
-                    <td>${sMax}</td>
-                    <td>${sObt}</td>
-                    <td style="font-weight:700; color:${gInfo.g==='F' ? '#dc2626' : '#062b63'};">${gInfo.g}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${idx + 1}</td>
+                        <td class="text-left" style="padding-left:14px; font-weight:600;">${sName}</td>
+                        <td>${sMax}</td>
+                        <td>${sObt}</td>
+                        <td style="font-weight:700; color:${gInfo.g==='F' ? '#dc2626' : '#062b63'};">${gInfo.g}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
             document.getElementById('tot-max').textContent = totMax;
             document.getElementById('tot-obt').textContent = totObt;
             document.getElementById('sum-max').textContent = totMax;
             document.getElementById('sum-obt').textContent = totObt;
 
-            const perc = ((totObt / totMax) * 100).toFixed(2);
+            const perc = totMax > 0 ? ((totObt / totMax) * 100).toFixed(2) : '0.00';
             document.getElementById('sum-perc').textContent = perc + '%';
             
-            const overallGrade = getGrade(totObt, totMax).g;
+            const overallGrade = getGrade(totObt, totMax || 100).g;
             document.getElementById('sum-grade').textContent = hasFailed ? 'F' : overallGrade;
 
             const resEl = document.getElementById('sum-result');
@@ -459,7 +714,23 @@
                 resEl.className = 'summary-val val-pass';
             }
 
-            // Generate Barcode Robustly
+            // Template Switcher Logic
+            const resultSheet = document.getElementById('result-container');
+            const templateSwitcher = document.getElementById('template-switcher');
+
+            function applyTemplate(tpl) {
+                resultSheet.className = 'a4-sheet template-' + tpl;
+                templateSwitcher.value = tpl;
+            }
+
+            const initialTemplate = res.template || 'photo_pro';
+            applyTemplate(initialTemplate);
+
+            templateSwitcher.addEventListener('change', (e) => {
+                applyTemplate(e.target.value);
+            });
+
+            // Generate Barcode
             try {
                 let safeName = (res.name || 'STUDENT').toString();
                 let shortName = safeName.substring(0, 15).toUpperCase().replace(/[^A-Z0-9 ]/g, ''); 
@@ -469,24 +740,21 @@
                     JsBarcode("#student-barcode", bText, {
                         format: "CODE128",
                         width: 1.2,
-                        height: 40,
+                        height: 36,
                         displayValue: true,
-                        fontSize: 12,
+                        fontSize: 11,
                         fontOptions: "bold",
                         font: "Inter",
                         textAlign: "center",
                         textPosition: "bottom",
-                        textMargin: 4,
+                        textMargin: 3,
                         margin: 0,
                         background: "transparent",
                         lineColor: "#062b63"
                     });
-                } else {
-                    // Ultimate fallback if CDN fails or blocked
-                    document.getElementById('student-barcode').src = `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(bText)}&scale=2&height=10&includetext`;
                 }
             } catch(e) {
-                console.error("Barcode generation failed", e);
+                console.error("Barcode generation error", e);
             }
         });
     </script>

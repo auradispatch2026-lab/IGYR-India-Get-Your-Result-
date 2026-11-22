@@ -8,6 +8,7 @@ import json
 import urllib.request
 import urllib.error
 import urllib.parse
+import re
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app, resources={r"/api/*": {"origins": ["https://igyr-india-get-your-result.onrender.com", "http://127.0.0.1:5005", "http://localhost:5005", "http://127.0.0.1:5500"]}})
@@ -796,6 +797,27 @@ def save_results():
             print("Auto push notification failed:", push_err)
     invalidate_sync_cache()
     return jsonify({"status": "success"})
+
+@app.route('/api/verify-vid/<path:vid>', methods=['GET'])
+def verify_vid(vid):
+    clean_vid = (vid or "").strip()
+    if not clean_vid:
+        return jsonify({"success": False, "message": "Verification ID is required"}), 400
+    try:
+        doc = results_col.find_one({
+            "$or": [
+                {"vid": {"$regex": f"^{re.escape(clean_vid)}$", "$options": "i"}},
+                {"roll": {"$regex": f"^{re.escape(clean_vid)}$", "$options": "i"}},
+                {"reg": {"$regex": f"^{re.escape(clean_vid)}$", "$options": "i"}}
+            ]
+        }, {"_id": 0})
+        if doc:
+            inst_id = doc.get("instId")
+            inst = institutes_col.find_one({"id": inst_id}, {"_id": 0}) if inst_id else None
+            return jsonify({"success": True, "result": doc, "institute": inst}), 200
+        return jsonify({"success": False, "message": f"No marksheet found matching '{clean_vid}'"}), 404
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/notices', methods=['POST'])
 def save_notices():

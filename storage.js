@@ -108,7 +108,14 @@ function syncWithServer(silent = true) {
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timeoutId = controller ? setTimeout(() => controller.abort(), 10000) : null;
     
-    return fetch(API_BASE + '/sync', controller ? { signal: controller.signal } : {})
+    // Cache-busting URL & no-store headers ensure deletions on Admin reflect instantly on public pages
+    const syncUrl = API_BASE + '/sync?_v=' + Date.now();
+    return fetch(syncUrl, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store', 'Pragma': 'no-cache' },
+        signal: controller ? controller.signal : undefined
+    })
         .then(res => {
             if (timeoutId) clearTimeout(timeoutId);
             if (!res.ok) throw new Error("Sync failed with status " + res.status);
@@ -135,6 +142,9 @@ function syncWithServer(silent = true) {
             const newHash = JSON.stringify(window.IGYR_DB);
             if (prevHash !== newHash) {
                 window.dispatchEvent(new Event('igyr_data_updated'));
+                if (typeof window.renderPublicData === 'function') {
+                    window.renderPublicData();
+                }
             }
         })
         .catch(err => {
@@ -145,6 +155,17 @@ function syncWithServer(silent = true) {
 
 // Launch non-blocking sync in background immediately
 syncWithServer(true);
+
+// Re-sync whenever visitor returns to the browser tab to catch admin deletions instantly
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        syncWithServer(true);
+    }
+});
+window.addEventListener('focus', () => {
+    syncWithServer(true);
+});
+
 
 
 // 2. Data Getters (Instantly return from memory)
